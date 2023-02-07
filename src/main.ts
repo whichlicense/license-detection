@@ -17,7 +17,7 @@
 import { compareHashes, fuzzyHash } from "./components/hashing.ts";
 import { stripLicense } from "./components/minification.ts";
 
-import licenses from "../licenses/hashes.json" assert { type: "json" };
+import licenses from "../licenses/ctph_hashes.json" assert { type: "json" };
 
 /**
  * ```BLOCK_SIZE``` is a property used to control the size of the blocks into which the input data is divided before being hashed.
@@ -38,19 +38,14 @@ const FUZZY_HASH_LENGTH = 5;
 
 
 
-// TODO: this will not work because we have no idea what the license is called when it comes in!
-const CTPH_SETTINGS_OVERRIDE: {[license: string]: {blockSize?: number, fuzzyHashLength?: number}} = JSON.parse(Deno.readTextFileSync("./licenses/ctph_settings_override.json"))
-
-
-
-const sourceLicense = fuzzyHash(new TextEncoder().encode(stripLicense(Deno.readTextFileSync('./LICENSE'))), BLOCK_SIZE, FUZZY_HASH_LENGTH)
+const incomingLicense = fuzzyHash(new TextEncoder().encode(stripLicense(Deno.readTextFileSync('./LICENSE'))), BLOCK_SIZE, FUZZY_HASH_LENGTH)
 
 const matches: (ReturnType<typeof compareHashes> & {name: string})[] = [];
 
 for(const entry in licenses){
     const license: keyof typeof licenses = entry as keyof typeof licenses;
     
-    const similarity = compareHashes(sourceLicense, licenses[license])
+    const similarity = compareHashes(incomingLicense, licenses[license])
     if(similarity.confidence > 0.4){
       matches.push({
         name: entry,
