@@ -25,11 +25,11 @@ export function createHash(buffer: Uint8Array, hashLength: number): string {
 
     const res = hash.toString(radix).padStart(hashLength, '0');
 
-    if(res.length > hashLength) {
-        console.warn(`[!] hash is too long.. expected ${hashLength} but got ${hash.toString(radix).length}..`);
-    }else if (res.length < hashLength) {
-        console.warn(`[!] hash is too short.. expected ${hashLength} but got ${hash.toString(radix).length}..`);
-    }
+    // if(res.length > hashLength) {
+    //     console.warn(`[!] hash is too long.. expected ${hashLength} but got ${hash.toString(radix).length}..`);
+    // }else if (res.length < hashLength) {
+    //     console.warn(`[!] hash is too short.. expected ${hashLength} but got ${hash.toString(radix).length}..`);
+    // }
 
     return res;
 }
