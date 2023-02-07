@@ -15,6 +15,7 @@
  */
 
 import { fuzzyHash } from "../components/hashing.ts";
+import {basename} from "https://deno.land/std@0.177.0/path/mod.ts";
 
 // TODO: make these props come from config file or flags
 /**
@@ -35,52 +36,83 @@ const DEFAULT_BLOCK_SIZE = 4;
 const DEFAULT_FUZZY_HASH_LENGTH = 5;
 
 
-
 // TODO: allow to only recompile 1 specific license.
 // TODO: separate system to recompile on change
 
-const TEMP_DB: Record<string, {
-    hash: string,
-    blockSize?: number,
-    fuzzyHashLength?: number
-}> = {}
-const CTPH_SETTINGS_OVERRIDE: {[license: string]: {blockSize?: number, fuzzyHashLength?: number}} = JSON.parse(Deno.readTextFileSync("./licenses/ctph_settings_override.json"))
-
-// TODO: make folder an input
-for (const dirEntry of Deno.readDirSync("./licenses/RAW")) {
-    let targetLicense: string | undefined;
-
-    const BLOCK_SIZE = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.blockSize || DEFAULT_BLOCK_SIZE
-    const FUZZY_HASH_LENGTH = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength || DEFAULT_FUZZY_HASH_LENGTH
-    
-    if(CTPH_SETTINGS_OVERRIDE[dirEntry.name])
-        targetLicense = fuzzyHash(
-                Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`),
-                BLOCK_SIZE,
-                FUZZY_HASH_LENGTH
-            )
-    else
-        targetLicense = fuzzyHash(Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`), DEFAULT_BLOCK_SIZE, DEFAULT_FUZZY_HASH_LENGTH)
-
-
-    TEMP_DB[dirEntry.name] = {
-        hash: targetLicense,
-        // TODO: remove the props if they are the default values
-        blockSize: BLOCK_SIZE,
-        fuzzyHashLength: FUZZY_HASH_LENGTH
+function computeLicenseHash(file: Uint8Array, blockSize: number, fuzzyHashLength: number) {
+    return {
+        hash: fuzzyHash(file, blockSize, fuzzyHashLength),
+        blockSize: blockSize,
+        fuzzyHashLength: fuzzyHashLength
     }
 }
 
-console.log(`Recompiled ${Object.keys(TEMP_DB).length} licenses.
-Total db size: ${new TextEncoder().encode(JSON.stringify(TEMP_DB)).length / 1e+6} MB
+function computeAllLicenseHashes(folderPath: string) {
+    const TEMP_DB: Record<string, {
+        hash: string,
+        blockSize?: number,
+        fuzzyHashLength?: number
+    }> = {}
+    const CTPH_SETTINGS_OVERRIDE: {[license: string]: {blockSize?: number, fuzzyHashLength?: number}} = JSON.parse(Deno.readTextFileSync("./licenses/ctph_settings_override.json"))
+    
+    for (const dirEntry of Deno.readDirSync(folderPath)) {
+        let targetLicense: string | undefined;
+
+        const BLOCK_SIZE = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.blockSize || DEFAULT_BLOCK_SIZE
+        const FUZZY_HASH_LENGTH = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength || DEFAULT_FUZZY_HASH_LENGTH
+        
+        if(CTPH_SETTINGS_OVERRIDE[dirEntry.name])
+            targetLicense = fuzzyHash(
+                    Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`),
+                    BLOCK_SIZE,
+                    FUZZY_HASH_LENGTH
+                )
+        else
+            targetLicense = fuzzyHash(Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`), DEFAULT_BLOCK_SIZE, DEFAULT_FUZZY_HASH_LENGTH)
+
+
+        TEMP_DB[dirEntry.name] = {
+            hash: targetLicense,
+            // TODO: remove the props if they are the default values
+            blockSize: BLOCK_SIZE,
+            fuzzyHashLength: FUZZY_HASH_LENGTH
+        }
+    }
+    return TEMP_DB;
+}
+
+
+
+
+if(import.meta.main){
+    if(Deno.args[0]){
+        const blockSize = parseInt(Deno.args[1]) || DEFAULT_BLOCK_SIZE
+        const hashLength = parseInt(Deno.args[2]) || DEFAULT_FUZZY_HASH_LENGTH
+        const out = computeLicenseHash(
+            Deno.readFileSync(Deno.args[0]),
+            blockSize,
+            hashLength
+        )
+        // TODO: more efficient data storage system with add and forget functionality (i.e., no loading required)
+        const temp = JSON.parse(Deno.readTextFileSync("./licenses/ctph_hashes.json"))
+        temp[basename(Deno.args[0])] = out
+        Deno.writeTextFileSync("./licenses/ctph_hashes.json", JSON.stringify(temp))
+        console.log(`Computed hash for ${basename(Deno.args[0])} with block size ${blockSize} and hash length ${hashLength}.`)
+
+    }else{
+        const out = computeAllLicenseHashes("./licenses/RAW")
+        const CTPH_SETTINGS_OVERRIDE: {[license: string]: {blockSize?: number, fuzzyHashLength?: number}} = JSON.parse(Deno.readTextFileSync("./licenses/ctph_settings_override.json"))
+        Deno.writeTextFileSync("./licenses/ctph_hashes.json", JSON.stringify(out))
+    
+    console.log(`Recompiled ${Object.keys(out).length} licenses.
+Total db size: ${new TextEncoder().encode(JSON.stringify(out)).length / 1e+6} MB
 
 Default block size: ${DEFAULT_BLOCK_SIZE}
 Default hash length: ${DEFAULT_FUZZY_HASH_LENGTH}
 
 --- CTPH_SETTINGS_OVERRIDE ---
-${Object.entries(CTPH_SETTINGS_OVERRIDE).map(([key, value]) => `${key}: \n\tBlock size: ${value.blockSize}\n\tFuzzy hash length: ${value.fuzzyHashLength}`)}
+${Object.entries(CTPH_SETTINGS_OVERRIDE).map(([key, value]) => `${key}: \n\tBlock size: ${value.blockSize}\n\tFuzzy hash length: ${value.fuzzyHashLength}`)}`)
+    
+    }
 
-`)
-
-Deno.writeTextFileSync("./licenses/ctph_hashes.json", JSON.stringify(TEMP_DB))
-
+}
