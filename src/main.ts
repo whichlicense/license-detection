@@ -25,7 +25,7 @@ import licenses from "../licenses/ctph_hashes.json" assert { type: "json" };
  * produce the same hash value. 
  * A larger block size can also result in fewer permutations, making it harder to detect similarities.
  */
-const BLOCK_SIZE = 4;
+// const BLOCK_SIZE = 4;
 
 /**
  * ```FUZZY_HASH_LENGTH``` is a property that determines the length of the final hash value that is produced
@@ -34,18 +34,32 @@ const BLOCK_SIZE = 4;
  * so a larger FUZZY_HASH_LENGTH value means that more blocks will be processed, resulting in a longer, more detailed hash value.
  * This can increase the sensitivity of the algorithm, but also increase the computational cost of generating the hash.
  */
-const FUZZY_HASH_LENGTH = 5;
+// const FUZZY_HASH_LENGTH = 5;
 
 
 
-const incomingLicense = fuzzyHash(new TextEncoder().encode(stripLicense(Deno.readTextFileSync('./LICENSE'))), BLOCK_SIZE, FUZZY_HASH_LENGTH)
+// TODO: for testing purposes
+const incomingLicense = new TextEncoder().encode(stripLicense(Deno.readTextFileSync('./LICENSE')))
+
+/**
+ * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
+ */
+const incomingLicenseHashes = new Map<string, string>();
+
 
 const matches: (ReturnType<typeof compareHashes> & {name: string})[] = [];
 
+
+
 for(const entry in licenses){
-    const license: keyof typeof licenses = entry as keyof typeof licenses;
-    
-    const similarity = compareHashes(incomingLicense, licenses[license])
+    const licenseName: keyof typeof licenses = entry as keyof typeof licenses;
+    const {blockSize, hash, fuzzyHashLength} = licenses[licenseName];
+
+    if(!incomingLicenseHashes.has(`${blockSize}-${fuzzyHashLength}`)){
+        incomingLicenseHashes.set(`${blockSize}-${fuzzyHashLength}`, fuzzyHash(incomingLicense, blockSize, fuzzyHashLength));
+    }
+
+    const similarity = compareHashes(incomingLicenseHashes.get(`${blockSize}-${fuzzyHashLength}`)!, hash, fuzzyHashLength)
     if(similarity.confidence > 0.4){
       matches.push({
         name: entry,
