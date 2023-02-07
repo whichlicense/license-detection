@@ -50,13 +50,14 @@ const CTPH_SETTINGS_OVERRIDE: {[license: string]: {blockSize?: number, fuzzyHash
 for (const dirEntry of Deno.readDirSync("./licenses/RAW")) {
     let targetLicense: string | undefined;
 
-    // const BLOCK_SIZE = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.blockSize || BLOCK_SIZE
+    const BLOCK_SIZE = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.blockSize || DEFAULT_BLOCK_SIZE
+    const FUZZY_HASH_LENGTH = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength || DEFAULT_FUZZY_HASH_LENGTH
     
     if(CTPH_SETTINGS_OVERRIDE[dirEntry.name])
         targetLicense = fuzzyHash(
                 Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`),
-                CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.blockSize || DEFAULT_BLOCK_SIZE,
-                CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength || DEFAULT_FUZZY_HASH_LENGTH
+                BLOCK_SIZE,
+                FUZZY_HASH_LENGTH
             )
     else
         targetLicense = fuzzyHash(Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`), DEFAULT_BLOCK_SIZE, DEFAULT_FUZZY_HASH_LENGTH)
@@ -64,8 +65,8 @@ for (const dirEntry of Deno.readDirSync("./licenses/RAW")) {
 
     TEMP_DB[dirEntry.name] = {
         hash: targetLicense,
-        blockSize: CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.blockSize || DEFAULT_BLOCK_SIZE,
-        fuzzyHashLength: CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength || DEFAULT_FUZZY_HASH_LENGTH
+        blockSize: BLOCK_SIZE,
+        fuzzyHashLength: FUZZY_HASH_LENGTH
     }
 }
 
