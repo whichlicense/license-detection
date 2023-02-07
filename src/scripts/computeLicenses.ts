@@ -24,7 +24,7 @@ import {basename} from "https://deno.land/std@0.177.0/path/mod.ts";
  * produce the same hash value. 
  * A larger block size can also result in fewer permutations, making it harder to detect similarities.
  */
-const DEFAULT_BLOCK_SIZE = 4;
+export const DEFAULT_BLOCK_SIZE = 4;
 
 /**
  * ```FUZZY_HASH_LENGTH``` is a property that determines the length of the final hash value that is produced
@@ -33,13 +33,13 @@ const DEFAULT_BLOCK_SIZE = 4;
  * so a larger FUZZY_HASH_LENGTH value means that more blocks will be processed, resulting in a longer, more detailed hash value.
  * This can increase the sensitivity of the algorithm, but also increase the computational cost of generating the hash.
  */
-const DEFAULT_FUZZY_HASH_LENGTH = 5;
+export const DEFAULT_FUZZY_HASH_LENGTH = 5;
 
 
 // TODO: allow to only recompile 1 specific license.
 // TODO: separate system to recompile on change
 
-function computeLicenseHash(file: Uint8Array, blockSize: number, fuzzyHashLength: number) {
+export function computeLicenseHash(file: Uint8Array, blockSize: number, fuzzyHashLength: number) {
     return {
         hash: fuzzyHash(file, blockSize, fuzzyHashLength),
         blockSize: blockSize,
@@ -47,7 +47,7 @@ function computeLicenseHash(file: Uint8Array, blockSize: number, fuzzyHashLength
     }
 }
 
-function computeAllLicenseHashes(folderPath: string) {
+export function computeAllLicenseHashes(folderPath: string) {
     const TEMP_DB: Record<string, {
         hash: string,
         blockSize?: number,
