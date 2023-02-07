@@ -1,0 +1,6 @@
+{
+    "deno.enable": true,
+    "copyrighter.author": "Duart Snel",
+    "copyrighter.license": "Apache2",
+    "copyrighter.newFilesOnly": false
+}
