@@ -19,27 +19,10 @@ import { stripLicense } from "./components/minification.ts";
 
 import licenses from "../licenses/ctph_hashes.json" assert { type: "json" };
 
-/**
- * ```BLOCK_SIZE``` is a property used to control the size of the blocks into which the input data is divided before being hashed.
- * The larger the block size, the fewer blocks will be created, and the higher the likelihood that similar files will
- * produce the same hash value. 
- * A larger block size can also result in fewer permutations, making it harder to detect similarities.
- */
-// const BLOCK_SIZE = 4;
-
-/**
- * ```FUZZY_HASH_LENGTH``` is a property that determines the length of the final hash value that is produced
- * by the fuzzy hashing algorithm.
- * The length of the hash is determined by the number of blocks that are processed and hashed, 
- * so a larger FUZZY_HASH_LENGTH value means that more blocks will be processed, resulting in a longer, more detailed hash value.
- * This can increase the sensitivity of the algorithm, but also increase the computational cost of generating the hash.
- */
-// const FUZZY_HASH_LENGTH = 5;
-
-
 
 // TODO: for testing purposes
-const incomingLicense = new TextEncoder().encode(stripLicense(Deno.readTextFileSync('./LICENSE')))
+const licenseText = Deno.readTextFileSync('./TEST_LICENSE')
+const incomingLicense = new TextEncoder().encode(stripLicense(licenseText))
 
 /**
  * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
@@ -48,6 +31,8 @@ const incomingLicenseHashes = new Map<string, string>();
 
 
 const matches: (ReturnType<typeof compareHashes> & {name: string})[] = [];
+
+const unclassified = JSON.parse(Deno.readTextFileSync('./licenses/unclassified.json'))
 
 
 
@@ -60,7 +45,7 @@ for(const entry in licenses){
     }
 
     const similarity = compareHashes(incomingLicenseHashes.get(`${blockSize}-${fuzzyHashLength}`)!, hash, fuzzyHashLength)
-    if(similarity.confidence > 0.4){
+    if(similarity.confidence > 0.1){
       matches.push({
         name: entry,
         confidence: similarity.confidence,
@@ -71,17 +56,23 @@ for(const entry in licenses){
 }
 
 
+if(matches.length === 0){
+  console.log('No matches found');
+  // TODO: only store things like file path, not the whole license text. request the license text from the server when needed.
+  // TODO: maybe extract features from the license and store these to make lawyers happy
+  unclassified.push(licenseText)
+  console.log('Added to unclassified licenses\n\n', licenseText)
+}else {
+  // just printing out for testing
+  const bestMatch = matches.sort((a, b) => b.confidence - a.confidence);
+  console.log(`Found ${matches.length} matches.
+  The best match is ${bestMatch[0].name} with a confidence of ${Math.min(100, bestMatch[0].confidence*100)}%
 
+  All matches (ranked):
+  ${matches
+    .map(match => `${Math.min(100, (match.confidence*100)).toFixed(2)}% - ${match.name} \t Common blocks: ${match.commonBlocks}/${match.totalBlocks}`)
+    .join('\n')
+  }
+  `)
 
-
-// just printing out for testing
-const bestMatch = matches.sort((a, b) => b.confidence - a.confidence);
-console.log(`Found ${matches.length} matches.
-The best match is ${bestMatch[0].name} with a confidence of ${Math.min(100, bestMatch[0].confidence*100)}%
-
-All matches (ranked):
-${matches
-  .map(match => `${Math.min(100, (match.confidence*100)).toFixed(2)}% - ${match.name} \t Common blocks: ${match.commonBlocks}/${match.totalBlocks}`)
-  .join('\n')
 }
-`)
