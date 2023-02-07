@@ -65,6 +65,7 @@ for (const dirEntry of Deno.readDirSync("./licenses/RAW")) {
 
     TEMP_DB[dirEntry.name] = {
         hash: targetLicense,
+        // TODO: remove the props if they are the default values
         blockSize: BLOCK_SIZE,
         fuzzyHashLength: FUZZY_HASH_LENGTH
     }
