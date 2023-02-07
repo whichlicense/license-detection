@@ -34,12 +34,9 @@ export function createHash(buffer: Uint8Array, hashLength: number): string {
     return res;
 }
 
-export function compareHashes(hash1: string, hash2: string, h1Length = 5, h2Length = 5) {
-    // const blocks1 = hash1.split(':');
-    // const blocks2 = hash2.split(':');
-
-    const blocks1 = hash1.match(new RegExp(`.{1,${h1Length}}`, 'g')) || [];
-    const blocks2 = hash2.match(new RegExp(`.{1,${h2Length}}`, 'g')) || [];
+export function compareHashes(hash1: string, hash2: string, hashLength = 5) {
+    const blocks1 = hash1.match(new RegExp(`.{1,${hashLength}}`, 'g')) || [];
+    const blocks2 = hash2.match(new RegExp(`.{1,${hashLength}}`, 'g')) || [];
   
     let commonBlocks = 0;
     for (let i = 0; i < blocks1.length && i < blocks2.length; i++) {
