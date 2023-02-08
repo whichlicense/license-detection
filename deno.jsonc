@@ -2,6 +2,7 @@
   "tasks": {
     "dev": "deno run --watch -A ./src/main.ts",
     "recompute-licenses": "deno run --allow-read --allow-write ./src/scripts/computeLicenses.ts",
-    "benchmark": "deno bench -A --v8-flags=--max-old-space-size=8000"
+    "benchmark": "deno bench -A --v8-flags=--max-old-space-size=8000",
+    "fmt": "deno fmt ./src ./bench ./tests"
   }
 }
