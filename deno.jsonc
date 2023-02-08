@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --watch ./src/main.ts",
+    "dev": "deno run --watch -A ./src/main.ts",
     "recompute-licenses": "deno run --allow-read --allow-write ./src/scripts/computeLicenses.ts",
     "benchmark": "deno bench -A"
   }
