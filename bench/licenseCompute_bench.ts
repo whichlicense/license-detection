@@ -22,13 +22,13 @@ const EXAMPLE_LICENSE = Deno.readFileSync('./licenses/RAW/Apache-2.0.txt');
 /**
  * The maximum block size to test against. The program will test all block sizes from MIN_BLOCK_SIZE to this value.
  */
-const MAX_BLOCK_SIZE = 20;
+const MAX_BLOCK_SIZE = 10;
 const MIN_BLOCK_SIZE = 2;
 
 /**
  * The maximum fuzzy hash length to test against. The program will test all fuzzy hash lengths from MIN_FUZZY_HASH_LENGTH to this value.
  */  
-const MAX_FUZZY_HASH_LENGTH = 10;
+const MAX_FUZZY_HASH_LENGTH = 9;
 const MIN_FUZZY_HASH_LENGTH = 2;
 
 console.log(`
