@@ -14,4 +14,10 @@
  *   limitations under the License.
  */
 
-export type TLicenseDB = {[license: string]: {hash: string, blockSize: number, fuzzyHashLength: number}};
+export type TLicenseDB = {
+  [license: string]: {
+    hash: string;
+    blockSize: number;
+    fuzzyHashLength: number;
+  };
+};

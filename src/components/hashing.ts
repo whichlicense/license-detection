@@ -14,60 +14,63 @@
  *   limitations under the License.
  */
 
-// TODO: faster hashing available: xxHash or CityHash 
+// TODO: faster hashing available: xxHash or CityHash
 export function createHash(buffer: Uint8Array, hashLength: number): string {
-    const radix = 36;
-    let hash = 0;
-    for (let i = 0; i < buffer.length; i++) {
-      hash = (hash << 5) - hash + buffer[i];
-      hash |= 0;
-    }
+  const radix = 36;
+  let hash = 0;
+  for (let i = 0; i < buffer.length; i++) {
+    hash = (hash << 5) - hash + buffer[i];
+    hash |= 0;
+  }
 
-    const res = hash.toString(radix).padStart(hashLength, '0');
+  const res = hash.toString(radix).padStart(hashLength, "0");
 
-    // if(res.length > hashLength) {
-    //     console.warn(`[!] hash is too long.. expected ${hashLength} but got ${hash.toString(radix).length}..`);
-    // }else if (res.length < hashLength) {
-    //     console.warn(`[!] hash is too short.. expected ${hashLength} but got ${hash.toString(radix).length}..`);
-    // }
+  // if(res.length > hashLength) {
+  //     console.warn(`[!] hash is too long.. expected ${hashLength} but got ${hash.toString(radix).length}..`);
+  // }else if (res.length < hashLength) {
+  //     console.warn(`[!] hash is too short.. expected ${hashLength} but got ${hash.toString(radix).length}..`);
+  // }
 
-    return res;
+  return res;
 }
 
 export function compareHashes(hash1: string, hash2: string, hashLength = 5) {
-    const blocks1 = hash1.match(new RegExp(`.{1,${hashLength}}`, 'g')) || [];
-    const blocks2 = hash2.match(new RegExp(`.{1,${hashLength}}`, 'g')) || [];
-  
-    let commonBlocks = 0;
-    for (let i = 0; i < blocks1.length && i < blocks2.length; i++) {
-      if (blocks1[i] === blocks2[i]) {
-        commonBlocks++;
-      }
-    }
+  const blocks1 = hash1.match(new RegExp(`.{1,${hashLength}}`, "g")) || [];
+  const blocks2 = hash2.match(new RegExp(`.{1,${hashLength}}`, "g")) || [];
 
-    const maxBlocks =  Math.max(blocks1.length, blocks2.length);
-
-    return {
-        commonBlocks,
-        totalBlocks: maxBlocks,
-        confidence: (commonBlocks) / Math.max(blocks1.length, blocks2.length)
+  let commonBlocks = 0;
+  for (let i = 0; i < blocks1.length && i < blocks2.length; i++) {
+    if (blocks1[i] === blocks2[i]) {
+      commonBlocks++;
     }
+  }
+
+  const maxBlocks = Math.max(blocks1.length, blocks2.length);
+
+  return {
+    commonBlocks,
+    totalBlocks: maxBlocks,
+    confidence: (commonBlocks) / Math.max(blocks1.length, blocks2.length),
+  };
 }
 
+export function fuzzyHash(
+  input: Uint8Array,
+  blockSize: number,
+  hashLength: number,
+): string {
+  // const blocks: string[] = new Array(input.length);
+  let blocks = "";
 
-export function fuzzyHash(input: Uint8Array, blockSize: number, hashLength: number): string {
-    // const blocks: string[] = new Array(input.length);
-    let blocks = ""
-  
-    for (let i = 0; i < input.length; i += blockSize) {
-      const block = input.slice(i, i + blockSize);
-      const hash = createHash(block, hashLength);
-      blocks += hash;
-    }
+  for (let i = 0; i < input.length; i += blockSize) {
+    const block = input.slice(i, i + blockSize);
+    const hash = createHash(block, hashLength);
+    blocks += hash;
+  }
 
-    return blocks;
+  return blocks;
 
-    // TODO: we can use webworker here to calculate the hashes in parallel. i will only optimize if required.
+  // TODO: we can use webworker here to calculate the hashes in parallel. i will only optimize if required.
 }
 
 // TODO: import meta main for further compilation of the code for external calling

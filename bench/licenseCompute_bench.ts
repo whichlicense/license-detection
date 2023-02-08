@@ -14,11 +14,15 @@
  *   limitations under the License.
  */
 
-import { computeAllLicenseHashes, computeLicenseHash, DEFAULT_BLOCK_SIZE, DEFAULT_FUZZY_HASH_LENGTH } from "../src/scripts/computeLicenses.ts";
-
+import {
+  computeAllLicenseHashes,
+  computeLicenseHash,
+  DEFAULT_BLOCK_SIZE,
+  DEFAULT_FUZZY_HASH_LENGTH,
+} from "../src/scripts/computeLicenses.ts";
 
 // --- properties
-const EXAMPLE_LICENSE = Deno.readFileSync('./licenses/RAW/Apache-2.0.txt');
+const EXAMPLE_LICENSE = Deno.readFileSync("./licenses/RAW/Apache-2.0.txt");
 /**
  * The maximum block size to test against. The program will test all block sizes from MIN_BLOCK_SIZE to this value.
  */
@@ -27,7 +31,7 @@ const MIN_BLOCK_SIZE = 2;
 
 /**
  * The maximum fuzzy hash length to test against. The program will test all fuzzy hash lengths from MIN_FUZZY_HASH_LENGTH to this value.
- */  
+ */
 const MAX_FUZZY_HASH_LENGTH = 9;
 const MIN_FUZZY_HASH_LENGTH = 2;
 
@@ -38,23 +42,34 @@ Legend:
 
 Notes:
   - The 'Single license [...]' benchmarks has a baseline with ${DEFAULT_BLOCK_SIZE} as blockSize and ${DEFAULT_FUZZY_HASH_LENGTH} as fuzzyHashLength. This conveniently also happens to be the default values for the 'computeLicenseHash' function.
-`)
-
+`);
 
 // --- benchmarks
 Deno.bench("Computing all license hashes", () => {
-  computeAllLicenseHashes('./licenses/RAW');
+  computeAllLicenseHashes("./licenses/RAW");
 });
 
+Deno.bench(
+  `Single license [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE)`,
+  { group: "slc", baseline: true },
+  () => {
+    computeLicenseHash(
+      EXAMPLE_LICENSE,
+      DEFAULT_BLOCK_SIZE,
+      DEFAULT_FUZZY_HASH_LENGTH,
+    );
+  },
+);
 
-Deno.bench(`Single license [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE)`, {group: 'slc', baseline: true}, () => {
-  computeLicenseHash(EXAMPLE_LICENSE, DEFAULT_BLOCK_SIZE, DEFAULT_FUZZY_HASH_LENGTH);
-});
-
-
-for(let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++){
-  for(let fuzzyHashLength = MIN_FUZZY_HASH_LENGTH; fuzzyHashLength <= MAX_FUZZY_HASH_LENGTH; fuzzyHashLength++){
-    Deno.bench(`Single license [${blockSize}, ${fuzzyHashLength}]`, {group: 'slc'}, () => {
+for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
+  for (
+    let fuzzyHashLength = MIN_FUZZY_HASH_LENGTH;
+    fuzzyHashLength <= MAX_FUZZY_HASH_LENGTH;
+    fuzzyHashLength++
+  ) {
+    Deno.bench(`Single license [${blockSize}, ${fuzzyHashLength}]`, {
+      group: "slc",
+    }, () => {
       computeLicenseHash(EXAMPLE_LICENSE, blockSize, fuzzyHashLength);
     });
   }

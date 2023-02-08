@@ -15,9 +15,9 @@
  */
 
 export function stripLicense(text: string): string {
-    return text.replaceAll(/( |\t|\n|\r|\n\r|\r\n)/g, "")
+  return text.replaceAll(/( |\t|\n|\r|\n\r|\r\n)/g, "");
 }
 
-if(import.meta.main){
-    console.log(stripLicense(Deno.readTextFileSync(Deno.args[0])));
+if (import.meta.main) {
+  console.log(stripLicense(Deno.readTextFileSync(Deno.args[0])));
 }
