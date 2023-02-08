@@ -24,7 +24,7 @@ const incomingLicense = new TextEncoder().encode(stripLicense(licenseText))
 
 const unclassified = JSON.parse(Deno.readTextFileSync('./licenses/unclassified.json'))
 
-const matches = detectLicense(incomingLicense, 0.1)
+const matches = detectLicense(incomingLicense, undefined, 0.1)
 
 
 if(matches.length === 0){
