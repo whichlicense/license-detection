@@ -16,6 +16,7 @@
 
 import { fuzzyHash } from "../components/hashing.ts";
 import {basename} from "https://deno.land/std@0.177.0/path/mod.ts";
+import { TLicenseDB } from "../types/License.ts";
 
 // TODO: make these props come from config file or flags
 /**
@@ -36,10 +37,9 @@ export const DEFAULT_BLOCK_SIZE = 4;
 export const DEFAULT_FUZZY_HASH_LENGTH = 5;
 
 
-// TODO: allow to only recompile 1 specific license.
 // TODO: separate system to recompile on change
-
-export function computeLicenseHash(file: Uint8Array, blockSize: number, fuzzyHashLength: number) {
+// TODO: all defaults should come from a settings file!
+export function computeLicenseHash(file: Uint8Array, blockSize = DEFAULT_BLOCK_SIZE, fuzzyHashLength = DEFAULT_FUZZY_HASH_LENGTH) {
     return {
         hash: fuzzyHash(file, blockSize, fuzzyHashLength),
         blockSize: blockSize,
@@ -47,19 +47,32 @@ export function computeLicenseHash(file: Uint8Array, blockSize: number, fuzzyHas
     }
 }
 
-export function computeAllLicenseHashes(folderPath: string) {
-    const TEMP_DB: Record<string, {
-        hash: string,
-        blockSize?: number,
-        fuzzyHashLength?: number
-    }> = {}
-    const CTPH_SETTINGS_OVERRIDE: {[license: string]: {blockSize?: number, fuzzyHashLength?: number}} = JSON.parse(Deno.readTextFileSync("./licenses/ctph_settings_override.json"))
+
+export type TLicenseComputeOptions = {
+    DEFAULT_BLOCK_SIZE: number;
+    DEFAULT_FUZZY_HASH_LENGTH: number;
+    CTPH_SETTINGS_OVERRIDE?: string;
+}
+export type TLicenseComputeSettingsOverride = {
+    [license: string]: {blockSize?: number, fuzzyHashLength?: number}
+}
+
+// TODO: extract options type to a separate type declaration
+export function computeAllLicenseHashes(licensesFolderPath: string, options: TLicenseComputeOptions = {
+    DEFAULT_BLOCK_SIZE: DEFAULT_BLOCK_SIZE,
+    DEFAULT_FUZZY_HASH_LENGTH: DEFAULT_FUZZY_HASH_LENGTH,
+    // TODO: make this take the object directly and also make it optional
+    CTPH_SETTINGS_OVERRIDE: './licenses/ctph_settings_override.json'
+
+}) {
+    const TEMP_DB: TLicenseDB = {};
+    const CTPH_SETTINGS_OVERRIDE: TLicenseComputeSettingsOverride = options.CTPH_SETTINGS_OVERRIDE ? JSON.parse(Deno.readTextFileSync(options.CTPH_SETTINGS_OVERRIDE)) : {}
     
-    for (const dirEntry of Deno.readDirSync(folderPath)) {
+    for (const dirEntry of Deno.readDirSync(licensesFolderPath)) {
         let targetLicense: string | undefined;
 
-        const BLOCK_SIZE = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.blockSize || DEFAULT_BLOCK_SIZE
-        const FUZZY_HASH_LENGTH = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength || DEFAULT_FUZZY_HASH_LENGTH
+        const BLOCK_SIZE = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.blockSize || options.DEFAULT_BLOCK_SIZE
+        const FUZZY_HASH_LENGTH = CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength || options.DEFAULT_FUZZY_HASH_LENGTH
         
         if(CTPH_SETTINGS_OVERRIDE[dirEntry.name])
             targetLicense = fuzzyHash(
@@ -68,7 +81,7 @@ export function computeAllLicenseHashes(folderPath: string) {
                     FUZZY_HASH_LENGTH
                 )
         else
-            targetLicense = fuzzyHash(Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`), DEFAULT_BLOCK_SIZE, DEFAULT_FUZZY_HASH_LENGTH)
+            targetLicense = fuzzyHash(Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`), options.DEFAULT_BLOCK_SIZE, options.DEFAULT_FUZZY_HASH_LENGTH)
 
 
         TEMP_DB[dirEntry.name] = {
