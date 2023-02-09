@@ -14,10 +14,11 @@
  *   limitations under the License.
  */
 
-export type TLicenseDB = {
-  [license: string]: {
-    hash: string;
-    blockSize: number;
-    fuzzyHashLength: number;
-  };
-};
+export type TLicenseDBEntry = {
+  name: string
+  hash: string;
+  blockSize: number;
+  fuzzyHashLength: number;
+}
+
+export type TLicense = Uint8Array;
