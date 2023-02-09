@@ -15,8 +15,9 @@
  */
 
 // TODO: make a manager that detects changes and imports them. Do this within a DAO class for better separation of concerns.
-import { TLicenseDB } from "../types/License.ts";
+import { TLicense } from "../types/License.ts";
 import { compareHashes, fuzzyHash } from "./hashing.ts";
+import LicenseStorage from "./storage.ts";
 
 /**
  * Attempts to detect the license of the incoming license text represented as a byte array.
@@ -25,10 +26,8 @@ import { compareHashes, fuzzyHash } from "./hashing.ts";
  * @returns an array of matches; empty array if no matches were found
  */
 export function detectLicense(
-  incomingLicense: Uint8Array,
-  licenseDB: TLicenseDB = JSON.parse(
-    Deno.readTextFileSync("./licenses/ctph_hashes.json"),
-  ),
+  incomingLicense: TLicense,
+  licenseDB: LicenseStorage = new LicenseStorage('./licenses/ctph_hashes.wlhdb'),
   confidenceThreshold = 0.1,
 ) {
   // TODO: setting for early exit on high confidence match! (i.e., 100% should exit immediately)
@@ -38,25 +37,25 @@ export function detectLicense(
   const incomingLicenseHashes = new Map<string, string>();
   const matches: (ReturnType<typeof compareHashes> & { name: string })[] = [];
 
-  for (const entry in licenseDB) {
-    const { blockSize, hash, fuzzyHashLength } = licenseDB[entry];
+  for (const entry of licenseDB) {
+    const { blockSize, hash, hashLength, name } = LicenseStorage.parseEntry(entry);
 
     // TODO: we can extract this to a global session-based cache? no need to calculate it multiple times in a single session
-    if (!incomingLicenseHashes.has(`${blockSize}-${fuzzyHashLength}`)) {
+    if (!incomingLicenseHashes.has(`${blockSize}-${hashLength}`)) {
       incomingLicenseHashes.set(
-        `${blockSize}-${fuzzyHashLength}`,
-        fuzzyHash(incomingLicense, blockSize, fuzzyHashLength),
+        `${blockSize}-${hashLength}`,
+        fuzzyHash(incomingLicense, blockSize, hashLength),
       );
     }
 
     const similarity = compareHashes(
-      incomingLicenseHashes.get(`${blockSize}-${fuzzyHashLength}`)!,
+      incomingLicenseHashes.get(`${blockSize}-${hashLength}`)!,
       hash,
-      fuzzyHashLength,
+      hashLength,
     );
     if (similarity.confidence > confidenceThreshold) {
       matches.push({
-        name: entry,
+        name,
         confidence: similarity.confidence,
         commonBlocks: similarity.commonBlocks,
         totalBlocks: similarity.totalBlocks,
@@ -66,3 +65,6 @@ export function detectLicense(
 
   return matches;
 }
+
+// TODO: paralellize this? we can use deno sub-instances to do this. divide the licenseDB into chunks and then run each chunk in a separate instance.
+// we can also use threads instead of sub-instances.
