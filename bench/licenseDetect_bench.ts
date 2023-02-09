@@ -18,6 +18,7 @@
 
 import { detectLicense } from "../src/components/detecting.ts";
 import { stripLicense } from "../src/components/minification.ts";
+import LicenseStorage from "../src/components/storage.ts";
 import {
   computeAllLicenseHashes,
   DEFAULT_BLOCK_SIZE,
@@ -89,21 +90,22 @@ for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
       prefix: `license_${blockSize}_${fuzzyHashLength}_`,
     });
 
-    Deno.writeTextFileSync(
-      TMEP_FILE_ENTRY,
-      JSON.stringify(ADJUSTED_LICENSE_DB),
-    );
+    const storage = new LicenseStorage(TMEP_FILE_ENTRY)
+    for(const license of ADJUSTED_LICENSE_DB) {
+      storage.addLicense(license)
+    }
+
     tempFiles.push(TMEP_FILE_ENTRY);
   }
 }
 
 for (const file of tempFiles) {
   const [blockSize, fuzzyHashLength] = file.split("_").slice(1);
-  const temp = JSON.parse(Deno.readTextFileSync(file));
+  const storageSys = new LicenseStorage(file);
   Deno.bench(`Single license [${blockSize}, ${fuzzyHashLength}]`, {
     group: "sld",
   }, () => {
-    detectLicense(EXAMPLE_LICENSE, temp, CONFIDENCE);
+    detectLicense(EXAMPLE_LICENSE, storageSys, CONFIDENCE);
   });
 }
 
