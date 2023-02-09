@@ -16,7 +16,8 @@
 
 import { fuzzyHash } from "../components/hashing.ts";
 import { basename } from "https://deno.land/std@0.177.0/path/mod.ts";
-import { TLicenseDB } from "../types/License.ts";
+import { TLicenseDBEntry } from "../types/License.ts";
+import LicenseStorage from "../components/storage.ts";
 
 // TODO: make these props come from config file or flags
 /**
@@ -69,7 +70,7 @@ export function computeAllLicenseHashes(
     CTPH_SETTINGS_OVERRIDE: "./licenses/ctph_settings_override.json",
   },
 ) {
-  const TEMP_DB: TLicenseDB = {};
+  const TEMP_DB: TLicenseDBEntry[] = [];
   const CTPH_SETTINGS_OVERRIDE: TLicenseComputeSettingsOverride =
     options.CTPH_SETTINGS_OVERRIDE
       ? JSON.parse(Deno.readTextFileSync(options.CTPH_SETTINGS_OVERRIDE))
@@ -98,12 +99,12 @@ export function computeAllLicenseHashes(
       );
     }
 
-    TEMP_DB[dirEntry.name] = {
+    TEMP_DB.push({
+      name: dirEntry.name,
       hash: targetLicense,
-      // TODO: remove the props if they are the default values
       blockSize: BLOCK_SIZE,
       fuzzyHashLength: FUZZY_HASH_LENGTH,
-    };
+    });
   }
   return TEMP_DB;
 }
@@ -130,13 +131,17 @@ if (import.meta.main) {
     );
   } else {
     const out = computeAllLicenseHashes("./licenses/RAW");
+    const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb")
+
+    for(const license of out) {
+      storage.addLicense(license)
+    }
+
     const CTPH_SETTINGS_OVERRIDE: {
       [license: string]: { blockSize?: number; fuzzyHashLength?: number };
     } = JSON.parse(
       Deno.readTextFileSync("./licenses/ctph_settings_override.json"),
     );
-    Deno.writeTextFileSync("./licenses/ctph_hashes.json", JSON.stringify(out));
-
     console.log(`Recompiled ${Object.keys(out).length} licenses.
 Total db size: ${new TextEncoder().encode(JSON.stringify(out)).length / 1e+6} MB
 
