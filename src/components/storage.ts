@@ -152,31 +152,38 @@ export default class LicenseStorage {
         }
     }
 
+    private combineUint8Arrays(arrays: Uint8Array[]): Uint8Array {
+        let totalLength = 0;
+        for (const array of arrays) {
+          totalLength += array.length;
+        }
+      
+        const combinedArray = new Uint8Array(totalLength);
+        let currentIndex = 0;
+        for (const array of arrays) {
+          combinedArray.set(array, currentIndex);
+          currentIndex += array.length;
+        }
+      
+        return combinedArray;
+    }
+
     *entriesBatched(batchEntryCount: number) {
         const ENTRY_COUNT = this.getEntryCount();
-        const CHUNK_COUNT = Math.ceil(ENTRY_COUNT / batchEntryCount);
-
-        // use the Symbol.iterator to get the entries but just up N entries into the requested chunk size
+        // group results from the iterator into buckets of size batchEntryCount
         const entries = this.entries();
-        for(let i = 0; i < CHUNK_COUNT; i++){
-            let chunk = new Uint8Array(0);
-            for(let j = 0; j < batchEntryCount; j++){
-                const entry = entries.next();
-                if(entry.done) break;
-                const tempArr = new Uint8Array(chunk.length + entry.value.length)
-                tempArr.set(chunk)
-                tempArr.set(entry.value, chunk.length)
-                chunk = tempArr;
+        let chunk: Uint8Array[] = [];
+        for(let i = 0; i < ENTRY_COUNT; i++){
+            const entry = entries.next();
+            if(entry.done) break;
+            chunk.push(entry.value);
+            if(chunk.length === batchEntryCount) {
+                yield this.combineUint8Arrays(chunk);
+                chunk = [];
             }
-            yield chunk;
         }
-        // for(const entry of this.entries()){
-        //     const chunk = [];
-        //     for(let i = 0; i < chunkSize; i++){
-        //         chunk.push(entry.next().value);
-        //     }
-        //     yield chunk;
-        // }
+        // yield remainder
+        if(chunk.length > 0) yield this.combineUint8Arrays(chunk);
     }
 
     *entries() {
