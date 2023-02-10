@@ -22,7 +22,7 @@ import { TDetectionThreadReply,EDetectionThreadMessageType,ECoordinationThreadMe
 import LicenseStorage from "../../storage.ts";
 
 // TODO: how many workers does the user want to spawn? make this configurable. i believe we can use either env here or a config file.
-const detectionThreads = new Array<Worker>(32);
+const detectionThreads = new Array<Worker>(navigator.hardwareConcurrency);
 const DETECTIONS = new Map<string, {
     results: Array<TDetectionThreadReply['result']>
     progress: number
