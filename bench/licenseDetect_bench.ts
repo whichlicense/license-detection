@@ -18,6 +18,7 @@
 
 import { detectLicense } from "../src/components/detecting.ts";
 import { stripLicense } from "../src/components/minification.ts";
+import { DetectionScheduler } from "../src/components/offloading/LicenseDetection/DetectionScheduler.ts";
 import LicenseStorage from "../src/components/storage.ts";
 import {
   computeAllLicenseHashes,
@@ -41,6 +42,17 @@ const MIN_FUZZY_HASH_LENGTH = 2;
 
 const CONFIDENCE = 0.5;
 
+// To simulate a real-world scenario, we'll create this ahead of time.
+const DETECTION_SCHEDULER = new DetectionScheduler()
+
+function cloneByteArray(source: Uint8Array): Uint8Array {
+  const ab = new ArrayBuffer(source.byteLength);
+  const new_arr = new Uint8Array(ab)
+  new_arr.set(new Uint8Array(source));
+  return new_arr;
+}
+
+// TODO: print out details about the data set. also print out time
 console.log(`
 Running license detection benchmarks.
 Legend:
@@ -61,9 +73,26 @@ const NO_EX_LICENSE = new TextEncoder().encode(
   ),
 );
 
-Deno.bench("Non existent license", () => {
+Deno.bench("Single threaded non existent license", () => {
   detectLicense(NO_EX_LICENSE, undefined, CONFIDENCE);
 });
+
+Deno.bench(
+  `(BASELINE) Non threaded detection [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}]`,
+  { group: "threaded_vs_nothread", baseline: true },
+  () => {
+    detectLicense(cloneByteArray(EXAMPLE_LICENSE), undefined, CONFIDENCE);
+  },
+);
+
+Deno.bench(
+  `Threaded detection [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}]`,
+  { group: "threaded_vs_nothread", },
+  async () => {
+    // awaiting results to make sure we measure till completion
+    await DETECTION_SCHEDULER.detectLicense(cloneByteArray(EXAMPLE_LICENSE))
+  },
+);
 
 Deno.bench(
   `Single license [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE)`,
@@ -108,20 +137,6 @@ for (const file of tempFiles) {
     detectLicense(EXAMPLE_LICENSE, storageSys, CONFIDENCE);
   });
 }
-
-// for(let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++){
-//     for(let fuzzyHashLength = MIN_FUZZY_HASH_LENGTH; fuzzyHashLength <= MAX_FUZZY_HASH_LENGTH; fuzzyHashLength++){
-//     // the new license DB adjusted with the bench cases constructed by the above loops
-//     const ADJUSTED_LICENSE_DB = computeAllLicenseHashes('./licenses/RAW', {
-//         DEFAULT_BLOCK_SIZE: blockSize,
-//         DEFAULT_FUZZY_HASH_LENGTH: fuzzyHashLength,
-//     });
-//     // ensure re-computation is not included in the benchmark, thats a different bench case
-//     Deno.bench(`Single license [${blockSize}, ${fuzzyHashLength}]`, {group: 'sld'}, () => {
-//         detectLicense(EXAMPLE_LICENSE, ADJUSTED_LICENSE_DB, CONFIDENCE);
-//     });
-//   }
-// }
 
 addEventListener("unload", () => {
   console.log("cleaning up temp files...");
