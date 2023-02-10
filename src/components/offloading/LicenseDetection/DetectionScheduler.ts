@@ -44,56 +44,55 @@ import { detectLicenseRawDB } from "../../detecting.ts";
 import {v1} from "https://deno.land/std@0.177.0/uuid/mod.ts";
 
 export class DetectionScheduler {
-    private coordinationThreads: {w: Worker, progress: 1}[]
-    private fallBackTurn = 0
-    constructor() {
+    private coordinationThreads: {w: Worker, loadView: DataView, load: number}[] = []
+
+    constructor(coordinationThreads = navigator.hardwareConcurrency) {
         console.log("DetectionScheduler created")
         // TODO: if this url proves to be a problem we can use import  maps with import.meta.resolve
-        this.coordinationThreads = [
-            {
+        for(let i = 0; i < coordinationThreads; i++){
+            const LOAD_BUFF = new SharedArrayBuffer(4)
+            const temp = {
                 w: new Worker(new URL("./coordinationThread.ts", import.meta.url).href, { type: "module" }),
-                // TODO: instead of fetching this we can have a shared array buffer for each thread, and a getter which returns the progress as a float
-                //          for the float we can use a dataview to fetch the float out of the single byte entry.
-                progress: 1,
-            }
-        ]
-
-        // TODO: listen for progress updates from the coordination threads, update the object in the array
-        for (const coordinationThread of this.coordinationThreads) {
-            coordinationThread.w.addEventListener('message', (e) => {
-                if (e.data.type === ECoordinationThreadMessageType.progress) {
-                    coordinationThread.progress = e.data.progress
+                loadView: new DataView(LOAD_BUFF),
+                get load() {
+                    return this.loadView.getUint32(0)
                 }
-            })
+            }
+            this.coordinationThreads.push(temp)
+            const INIT_MSG: TCoordinationThreadMessage = {type: ECoordinationThreadMessageType.init, loadBuffer: LOAD_BUFF}
+            temp.w.postMessage(INIT_MSG)
         }
     }
 
     // TODO: method to get scheduler load as percentage (indicating how many threads are busy)
 
     private findFreeCoordinationThread(): Worker {
-        const freeCoordinationThread = this.coordinationThreads.find((ct) => ct.progress === 1)
-        if (freeCoordinationThread) {
-            return freeCoordinationThread.w
-        } else {
-            // fallback to round robin when all threads are busy.
-            const coordinationThread = this.coordinationThreads[this.fallBackTurn]
-            this.fallBackTurn = (this.fallBackTurn + 1) % this.coordinationThreads.length
-            return coordinationThread.w
-        }
+        // TODO: early exit sorting.. i.e., exit if value is 0 or continue to sort to find smallest
+        const freeCoordinationThread = this.coordinationThreads[0].load === 0 ? this.coordinationThreads[0] : this.coordinationThreads.sort((a, b) => a.load - b.load)[0]
+        return freeCoordinationThread.w;
+    }
+
+    getLoadInfo(){
+        return this.coordinationThreads.map((t,i) => {return {id: i, load: t.load}})
     }
 
     // TODO: method to re-load all databases in all threads
 
+    /**
+     * > **NOTE!**: this method transfers the license buffer to the coordination thread, this means you **can't** use the license buffer after calling this method.
+     * @param license 
+     * @returns 
+     */
     public detectLicense(license: TLicense): Promise<ReturnType<typeof detectLicenseRawDB>> {
         return new Promise((resolve, reject) => {
             // TODO: implement timeout rejection system
             const coordinationThread = this.findFreeCoordinationThread()
             coordinationThread.addEventListener('message', (e: MessageEvent<TCoordinationThreadMessage>) => {
                 if (e.data.type === ECoordinationThreadMessageType.result) {
+                    // TODO: results don't have an id, so we can't match them to the request.!!
                     resolve(e.data.results)
                 }
             })
-            // TODO: generate or take in an id.
             const THREAD_MSG: TCoordinationThreadMessage = { type: ECoordinationThreadMessageType.detect, license: license.buffer, id: v1.generate() as string }
             coordinationThread.postMessage(THREAD_MSG, [license.buffer])
         })
