@@ -54,6 +54,7 @@ export default class LicenseStorage {
         MAX_FILE_ENTRY_BLOCKS: 13,
         MAX_ENTRY_ALLOC_BLOCKS: 7
     }
+    private static entryParsingRegex = new RegExp(/(?<name>.+)\n(?<hash>.+)\n(?<blockSize>\d+)\n(?<hashLength>\d+)\n/, 'g')
 
     constructor(file: string | URL, options?: {
         MAX_FILE_ALLOC_BLOCKS?: number;
@@ -135,14 +136,51 @@ export default class LicenseStorage {
 
     // }
 
-    static parseEntry(entry: Uint8Array) {
-        const [,name, hash, blockSize, hashLength] = new TextDecoder().decode(entry).split('\n');
-        return {
-            name,
-            hash,
-            blockSize: parseInt(blockSize),
-            hashLength: parseInt(hashLength)
+    static *parseEntry(entry: Uint8Array) {
+        // multiple entries can be in the same buffer, so we need to split them up and return all.
+        const res = new TextDecoder().decode(entry).matchAll(this.entryParsingRegex)
+        for(const match of res) {
+            if(match.groups) {
+                yield {
+                    name: match.groups.name,
+                    hash: match.groups.hash,
+                    // rest assured, these exist or the regex wouldn't match ;)
+                    blockSize: parseInt(match.groups.blockSize),
+                    hashLength: parseInt(match.groups.hashLength)
+                }
+            }
         }
+    }
+
+    *entriesBatched(batchEntryCount: number) {
+        const ENTRY_COUNT = this.getEntryCount();
+        const CHUNK_COUNT = Math.ceil(ENTRY_COUNT / batchEntryCount);
+
+        // use the Symbol.iterator to get the entries but just up N entries into the requested chunk size
+        const entries = this.entries();
+        for(let i = 0; i < CHUNK_COUNT; i++){
+            let chunk = new Uint8Array(0);
+            for(let j = 0; j < batchEntryCount; j++){
+                const entry = entries.next();
+                if(entry.done) break;
+                const tempArr = new Uint8Array(chunk.length + entry.value.length)
+                tempArr.set(chunk)
+                tempArr.set(entry.value, chunk.length)
+                chunk = tempArr;
+            }
+            yield chunk;
+        }
+        // for(const entry of this.entries()){
+        //     const chunk = [];
+        //     for(let i = 0; i < chunkSize; i++){
+        //         chunk.push(entry.next().value);
+        //     }
+        //     yield chunk;
+        // }
+    }
+
+    *entries() {
+        for(const entry of this) yield entry;
     }
 
     *[Symbol.iterator]() {
