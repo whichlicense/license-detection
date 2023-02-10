@@ -1,4 +1,5 @@
 licenses/RAW/**
 .DS_Store
-TEST_LICENSE
+TEST_LICENSE_1
+TEST_LICENSE_2
 x.ts
