@@ -19,7 +19,8 @@ import { detectLicenseRawDB } from "../components/detecting.ts";
 export enum ECoordinationThreadMessageType {
     detect,
     result,
-    progress
+    progress,
+    init
 }
 
 export type TCoordinationThreadMessage = {
@@ -32,6 +33,9 @@ export type TCoordinationThreadMessage = {
     type: ECoordinationThreadMessageType.detect,
     license: ArrayBufferLike,
     id: string
+} | {
+    type: ECoordinationThreadMessageType.init,
+    loadBuffer: SharedArrayBuffer,
 }
 
 
