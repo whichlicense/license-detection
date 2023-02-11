@@ -13,26 +13,24 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
-// TODO: import map
-import { EDetectionThreadMessageType, TDetectionThreadMessage, TDetectionThreadReply } from "../../../types/DetectionScheduler.ts";
-import { detectLicenseRawDB } from "../../detecting.ts";
-
-// TODO: we can maybe use new promises with timeouts to force async computation in the thread?
-
 /// <reference no-default-lib="true" />
 /// <reference lib="deno.worker" />
+// TODO: import map
+import { EDetectionThreadMessageType, TDetectionThreadMessage } from "../../../types/DetectionScheduler.ts";
+import { detectLicenseRawDB } from "../../detecting.ts";
 
-
+let DB: Uint8Array = new Uint8Array();
 
 // TODO: pass in confidence threshold if required.
 self.onmessage = (e: MessageEvent<TDetectionThreadMessage>) => {
-    const RAW_LICENSE = new Uint8Array(e.data.srcl); // memory is shared across threads
-    const THREAD_DB = new Uint8Array(e.data.db); // section of the db handed off to this thread
-
-    const matches = detectLicenseRawDB(RAW_LICENSE, THREAD_DB);
-    // detectLicense(RAW_LICENSE, e.data.db)
-
-    const REPLY: TDetectionThreadReply = {type: EDetectionThreadMessageType.RESULT, for: e.data.id, result: matches}
-    postMessage(REPLY);
+    if(e.data.type === EDetectionThreadMessageType.INIT){
+        DB = new Uint8Array(e.data.db);
+    }else if(e.data.type === EDetectionThreadMessageType.DETECT) {
+        const RAW_LICENSE = new Uint8Array(e.data.srcl); // memory is shared across threads
+    
+        const matches = detectLicenseRawDB(RAW_LICENSE, DB);
+    
+        const REPLY: TDetectionThreadMessage = {type: EDetectionThreadMessageType.RESULT, for: e.data.id, result: matches}
+        postMessage(REPLY);
+    }
 };
