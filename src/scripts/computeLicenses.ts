@@ -18,6 +18,7 @@ import { fuzzyHash } from "../components/hashing.ts";
 import { basename } from "https://deno.land/std@0.177.0/path/mod.ts";
 import { TLicenseDBEntry } from "../types/License.ts";
 import LicenseStorage from "../components/storage.ts";
+import { stripLicense } from "../components/minification.ts";
 
 // TODO: make these props come from config file or flags
 /**
@@ -85,15 +86,18 @@ export function computeAllLicenseHashes(
       CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength ||
       options.DEFAULT_FUZZY_HASH_LENGTH;
 
+      const FILE_CONTENTS = Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`);
+      if(FILE_CONTENTS.length < 2) continue;
+
     if (CTPH_SETTINGS_OVERRIDE[dirEntry.name]) {
       targetLicense = fuzzyHash(
-        Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`),
+        FILE_CONTENTS,
         BLOCK_SIZE,
         FUZZY_HASH_LENGTH,
       );
     } else {
       targetLicense = fuzzyHash(
-        Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`),
+        FILE_CONTENTS,
         options.DEFAULT_BLOCK_SIZE,
         options.DEFAULT_FUZZY_HASH_LENGTH,
       );
@@ -107,6 +111,15 @@ export function computeAllLicenseHashes(
     });
   }
   return TEMP_DB;
+}
+
+export function stripAndDumpLicense(folder: string) {
+  for (const dirEntry of Deno.readDirSync(folder)) {
+    if(dirEntry.isFile){
+      const license = stripLicense(Deno.readTextFileSync(`${folder}/${dirEntry.name}`).replace(/(---\n)(\n|.)+(---\n)/g, ""))
+      if(license.length > 2) Deno.writeTextFileSync(`${folder}/${dirEntry.name}`, license)
+    }
+  }
 }
 
 if (import.meta.main) {
