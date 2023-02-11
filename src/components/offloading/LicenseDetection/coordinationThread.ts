@@ -25,7 +25,6 @@ import LicenseStorage from "../../storage.ts";
 const detectionThreads = new Array<Worker>(navigator.hardwareConcurrency);
 const DETECTIONS = new Map<string, {
     results: Array<TDetectionResult>
-    progress: number
 }>();
 
 let LOAD_BUFFER: DataView | undefined;
@@ -92,10 +91,7 @@ self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
 
         // set up storage for request
         DETECTIONS.set(id, {
-            results: [],
-            get progress() {
-                return this.results.length / detectionThreads.length;
-            }
+            results: []
         });
         LOAD_BUFFER?.setUint32(0, DETECTIONS.size)
         // const licenseCount = licenseDB.getEntryCount()
