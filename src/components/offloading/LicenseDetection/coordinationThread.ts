@@ -18,13 +18,13 @@
 /// <reference lib="deno.worker" />
 
 // TODO: import maps!!!
-import { TDetectionThreadReply,EDetectionThreadMessageType,ECoordinationThreadMessageType, TCoordinationThreadMessage, TDetectionThreadMessage } from "../../../types/DetectionScheduler.ts";
+import { TDetectionThreadMessage, EDetectionThreadMessageType,ECoordinationThreadMessageType, TCoordinationThreadMessage, TDetectionResult } from "../../../types/DetectionScheduler.ts";
 import LicenseStorage from "../../storage.ts";
 
 // TODO: how many workers does the user want to spawn? make this configurable. i believe we can use either env here or a config file.
 const detectionThreads = new Array<Worker>(navigator.hardwareConcurrency);
 const DETECTIONS = new Map<string, {
-    results: Array<TDetectionThreadReply['result']>
+    results: Array<TDetectionResult>
     progress: number
 }>();
 
@@ -35,7 +35,7 @@ const detectionThreadRef = new URL("./detectionThread.ts", import.meta.url).href
 for (let i = 0; i < detectionThreads.length; i++) {
     detectionThreads[i] = new Worker(detectionThreadRef, { type: "module" });
     
-    detectionThreads[i].addEventListener("message", (e: MessageEvent<TDetectionThreadReply>) => {
+    detectionThreads[i].addEventListener("message", (e: MessageEvent<TDetectionThreadMessage>) => {
         if(e.data.type === EDetectionThreadMessageType.RESULT){
             DETECTIONS.get(e.data.for)?.results.push(e.data.result);
             if(DETECTIONS.get(e.data.for)?.results.length === detectionThreads.length){
@@ -58,12 +58,35 @@ const licenseDB = new LicenseStorage("./licenses/ctph_hashes.wlhdb");
 // TODO: we need a map so that we can distinguish between which computation belongs to which license request
 
 
+
+// TODO: add instruction to update thread concerns if license db changes.
+/**
+ * Distribute the database sections to the workers that need to be concerned with their respective sections.
+ */
+function DistributeConcerns(){
+    const licenseCount = licenseDB.getEntryCount();
+    const licensesPerThread = Math.floor(licenseCount / detectionThreads.length)
+    let currentThreadIndex = 0;
+    // would be nice if we can pre-group the licenses into chunks and send them to the threads.
+    for(const licenseEntry of licenseDB.entriesBatched(licensesPerThread)){
+        const INIT_MSG: TDetectionThreadMessage = {
+            type: EDetectionThreadMessageType.INIT,
+            db: licenseEntry.buffer
+        }
+        detectionThreads[currentThreadIndex]?.postMessage(INIT_MSG, [licenseEntry.buffer]);
+        currentThreadIndex = (currentThreadIndex + 1) % detectionThreads.length;
+    }
+}
+
+
 // TODO: pre-spawn the threads.. spawnup time can be slow.
 self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
     if(e.data.type === ECoordinationThreadMessageType.init){
         const {loadBuffer} = e.data;
         LOAD_BUFFER = new DataView(loadBuffer);
         LOAD_BUFFER.setUint32(0, DETECTIONS.size)
+
+        DistributeConcerns();
     }else if(e.data.type === ECoordinationThreadMessageType.detect){
         const {id, license} = e.data;
 
@@ -75,18 +98,18 @@ self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
             }
         });
         LOAD_BUFFER?.setUint32(0, DETECTIONS.size)
-        const licenseCount = licenseDB.getEntryCount()
+        // const licenseCount = licenseDB.getEntryCount()
         const SHARED_LICENSE_BUFFER = new SharedArrayBuffer(e.data.license.byteLength);
         const RAW_LICENSE = new Uint8Array(SHARED_LICENSE_BUFFER);
         RAW_LICENSE.set(new Uint8Array(license));
-        // split licenseCount evenly between all worker threads. remainders will be put on the last worker thread
-        const licensesPerThread = Math.floor(licenseCount / detectionThreads.length)
-        let currentThreadIndex = 0;
-        // would be nice if we can pre-group the licenses into chunks and send them to the threads.
-        for(const licenseEntry of licenseDB.entriesBatched(licensesPerThread)){
-            const MSG: TDetectionThreadMessage = {id, srcl: SHARED_LICENSE_BUFFER, db: licenseEntry.buffer}
-            detectionThreads[currentThreadIndex]?.postMessage(MSG, [licenseEntry.buffer]);
-            currentThreadIndex = (currentThreadIndex + 1) % detectionThreads.length;
+
+        for(const thread of detectionThreads){
+            const MSG: TDetectionThreadMessage = {
+                type: EDetectionThreadMessageType.DETECT,
+                id,
+                srcl: SHARED_LICENSE_BUFFER,
+            }
+            thread.postMessage(MSG);
         }
     }
 };
