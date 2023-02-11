@@ -27,7 +27,7 @@ import {
 } from "../src/scripts/computeLicenses.ts";
 
 // --- properties
-const EXAMPLE_LICENSE = Deno.readFileSync("./licenses/RAW/Apache-2.0.txt");
+const EXAMPLE_LICENSE = Deno.readFileSync("./licenses/RAW/apache-2.0.LICENSE");
 /**
  * The maximum block size to test against. The program will test all block sizes from MIN_BLOCK_SIZE to this value.
  */
@@ -54,7 +54,10 @@ function cloneByteArray(source: Uint8Array): Uint8Array {
 
 // TODO: print out details about the data set. also print out time
 console.log(`
-Running license detection benchmarks.
+Running license detection benchmarks (${new Date().toISOString()}).
+Default data set details:
+  Amount of licenses: ${new LicenseStorage('./licenses/ctph_hashes.wlhdb').getEntryCount()}
+
 Legend:
   - Single license [blockSize, fuzzyHashLength] \t (e.g., Single license [64, 64])
 

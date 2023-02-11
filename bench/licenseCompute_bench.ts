@@ -22,7 +22,7 @@ import {
 } from "../src/scripts/computeLicenses.ts";
 
 // --- properties
-const EXAMPLE_LICENSE = Deno.readFileSync("./licenses/RAW/Apache-2.0.txt");
+const EXAMPLE_LICENSE = Deno.readFileSync("./licenses/RAW/apache-2.0.LICENSE");
 /**
  * The maximum block size to test against. The program will test all block sizes from MIN_BLOCK_SIZE to this value.
  */
@@ -37,7 +37,7 @@ const MIN_FUZZY_HASH_LENGTH = 2;
 
 // TODO: print out time..
 console.log(`
-Running license hash computation benchmarks.
+Running license hash computation benchmarks (${new Date().toISOString()}).
 Legend:
   - Single license [blockSize, fuzzyHashLength] \t (e.g., Single license [64, 64])
 
