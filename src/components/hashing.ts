@@ -34,18 +34,31 @@ export function createHash(buffer: Uint8Array, hashLength: number): string {
   return res;
 }
 
-export function compareHashes(hash1: string, hash2: string, hashLength = 5) {
+export function compareHashes(hash1: string, hash2: string, hashLength = 5, minConfidence: number = 0) {
   const blocks1 = hash1.match(new RegExp(`.{1,${hashLength}}`, "g")) || [];
   const blocks2 = hash2.match(new RegExp(`.{1,${hashLength}}`, "g")) || [];
 
   let commonBlocks = 0;
-  for (let i = 0; i < blocks1.length && i < blocks2.length; i++) {
+  let uncommonBlocks = 0;
+  const maxBlocks = Math.max(blocks1.length, blocks2.length);
+ 
+  const maxUncommonBlocks = minConfidence === 0 ? maxBlocks+1 : Math.ceil((minConfidence) * Math.max(blocks1.length, blocks2.length));
+
+  for (let i = 0; i < maxBlocks; i++) {
     if (blocks1[i] === blocks2[i]) {
       commonBlocks++;
+    }else{
+      uncommonBlocks++;
+      if(uncommonBlocks > maxUncommonBlocks) {
+        return {
+          commonBlocks: -1,
+          totalBlocks: Math.max(blocks1.length, blocks2.length),
+          confidence: -1,
+        };
+      }
     }
   }
 
-  const maxBlocks = Math.max(blocks1.length, blocks2.length);
 
   return {
     commonBlocks,
