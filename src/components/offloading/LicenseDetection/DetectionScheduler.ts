@@ -93,6 +93,8 @@ export class DetectionScheduler {
                     resolve(e.data.results)
                 }
             })
+
+            // TODO: pass in min confidence threshold to threads
             const THREAD_MSG: TCoordinationThreadMessage = { type: ECoordinationThreadMessageType.detect, license: license.buffer, id: v1.generate() as string }
             coordinationThread.postMessage(THREAD_MSG, [license.buffer])
         })
