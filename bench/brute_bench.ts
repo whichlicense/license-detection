@@ -16,7 +16,6 @@
 
 import { DetectionScheduler } from "../src/components/offloading/LicenseDetection/DetectionScheduler.ts";
 import LicenseStorage from "../src/components/storage.ts";
-import { DEFAULT_BLOCK_SIZE,DEFAULT_FUZZY_HASH_LENGTH } from "../src/scripts/computeLicenses.ts";
 
 /**
  * This will hold all brute force style benchmarks that don't really make sense (like detecting a million licenses in one go or something)
