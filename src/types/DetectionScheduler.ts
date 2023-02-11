@@ -23,6 +23,8 @@ export enum ECoordinationThreadMessageType {
     init
 }
 
+export type TDetectionResult = ReturnType<typeof detectLicenseRawDB>;
+
 export type TCoordinationThreadMessage = {
     type: ECoordinationThreadMessageType.result,
     results: ReturnType<typeof detectLicenseRawDB>
@@ -40,31 +42,29 @@ export type TCoordinationThreadMessage = {
 
 
 export enum EDetectionThreadMessageType {
-    RESULT
+    RESULT, INIT, DETECT
 }
 
 // TODO: unionize this when we have more options
-export type TDetectionThreadReply = {
+export type TDetectionThreadMessage = {
     type: EDetectionThreadMessageType.RESULT,
     for: string,
     result: ReturnType<typeof detectLicenseRawDB>
-}
-
-/**
- * Incoming message in the detection thread.
- */
-export type TDetectionThreadMessage = {
+} | {
+    type: EDetectionThreadMessageType.INIT,
+    
+    /**
+     * DB section
+     */
+    db: ArrayBufferLike,
+} | {
+    type: EDetectionThreadMessageType.DETECT,
     /**
      * Source license
      */
     srcl: SharedArrayBuffer,
     /**
-     * DB section
-     */
-    db: ArrayBufferLike,
-    /**
-     * ID of the license
-     *  
+     * ID of the request
      */
     id: string
 }
