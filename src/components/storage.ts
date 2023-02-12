@@ -93,6 +93,14 @@ export default class LicenseStorage {
         this.file.seekSync(0, Deno.SeekMode.Start);
         this.file.writeSync(new TextEncoder().encode(`${count.toString().padStart(this.options.MAX_FILE_ENTRY_BLOCKS, '0')}\n`));
     }
+
+    /**
+     * Removes everything from the database... use with caution
+     */
+    clear(){
+        this.file.truncateSync();
+        this.setEntryCountSync(0);
+    }
             
 
     addLicense(obj: TLicenseDBEntry) {
