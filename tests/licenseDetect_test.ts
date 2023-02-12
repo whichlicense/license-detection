@@ -42,11 +42,9 @@ Deno.test("License matching is up to spec", {},
         assert(detected[0].confidence > 0.9);
     });
 
-    await t.step("Similar license is detected with >90% confidence", async () => {
-        const detected = await ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_2))
-        assert(detected.length > 0);
-        assertEquals(detected[0].name, "apache-2.0.LICENSE");
-        assert(detected[0].confidence > 0.9);
+    await t.step("Unavailable license is not detected", async () => {
+        const detected = await ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_3))
+        assert(detected.length === 0);
     });
 });
 
@@ -248,4 +246,17 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+`)
+
+
+const TEST_LICENSE_3 = stripLicense(`
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi posuere sagittis metus, sit amet ullamcorper erat ultrices sed. Duis ut tellus malesuada, tempor purus sollicitudin, posuere augue. Pellentesque ornare enim ornare vestibulum porta. Vivamus ac mauris sed libero interdum finibus. Ut vestibulum leo tortor, id iaculis eros porttitor vitae. Nunc eu sagittis odio. Nunc tempus mauris a pellentesque sagittis.
+
+Quisque eleifend auctor molestie. Cras convallis volutpat nunc, a pretium ante tempus at. Duis vestibulum nisi metus, non interdum velit faucibus vitae. Pellentesque ac euismod elit. Vivamus ac est lectus. Fusce quis sapien quam. Vestibulum magna nisi, euismod non lobortis et, viverra in orci.
+
+Maecenas fermentum sagittis laoreet. Aliquam congue dolor tortor, et aliquam enim volutpat a. Pellentesque eu libero erat. Phasellus sodales laoreet lobortis. Proin laoreet dolor mollis, vulputate augue a, pellentesque ipsum. Mauris at purus efficitur, ornare ante eget, elementum est. Integer vel risus aliquet, fringilla ex vulputate, hendrerit magna. Suspendisse ut nisi condimentum, auctor magna et, pellentesque arcu. Morbi convallis tempus nibh eget aliquam. Nullam sit amet ligula arcu. Mauris fermentum lectus a laoreet aliquam.
+
+Suspendisse ullamcorper non enim consectetur rhoncus. Nunc sed ultricies libero. Sed quis aliquet ante. Fusce vitae dapibus urna, a malesuada massa. Donec pretium libero non lacus euismod, ac mollis enim consequat. Nunc fermentum neque ante, quis hendrerit risus eleifend et. Ut imperdiet convallis dictum. Phasellus feugiat laoreet scelerisque.
+
+In molestie, odio nec viverra facilisis, enim erat consequat urna, sit amet auctor arcu massa vitae purus. In a nisl a est pretium iaculis. Pellentesque quis interdum erat, eu auctor quam. Nam ullamcorper nisl vitae ligula hendrerit, vitae viverra ipsum sollicitudin. Vestibulum mauris risus, semper in feugiat nec, condimentum sed dolor. Integer pellentesque, elit ut posuere volutpat, metus ligula fermentum massa, at bibendum nisl elit at urna. Vestibulum ullamcorper magna libero, vitae faucibus mauris efficitur ut. Phasellus ornare ultricies rhoncus. Mauris congue nibh ut convallis tincidunt. Ut a purus magna. Maecenas sit amet purus a enim dapibus luctus. Pellentesque venenatis arcu molestie, blandit nisi sed, porttitor ante. In hac habitasse platea dictumst. Curabitur condimentum sodales risus. Aenean dolor massa, pretium ac auctor imperdiet, volutpat aliquam justo.
 `)
