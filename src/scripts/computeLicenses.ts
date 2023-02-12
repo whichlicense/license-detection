@@ -27,7 +27,7 @@ import { stripLicense } from "../components/minification.ts";
  * produce the same hash value.
  * A larger block size can also result in fewer permutations, making it harder to detect similarities.
  */
-export const DEFAULT_BLOCK_SIZE = 4;
+export const DEFAULT_BLOCK_SIZE = 10;
 
 /**
  * ```FUZZY_HASH_LENGTH``` is a property that determines the length of the final hash value that is produced
@@ -36,7 +36,7 @@ export const DEFAULT_BLOCK_SIZE = 4;
  * so a larger FUZZY_HASH_LENGTH value means that more blocks will be processed, resulting in a longer, more detailed hash value.
  * This can increase the sensitivity of the algorithm, but also increase the computational cost of generating the hash.
  */
-export const DEFAULT_FUZZY_HASH_LENGTH = 5;
+export const DEFAULT_FUZZY_HASH_LENGTH = 7;
 
 // TODO: separate system to recompile on change
 // TODO: all defaults should come from a settings file!
@@ -145,6 +145,7 @@ if (import.meta.main) {
   } else {
     const out = computeAllLicenseHashes("./licenses/RAW");
     const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb")
+    storage.clear()
 
     for(const license of out) {
       storage.addLicense(license)
