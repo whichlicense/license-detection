@@ -113,5 +113,3 @@ export function detectLicenseRawDB(
 
   return matches;
 }
-// TODO: paralellize this? we can use deno sub-instances to do this. divide the licenseDB into chunks and then run each chunk in a separate instance.
-// we can also use threads instead of sub-instances.
