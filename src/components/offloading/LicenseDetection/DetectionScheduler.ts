@@ -83,7 +83,7 @@ export class DetectionScheduler {
      * @param license 
      * @returns 
      */
-    public detectLicense(license: TLicense): Promise<ReturnType<typeof detectLicenseRawDB>> {
+    public detectLicense(license: TLicense, minConfidence = 0.9): Promise<ReturnType<typeof detectLicenseRawDB>> {
         return new Promise((resolve, reject) => {
             // TODO: implement timeout rejection system
             const coordinationThread = this.findFreeCoordinationThread()
@@ -95,7 +95,12 @@ export class DetectionScheduler {
             })
 
             // TODO: pass in min confidence threshold to threads
-            const THREAD_MSG: TCoordinationThreadMessage = { type: ECoordinationThreadMessageType.detect, license: license.buffer, id: v1.generate() as string }
+            const THREAD_MSG: TCoordinationThreadMessage = {
+                    type: ECoordinationThreadMessageType.detect,
+                    license: license.buffer,
+                    id: v1.generate() as string ,
+                    minConfidence
+                }
             coordinationThread.postMessage(THREAD_MSG, [license.buffer])
         })
     }

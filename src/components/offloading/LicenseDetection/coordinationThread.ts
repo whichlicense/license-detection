@@ -87,7 +87,7 @@ self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
 
         DistributeConcerns();
     }else if(e.data.type === ECoordinationThreadMessageType.detect){
-        const {id, license} = e.data;
+        const {id, license, minConfidence} = e.data;
 
         // set up storage for request
         DETECTIONS.set(id, {
@@ -104,6 +104,7 @@ self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
                 type: EDetectionThreadMessageType.DETECT,
                 id,
                 srcl: SHARED_LICENSE_BUFFER,
+                minConfidence
             }
             thread.postMessage(MSG);
         }

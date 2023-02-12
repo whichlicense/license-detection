@@ -34,7 +34,13 @@ export type TCoordinationThreadMessage = {
 } | {
     type: ECoordinationThreadMessageType.detect,
     license: ArrayBufferLike,
-    id: string
+    id: string,
+
+    /**
+     * Minimum confidence required to be considered a match worthy of returning. anything below this will be ignored.
+     * > This speeds up detection the higher it is set.
+     */
+    minConfidence: number
 } | {
     type: ECoordinationThreadMessageType.init,
     loadBuffer: SharedArrayBuffer,
@@ -66,5 +72,10 @@ export type TDetectionThreadMessage = {
     /**
      * ID of the request
      */
-    id: string
+    id: string,
+    /**
+     * Minimum confidence required to be considered a match worthy of returning. anything below this will be ignored.
+     * > This speeds up detection the higher it is set.
+     */
+    minConfidence: number
 }

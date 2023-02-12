@@ -27,8 +27,7 @@ self.onmessage = (e: MessageEvent<TDetectionThreadMessage>) => {
         DB = new Uint8Array(e.data.db);
     }else if(e.data.type === EDetectionThreadMessageType.DETECT) {
         const RAW_LICENSE = new Uint8Array(e.data.srcl); // memory is shared across threads
-    
-        const matches = detectLicenseRawDB(RAW_LICENSE, DB);
+        const matches = detectLicenseRawDB(RAW_LICENSE, DB, e.data.minConfidence);
     
         const REPLY: TDetectionThreadMessage = {type: EDetectionThreadMessageType.RESULT, for: e.data.id, result: matches}
         postMessage(REPLY);
