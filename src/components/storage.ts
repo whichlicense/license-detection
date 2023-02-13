@@ -49,6 +49,7 @@ hfj24978389fh4839fn3948nf384nf9538h3489nf8943h48f9hn4389fn8943f3489fn8
 
 export default class LicenseStorage {
     private file: Deno.FsFile;
+    private isClosed: boolean;
     private filePath: string | URL;
     private options = {
         MAX_FILE_ENTRY_BLOCKS: 13,
@@ -65,15 +66,16 @@ export default class LicenseStorage {
 
         // TODO: figure out if we need reading..
         this.file = Deno.openSync(file, {create: true, read: true, write: true});
+        this.isClosed = false;
         if(this.file.statSync().size <= 2) this.setEntryCountSync(0);
 
 
         addEventListener("unload", () => {
-            this.file.close();
+            this.closeDB();
         });
 
         addEventListener("unhandledrejection", () => {
-            this.file.close();
+            this.closeDB();
         });
     }
 
@@ -158,6 +160,15 @@ export default class LicenseStorage {
                 }
             }
         }
+    }
+
+    /**
+     * Closes the file handle.. use this when you're done with the database.
+     * > calling this method will prevent you from using the database again until you create a new instance
+     */
+    closeDB() {
+        if(!this.isClosed) this.file.close();
+        this.isClosed = true;
     }
 
     private combineUint8Arrays(arrays: Uint8Array[]): Uint8Array {
