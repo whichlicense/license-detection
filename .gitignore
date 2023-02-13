@@ -4,3 +4,4 @@ TEST_LICENSE_1
 TEST_LICENSE_2
 x.ts
 PERSONAL_TODO.md
+coverage/**
