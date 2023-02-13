@@ -4,5 +4,17 @@
     "recompute-licenses": "deno run --allow-read --allow-write ./src/scripts/computeLicenses.ts",
     "benchmark": "deno bench -A --v8-flags=--max-old-space-size=8000",
     "fmt": "deno fmt ./src ./bench ./tests"
+  },
+  "imports": {
+    "DetectionScheduler": "./src/components/offloading/LicenseDetection/DetectionScheduler.ts",
+    "components/detecting": "./src/components/detecting.ts",
+    "components/hashing": "./src/components/hashing.ts",
+    "components/minification": "./src/components/minification.ts",
+    "components/storage": "./src/components/storage.ts",
+    "scripts/computeLicenses": "./src/scripts/computeLicenses.ts",
+
+    "types/DetectionScheduler": "./src/types/DetectionScheduler.ts",
+    "types/License": "./src/types/License.ts",
+    "types/LicenseCompute": "./src/types/LicenseCompute.ts",
   }
 }
