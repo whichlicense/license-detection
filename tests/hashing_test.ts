@@ -54,42 +54,41 @@ Deno.test("Creating hashes", {}, async (t) => {
       assert(!res.includes('0'))
     });
   });
-
 });
 
 Deno.test("Compare hashes", {}, async (t) => {
   await t.step("Equal hash matches with high confidense", () => {
-    const res = compareHashes("abcd", "abcd", 2, 0.5);
+    const res = compareHashes("a:b:c:d", "a:b:c:d", 0.5);
     assert(res.confidence === 1);
   });
 
   await t.step("50% change produces 50% confidence", () => {
-    const res = compareHashes("abcd", "abxx", 2, 0.1);
-    assert(res.confidence === 0.5);
+    const res = compareHashes("a:b:c:d", "a:b:x:x");
+    assertEquals(res.confidence, 0.5);
   });
 
   await t.step("Cut off confidence tests", async (t) => {
     await t.step("Does not cut-off when above min confidence", () => {
       // should be a 50% confidence
-      const res = compareHashes("1234567890", "abcde67890", 1, 0.6);
+      const res = compareHashes("1:2:3:4:5:6:7:8:9:0", "a:b:c:d:e:6:7:8:9:0", 0.6);
       assert(res.confidence !== -1);
     });
 
     await t.step("Does not cut-off when exactly min confidence", () => {
       // should be a 50% confidence
-      const res = compareHashes("1234567890", "abcde67890", 1, 0.5);
+      const res = compareHashes("1:2:3:4:5:6:7:8:9:0", "a:b:c:d:e:6:7:8:9:0", 0.5);
       assert(res.confidence !== -1);
     });
 
     await t.step("Cuts off when below min confidence", () => {
       // should be a 50% confidence
-      const res = compareHashes("OOOOOOOOOO", "XXXXXXOOOO", 1, 0.5);
+      const res = compareHashes("O:O:O:O:O:O:O:O:O:O", "X:X:X:X:X:X:O:O:O:O:", 0.5);
       assert(res.confidence === -1);
     });
 
     await t.step("No min confidence lets all through", () => {
       // should be a 50% confidence
-      const res = compareHashes("OOOOOOOOOO", "XXXXXXXXXXXXXXXX", 1);
+      const res = compareHashes("O:O:O:O:O:O:O:O:O:O", "X:X:X:X:X:X:X:X:X:X:X:X:X:X:X:X");
       assert(res.confidence !== -1);
     });
   });
