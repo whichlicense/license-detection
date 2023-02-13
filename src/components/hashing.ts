@@ -23,7 +23,7 @@ export function createHash(buffer: Uint8Array, hashLength: number): string {
     hash |= 0;
   }
 
-  const res = hash.toString(radix).padStart(hashLength, "0");
+  const res = hash.toString(radix)
   return res;
 }
 
