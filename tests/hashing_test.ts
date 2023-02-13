@@ -15,8 +15,47 @@
  *   limitations under the License.
  */
 
-import { assert } from "https://deno.land/std@0.177.0/testing/asserts.ts";
-import { compareHashes } from "../src/components/hashing.ts";
+import { assert, assertEquals, assertExists, assertNotEquals, assertStrictEquals } from "https://deno.land/std@0.177.0/testing/asserts.ts";
+import { compareHashes, createHash } from "components/hashing";
+
+
+const TEST_HASH_1 = new TextEncoder().encode("1234567890");
+const TEST_HASH_2 = new TextEncoder().encode("abcdefghij");
+
+Deno.test("Creating hashes", {}, async (t) => {
+  await t.step("Returns results", () => {
+    const res = createHash(TEST_HASH_1, TEST_HASH_1.length);
+    assertExists(res);
+  });
+
+  await t.step("Same inputs compares", () => {
+    const res = createHash(TEST_HASH_1, TEST_HASH_1.length);
+    assertEquals(res, createHash(TEST_HASH_1, TEST_HASH_1.length));
+  });
+
+  await t.step("Different inputs produce different hash", () => {
+    const res = createHash(TEST_HASH_1, TEST_HASH_1.length);
+    assertNotEquals(res, createHash(TEST_HASH_2, TEST_HASH_2.length));
+  });
+
+  await t.step("Different hash lengths produce different hash", () => {
+    const res = createHash(TEST_HASH_1, TEST_HASH_1.length);
+    assertNotEquals(res, createHash(TEST_HASH_1, TEST_HASH_1.length + 1));
+  });
+
+  await t.step("Hash length can be controlled", async (t) => {
+    await t.step("Bugger hash length pads with zeros", () => {
+      const res = createHash(TEST_HASH_1, 20);
+      assert(res.includes('0'))
+    });
+
+    await t.step("Smaller hash length has no padding", () => {
+      const res = createHash(TEST_HASH_1, 1);
+      assert(!res.includes('0'))
+    });
+  });
+
+});
 
 Deno.test("Compare hashes", {}, async (t) => {
   await t.step("Equal hash matches with high confidense", () => {
