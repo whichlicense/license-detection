@@ -12,6 +12,8 @@ const ds = new DetectionScheduler();
 const detected = await ds.detectLicense(SOME_LICENSE);
 ```
 
+> Note: once an instance of the detection scheduler has been created, it should be reused for all subsequent detections. The detection scheduler will spawn the scheduling and detection threads once and reuse them for all subsequent detections.
+
 ### Single-threaded detection
 ```typescript
 detectLicense(SOME_LICENSE);
