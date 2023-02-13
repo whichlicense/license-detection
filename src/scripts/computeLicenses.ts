@@ -19,6 +19,7 @@ import { basename } from "https://deno.land/std@0.177.0/path/mod.ts";
 import { TLicenseDBEntry } from "../types/License.ts";
 import LicenseStorage from "../components/storage.ts";
 import { stripLicense } from "../components/minification.ts";
+import { TLicenseComputeOptions,TLicenseComputeSettingsOverride } from "../types/LicenseCompute.ts";
 
 // TODO: make these props come from config file or flags
 /**
@@ -52,16 +53,6 @@ export function computeLicenseHash(
   };
 }
 
-export type TLicenseComputeOptions = {
-  DEFAULT_BLOCK_SIZE: number;
-  DEFAULT_FUZZY_HASH_LENGTH: number;
-  CTPH_SETTINGS_OVERRIDE?: string;
-};
-export type TLicenseComputeSettingsOverride = {
-  [license: string]: { blockSize?: number; fuzzyHashLength?: number };
-};
-
-// TODO: extract options type to a separate type declaration
 export function computeAllLicenseHashes(
   licensesFolderPath: string,
   options: TLicenseComputeOptions = {
