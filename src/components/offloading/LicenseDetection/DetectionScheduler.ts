@@ -83,13 +83,16 @@ export class DetectionScheduler {
      * @param license 
      * @returns 
      */
-    public detectLicense(license: TLicense, minConfidence = 0.9): Promise<ReturnType<typeof detectLicenseRawDB>> {
+    public detectLicense(license: TLicense, minConfidence = 0.9, timeout?: number): Promise<ReturnType<typeof detectLicenseRawDB>> {
         return new Promise((resolve, reject) => {
-            // TODO: implement timeout rejection system
             const coordinationThread = this.findFreeCoordinationThread()
+            const REQ_TIMEOUT = timeout ? setTimeout(() => {
+                reject("request timed out")
+            }, timeout) : undefined
+
             coordinationThread.addEventListener('message', (e: MessageEvent<TCoordinationThreadMessage>) => {
                 if (e.data.type === ECoordinationThreadMessageType.result) {
-                    // TODO: results don't have an id, so we can't match them to the request.!!
+                    if(REQ_TIMEOUT) clearTimeout(REQ_TIMEOUT)
                     resolve(e.data.results)
                 }
             })
