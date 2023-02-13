@@ -67,7 +67,6 @@ export class DetectionScheduler {
     // TODO: method to get scheduler load as percentage (indicating how many threads are busy)
 
     private findFreeCoordinationThread(): Worker {
-        // TODO: early exit sorting.. i.e., exit if value is 0 or continue to sort to find smallest
         const freeCoordinationThread = this.coordinationThreads[0].load === 0 ? this.coordinationThreads[0] : this.coordinationThreads.sort((a, b) => a.load - b.load)[0]
         return freeCoordinationThread.w;
     }
