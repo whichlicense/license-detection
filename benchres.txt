@@ -1,95 +1,110 @@
+DetectionScheduler created
 
-Running license hash computation benchmarks (2023-02-11T14:56:06.786Z).
-Legend:
-  - Single license [blockSize, fuzzyHashLength] 	 (e.g., Single license [64, 64])
-
-Notes:
-  - The 'Single license [...]' benchmarks has a baseline with 4 as blockSize and 5 as fuzzyHashLength. This conveniently also happens to be the default values for the 'computeLicenseHash' function.
+Running some unreasonable benchmarks (2023-02-13T09:07:15.959Z).
+Data set details:
+  Amount of licenses: 2046
 
 [0m[38;5;245mcpu: Apple M1 Pro[0m
 [0m[38;5;245mruntime: deno 1.30.3 (aarch64-apple-darwin)[0m
 
-[0m[38;5;245mfile:///Users/duartsnel/local/personal_projects/whatlicense/backend/bench/licenseCompute_bench.ts[0m
-benchmark                             time (avg)             (min … max)       p75       p99      p995
------------------------------------------------------------------------- -----------------------------
-Computing all license hashes         [33m1.56 s[0m/iter       ([36m1.41 s[0m … [35m1.77 s[0m)    [90m1.64 s[0m    [90m1.77 s[0m    [90m1.77 s[0m
+[0m[38;5;245mfile:///Users/duartsnel/local/personal_projects/whatlicense/backend/bench/brute_bench.ts[0m
+benchmark                                             time (avg)             (min … max)       p75       p99      p995
+---------------------------------------------------------------------------------------- -----------------------------
+Threaded random license detection (1 iterations)   [33m10.83 ms[0m/iter    ([36m8.68 ms[0m … [35m12.66 ms[0m)  [90m11.29 ms[0m  [90m12.66 ms[0m  [90m12.66 ms[0m
 
-Single license [4, 5] (BASELINE)    [33m1.08 ms[0m/iter   ([36m466.62 µs[0m … [35m5.42 ms[0m)    [90m1.8 ms[0m   [90m2.77 ms[0m   [90m3.42 ms[0m
-Single license [2, 2]               [33m1.86 ms[0m/iter  ([36m834.25 µs[0m … [35m12.71 ms[0m)   [90m1.97 ms[0m    [90m9.1 ms[0m   [90m9.39 ms[0m
-Single license [2, 3]               [33m2.23 ms[0m/iter    ([36m867.5 µs[0m … [35m7.16 ms[0m)   [90m3.61 ms[0m   [90m5.91 ms[0m      [90m6 ms[0m
-Single license [2, 4]               [33m2.52 ms[0m/iter   ([36m914.42 µs[0m … [35m8.84 ms[0m)   [90m4.11 ms[0m   [90m5.37 ms[0m   [90m7.18 ms[0m
-Single license [2, 5]               [33m2.33 ms[0m/iter   ([36m902.92 µs[0m … [35m8.98 ms[0m)   [90m3.53 ms[0m   [90m5.91 ms[0m   [90m7.93 ms[0m
-Single license [2, 6]               [33m2.44 ms[0m/iter   ([36m955.38 µs[0m … [35m6.63 ms[0m)   [90m3.92 ms[0m   [90m4.78 ms[0m   [90m4.86 ms[0m
-Single license [2, 7]               [33m2.33 ms[0m/iter   ([36m973.71 µs[0m … [35m7.17 ms[0m)   [90m3.68 ms[0m   [90m4.81 ms[0m   [90m4.84 ms[0m
-Single license [2, 8]               [33m2.25 ms[0m/iter   ([36m979.21 µs[0m … [35m5.77 ms[0m)   [90m3.61 ms[0m   [90m4.81 ms[0m   [90m4.83 ms[0m
-Single license [2, 9]               [33m2.29 ms[0m/iter  ([36m965.62 µs[0m … [35m10.91 ms[0m)   [90m3.41 ms[0m   [90m6.39 ms[0m   [90m7.45 ms[0m
-Single license [3, 2]               [33m1.66 ms[0m/iter   ([36m608.83 µs[0m … [35m8.46 ms[0m)   [90m2.74 ms[0m    [90m3.9 ms[0m   [90m8.25 ms[0m
-Single license [3, 3]               [33m1.86 ms[0m/iter   ([36m614.25 µs[0m … [35m4.38 ms[0m)   [90m2.83 ms[0m   [90m3.14 ms[0m   [90m3.19 ms[0m
-Single license [3, 4]               [33m1.32 ms[0m/iter   ([36m604.29 µs[0m … [35m7.02 ms[0m)    [90m1.6 ms[0m   [90m5.58 ms[0m   [90m6.78 ms[0m
-Single license [3, 5]               [33m1.58 ms[0m/iter   ([36m618.29 µs[0m … [35m3.18 ms[0m)   [90m2.61 ms[0m   [90m3.14 ms[0m   [90m3.15 ms[0m
-Single license [3, 6]               [33m1.48 ms[0m/iter   ([36m642.21 µs[0m … [35m6.67 ms[0m)   [90m2.32 ms[0m    [90m4.1 ms[0m   [90m5.87 ms[0m
-Single license [3, 7]               [33m1.71 ms[0m/iter   ([36m643.21 µs[0m … [35m7.59 ms[0m)   [90m2.63 ms[0m   [90m3.24 ms[0m   [90m3.33 ms[0m
-Single license [3, 8]                [33m1.5 ms[0m/iter   ([36m667.29 µs[0m … [35m4.92 ms[0m)   [90m2.31 ms[0m    [90m3.3 ms[0m   [90m3.35 ms[0m
-Single license [3, 9]               [33m1.62 ms[0m/iter  ([36m669.08 µs[0m … [35m11.54 ms[0m)   [90m2.48 ms[0m   [90m4.33 ms[0m   [90m7.33 ms[0m
-Single license [4, 2]               [33m1.37 ms[0m/iter   ([36m460.33 µs[0m … [35m6.78 ms[0m)   [90m2.15 ms[0m    [90m4.4 ms[0m   [90m6.65 ms[0m
-Single license [4, 3]               [33m1.07 ms[0m/iter  ([36m459.58 µs[0m … [35m16.16 ms[0m)    [90m1.3 ms[0m   [90m4.61 ms[0m   [90m4.97 ms[0m
-Single license [4, 4]               [33m1.49 ms[0m/iter   ([36m478.79 µs[0m … [35m2.45 ms[0m)   [90m2.11 ms[0m    [90m2.4 ms[0m   [90m2.43 ms[0m
-Single license [4, 5]                [33m1.3 ms[0m/iter  ([36m465.92 µs[0m … [35m10.93 ms[0m)   [90m2.07 ms[0m   [90m2.45 ms[0m   [90m3.53 ms[0m
-Single license [4, 6]               [33m1.35 ms[0m/iter  ([36m497.58 µs[0m … [35m12.74 ms[0m)   [90m2.02 ms[0m   [90m3.09 ms[0m   [90m3.62 ms[0m
-Single license [4, 7]               [33m1.25 ms[0m/iter   ([36m494.21 µs[0m … [35m4.67 ms[0m)   [90m2.09 ms[0m   [90m2.88 ms[0m   [90m3.49 ms[0m
-Single license [4, 8]               [33m1.26 ms[0m/iter   ([36m518.88 µs[0m … [35m6.25 ms[0m)   [90m2.01 ms[0m   [90m2.87 ms[0m   [90m4.34 ms[0m
-Single license [4, 9]               [33m1.29 ms[0m/iter   ([36m510.96 µs[0m … [35m4.91 ms[0m)   [90m2.09 ms[0m    [90m2.5 ms[0m   [90m2.56 ms[0m
-Single license [5, 2]               [33m1.05 ms[0m/iter   ([36m377.33 µs[0m … [35m2.53 ms[0m)   [90m1.68 ms[0m   [90m2.06 ms[0m    [90m2.1 ms[0m
-Single license [5, 3]             [33m874.21 µs[0m/iter  ([36m367.54 µs[0m … [35m11.11 ms[0m)   [90m1.32 ms[0m   [90m2.93 ms[0m   [90m3.53 ms[0m
-Single license [5, 4]               [33m1.18 ms[0m/iter   ([36m381.29 µs[0m … [35m4.56 ms[0m)   [90m1.67 ms[0m      [90m2 ms[0m    [90m2.3 ms[0m
-Single license [5, 5]             [33m889.37 µs[0m/iter   ([36m364.42 µs[0m … [35m5.82 ms[0m)   [90m1.36 ms[0m   [90m3.64 ms[0m   [90m5.03 ms[0m
-Single license [5, 6]               [33m1.07 ms[0m/iter    ([36m379.38 µs[0m … [35m7.5 ms[0m)   [90m1.62 ms[0m   [90m2.06 ms[0m   [90m2.32 ms[0m
-Single license [5, 7]             [33m920.01 µs[0m/iter    ([36m388.5 µs[0m … [35m1.96 ms[0m)   [90m1.54 ms[0m   [90m1.91 ms[0m   [90m1.93 ms[0m
-Single license [5, 8]             [33m910.55 µs[0m/iter   ([36m390.04 µs[0m … [35m5.35 ms[0m)   [90m1.47 ms[0m   [90m2.24 ms[0m    [90m4.2 ms[0m
-Single license [5, 9]               [33m1.03 ms[0m/iter   ([36m397.46 µs[0m … [35m5.81 ms[0m)   [90m1.69 ms[0m   [90m1.95 ms[0m   [90m2.12 ms[0m
-Single license [6, 2]              [33m906.2 µs[0m/iter   ([36m487.54 µs[0m … [35m4.84 ms[0m)   [90m1.01 ms[0m   [90m2.79 ms[0m   [90m4.33 ms[0m
-Single license [6, 3]             [33m866.16 µs[0m/iter   ([36m489.83 µs[0m … [35m6.54 ms[0m) [90m853.62 µs[0m   [90m2.39 ms[0m   [90m2.64 ms[0m
-Single license [6, 4]             [33m953.83 µs[0m/iter   ([36m495.75 µs[0m … [35m2.71 ms[0m)   [90m1.41 ms[0m   [90m2.37 ms[0m   [90m2.62 ms[0m
-Single license [6, 5]             [33m805.99 µs[0m/iter   ([36m492.67 µs[0m … [35m3.64 ms[0m) [90m763.96 µs[0m   [90m2.38 ms[0m    [90m2.7 ms[0m
-Single license [6, 6]             [33m941.12 µs[0m/iter   ([36m493.92 µs[0m … [35m5.33 ms[0m)   [90m1.16 ms[0m   [90m2.37 ms[0m   [90m3.29 ms[0m
-Single license [6, 7]             [33m837.35 µs[0m/iter   ([36m492.29 µs[0m … [35m5.65 ms[0m)    [90m760 µs[0m   [90m2.49 ms[0m   [90m2.84 ms[0m
-Single license [6, 8]             [33m818.59 µs[0m/iter   ([36m502.38 µs[0m … [35m4.39 ms[0m) [90m734.96 µs[0m   [90m2.44 ms[0m   [90m3.36 ms[0m
-Single license [6, 9]             [33m852.18 µs[0m/iter   ([36m511.75 µs[0m … [35m4.41 ms[0m) [90m738.46 µs[0m    [90m2.4 ms[0m    [90m2.5 ms[0m
-Single license [7, 2]             [33m783.77 µs[0m/iter   ([36m448.58 µs[0m … [35m5.32 ms[0m) [90m736.12 µs[0m   [90m2.43 ms[0m   [90m4.77 ms[0m
-Single license [7, 3]             [33m825.22 µs[0m/iter   ([36m448.42 µs[0m … [35m4.72 ms[0m) [90m757.88 µs[0m   [90m2.12 ms[0m   [90m2.18 ms[0m
-Single license [7, 4]             [33m725.74 µs[0m/iter   ([36m450.62 µs[0m … [35m5.47 ms[0m) [90m659.54 µs[0m   [90m1.97 ms[0m   [90m3.11 ms[0m
-Single license [7, 5]             [33m830.21 µs[0m/iter   ([36m450.96 µs[0m … [35m3.89 ms[0m)   [90m1.15 ms[0m   [90m2.11 ms[0m   [90m2.28 ms[0m
-Single license [7, 6]             [33m754.91 µs[0m/iter    ([36m449.5 µs[0m … [35m10.9 ms[0m) [90m675.79 µs[0m   [90m2.11 ms[0m   [90m2.56 ms[0m
-Single license [7, 7]             [33m942.02 µs[0m/iter   ([36m465.33 µs[0m … [35m2.22 ms[0m)   [90m1.61 ms[0m   [90m2.15 ms[0m    [90m2.2 ms[0m
-Single license [7, 8]             [33m773.89 µs[0m/iter  ([36m464.88 µs[0m … [35m11.47 ms[0m) [90m686.71 µs[0m    [90m2.1 ms[0m   [90m2.33 ms[0m
-Single license [7, 9]             [33m907.05 µs[0m/iter   ([36m467.46 µs[0m … [35m2.27 ms[0m)   [90m1.46 ms[0m   [90m2.09 ms[0m   [90m2.12 ms[0m
-Single license [8, 2]             [33m637.63 µs[0m/iter   ([36m368.5 µs[0m … [35m11.19 ms[0m) [90m576.88 µs[0m   [90m1.78 ms[0m   [90m2.45 ms[0m
-Single license [8, 3]             [33m651.02 µs[0m/iter   ([36m366.83 µs[0m … [35m2.98 ms[0m)    [90m642 µs[0m   [90m1.64 ms[0m   [90m1.77 ms[0m
-Single license [8, 4]             [33m586.18 µs[0m/iter  ([36m370.25 µs[0m … [35m10.57 ms[0m) [90m504.38 µs[0m   [90m1.77 ms[0m   [90m2.21 ms[0m
-Single license [8, 5]             [33m766.63 µs[0m/iter   ([36m374.92 µs[0m … [35m1.91 ms[0m)   [90m1.27 ms[0m   [90m1.83 ms[0m   [90m1.85 ms[0m
-Single license [8, 6]             [33m693.97 µs[0m/iter   ([36m368.04 µs[0m … [35m16.1 ms[0m) [90m708.96 µs[0m   [90m1.89 ms[0m   [90m2.31 ms[0m
-Single license [8, 7]             [33m722.66 µs[0m/iter   ([36m375.58 µs[0m … [35m1.91 ms[0m)    [90m1.1 ms[0m   [90m1.72 ms[0m   [90m1.87 ms[0m
-Single license [8, 8]             [33m635.53 µs[0m/iter   ([36m382.5 µs[0m … [35m11.75 ms[0m) [90m561.12 µs[0m   [90m1.81 ms[0m   [90m4.41 ms[0m
-Single license [8, 9]             [33m719.88 µs[0m/iter   ([36m390.21 µs[0m … [35m7.84 ms[0m)      [90m1 ms[0m   [90m1.81 ms[0m   [90m2.07 ms[0m
-Single license [9, 2]             [33m593.36 µs[0m/iter   ([36m321.96 µs[0m … [35m3.76 ms[0m) [90m602.17 µs[0m   [90m1.63 ms[0m   [90m1.88 ms[0m
-Single license [9, 3]             [33m650.19 µs[0m/iter   ([36m324.96 µs[0m … [35m3.97 ms[0m) [90m999.67 µs[0m   [90m2.39 ms[0m   [90m2.97 ms[0m
-Single license [9, 4]              [33m656.6 µs[0m/iter      ([36m321 µs[0m … [35m3.63 ms[0m) [90m956.88 µs[0m   [90m2.19 ms[0m   [90m3.39 ms[0m
-Single license [9, 5]             [33m589.33 µs[0m/iter   ([36m325.08 µs[0m … [35m3.66 ms[0m) [90m587.62 µs[0m   [90m1.55 ms[0m   [90m1.71 ms[0m
-Single license [9, 6]             [33m605.02 µs[0m/iter   ([36m323.79 µs[0m … [35m4.19 ms[0m) [90m615.67 µs[0m   [90m1.63 ms[0m   [90m1.83 ms[0m
-Single license [9, 7]             [33m586.52 µs[0m/iter      ([36m329 µs[0m … [35m3.79 ms[0m) [90m569.79 µs[0m   [90m1.85 ms[0m   [90m2.32 ms[0m
-Single license [9, 8]             [33m534.78 µs[0m/iter   ([36m337.88 µs[0m … [35m2.69 ms[0m) [90m466.71 µs[0m   [90m1.51 ms[0m   [90m1.66 ms[0m
-Single license [9, 9]             [33m576.79 µs[0m/iter    ([36m341.08 µs[0m … [35m4.5 ms[0m) [90m529.38 µs[0m   [90m1.62 ms[0m   [90m1.79 ms[0m
-Single license [10, 2]            [33m498.58 µs[0m/iter  ([36m280.62 µs[0m … [35m11.01 ms[0m) [90m452.08 µs[0m   [90m1.53 ms[0m   [90m2.06 ms[0m
-Single license [10, 3]             [33m574.4 µs[0m/iter   ([36m287.46 µs[0m … [35m2.53 ms[0m) [90m956.58 µs[0m   [90m1.34 ms[0m   [90m1.52 ms[0m
-Single license [10, 4]            [33m528.26 µs[0m/iter   ([36m281.83 µs[0m … [35m3.18 ms[0m)  [90m523.5 µs[0m   [90m1.73 ms[0m   [90m2.48 ms[0m
-Single license [10, 5]            [33m553.07 µs[0m/iter   ([36m280.33 µs[0m … [35m2.76 ms[0m)    [90m751 µs[0m   [90m1.43 ms[0m   [90m1.87 ms[0m
-Single license [10, 6]            [33m518.09 µs[0m/iter   ([36m278.62 µs[0m … [35m3.42 ms[0m) [90m528.42 µs[0m   [90m1.54 ms[0m   [90m2.42 ms[0m
-Single license [10, 7]            [33m530.44 µs[0m/iter   ([36m286.96 µs[0m … [35m2.09 ms[0m) [90m624.79 µs[0m   [90m1.46 ms[0m   [90m1.51 ms[0m
-Single license [10, 8]            [33m538.99 µs[0m/iter    ([36m292.5 µs[0m … [35m7.61 ms[0m) [90m505.71 µs[0m   [90m1.75 ms[0m   [90m3.02 ms[0m
-Single license [10, 9]            [33m589.98 µs[0m/iter   ([36m296.71 µs[0m … [35m3.31 ms[0m) [90m906.12 µs[0m    [90m1.5 ms[0m   [90m1.58 ms[0m
+[0m[38;5;245mfile:///Users/duartsnel/local/personal_projects/whatlicense/backend/bench/hash_bench.ts[0m
+benchmark      time (avg)             (min … max)       p75       p99      p995
+------------------------------------------------- -----------------------------
+
+Running license hash computation benchmarks (2023-02-13T09:07:19.950Z).
+Legend:
+  - Single license [blockSize, fuzzyHashLength] 	 (e.g., Single license [64, 64])
+
+Notes:
+  - The 'Single license [...]' benchmarks has a baseline with 10 as blockSize and 7 as fuzzyHashLength. This conveniently also happens to be the default values for the 'computeLicenseHash' function.
+
+
+[0m[38;5;245mfile:///Users/duartsnel/local/personal_projects/whatlicense/backend/bench/licenseCompute_bench.ts[0m
+benchmark                              time (avg)             (min … max)       p75       p99      p995
+------------------------------------------------------------------------- -----------------------------
+Computing all license hashes       [33m758.44 ms[0m/iter  ([36m702.1 ms[0m … [35m828.73 ms[0m) [90m763.92 ms[0m [90m828.73 ms[0m [90m828.73 ms[0m
+
+Single license [10, 7] (BASELINE)  [33m506.47 µs[0m/iter   ([36m288.08 µs[0m … [35m4.01 ms[0m) [90m497.79 µs[0m   [90m1.44 ms[0m   [90m1.54 ms[0m
+Single license [2, 2]                [33m2.66 ms[0m/iter    ([36m843.5 µs[0m … [35m4.63 ms[0m)   [90m4.23 ms[0m   [90m4.57 ms[0m   [90m4.63 ms[0m
+Single license [2, 3]                [33m2.41 ms[0m/iter   ([36m844.58 µs[0m … [35m5.88 ms[0m)   [90m3.92 ms[0m   [90m4.53 ms[0m   [90m4.58 ms[0m
+Single license [2, 4]                [33m2.64 ms[0m/iter   ([36m880.83 µs[0m … [35m4.67 ms[0m)   [90m3.83 ms[0m    [90m4.6 ms[0m   [90m4.66 ms[0m
+Single license [2, 5]                [33m2.38 ms[0m/iter   ([36m904.08 µs[0m … [35m7.03 ms[0m)   [90m3.78 ms[0m   [90m4.66 ms[0m   [90m4.75 ms[0m
+Single license [2, 6]                [33m2.56 ms[0m/iter   ([36m923.58 µs[0m … [35m5.27 ms[0m)   [90m4.07 ms[0m   [90m4.71 ms[0m   [90m4.71 ms[0m
+Single license [2, 7]                [33m2.54 ms[0m/iter   ([36m936.58 µs[0m … [35m6.63 ms[0m)   [90m4.11 ms[0m   [90m4.89 ms[0m   [90m6.54 ms[0m
+Single license [2, 8]                 [33m2.2 ms[0m/iter    ([36m958.96 µs[0m … [35m5.4 ms[0m)   [90m3.43 ms[0m   [90m4.76 ms[0m   [90m4.77 ms[0m
+Single license [2, 9]                [33m2.68 ms[0m/iter   ([36m956.58 µs[0m … [35m4.68 ms[0m)   [90m4.03 ms[0m   [90m4.66 ms[0m   [90m4.68 ms[0m
+Single license [3, 2]                [33m1.62 ms[0m/iter   ([36m593.29 µs[0m … [35m8.03 ms[0m)   [90m2.63 ms[0m   [90m4.74 ms[0m    [90m7.8 ms[0m
+Single license [3, 3]                 [33m1.6 ms[0m/iter   ([36m590.75 µs[0m … [35m3.25 ms[0m)    [90m2.7 ms[0m   [90m3.14 ms[0m   [90m3.21 ms[0m
+Single license [3, 4]                 [33m1.7 ms[0m/iter   ([36m587.04 µs[0m … [35m7.94 ms[0m)    [90m2.6 ms[0m   [90m4.57 ms[0m   [90m6.81 ms[0m
+Single license [3, 5]                [33m1.71 ms[0m/iter   ([36m621.08 µs[0m … [35m3.19 ms[0m)   [90m2.79 ms[0m   [90m3.16 ms[0m   [90m3.18 ms[0m
+Single license [3, 6]                [33m1.72 ms[0m/iter   ([36m639.38 µs[0m … [35m7.29 ms[0m)   [90m2.68 ms[0m   [90m5.41 ms[0m   [90m7.19 ms[0m
+Single license [3, 7]                [33m1.71 ms[0m/iter   ([36m645.25 µs[0m … [35m3.18 ms[0m)   [90m2.81 ms[0m   [90m3.17 ms[0m   [90m3.17 ms[0m
+Single license [3, 8]                [33m1.54 ms[0m/iter   ([36m649.38 µs[0m … [35m4.35 ms[0m)   [90m2.66 ms[0m   [90m3.23 ms[0m   [90m3.59 ms[0m
+Single license [3, 9]                [33m1.66 ms[0m/iter   ([36m667.79 µs[0m … [35m3.27 ms[0m)   [90m2.63 ms[0m   [90m3.21 ms[0m   [90m3.25 ms[0m
+Single license [4, 2]                [33m1.22 ms[0m/iter   ([36m460.83 µs[0m … [35m6.71 ms[0m)   [90m2.06 ms[0m    [90m3.2 ms[0m   [90m4.24 ms[0m
+Single license [4, 3]                [33m1.22 ms[0m/iter    ([36m459.17 µs[0m … [35m6.5 ms[0m)   [90m2.03 ms[0m   [90m2.53 ms[0m   [90m4.89 ms[0m
+Single license [4, 4]                [33m1.24 ms[0m/iter   ([36m460.71 µs[0m … [35m2.55 ms[0m)   [90m2.12 ms[0m   [90m2.44 ms[0m    [90m2.5 ms[0m
+Single license [4, 5]                [33m1.12 ms[0m/iter   ([36m458.38 µs[0m … [35m5.82 ms[0m)   [90m1.86 ms[0m   [90m2.57 ms[0m   [90m3.59 ms[0m
+Single license [4, 6]                [33m1.21 ms[0m/iter   ([36m480.04 µs[0m … [35m2.57 ms[0m)   [90m2.14 ms[0m   [90m2.42 ms[0m   [90m2.47 ms[0m
+Single license [4, 7]                [33m1.23 ms[0m/iter   ([36m492.33 µs[0m … [35m4.68 ms[0m)   [90m2.08 ms[0m   [90m2.49 ms[0m   [90m3.77 ms[0m
+Single license [4, 8]                [33m1.28 ms[0m/iter   ([36m500.38 µs[0m … [35m2.48 ms[0m)   [90m2.17 ms[0m   [90m2.42 ms[0m   [90m2.44 ms[0m
+Single license [4, 9]                [33m1.21 ms[0m/iter   ([36m504.17 µs[0m … [35m5.82 ms[0m)   [90m1.96 ms[0m   [90m3.53 ms[0m   [90m3.91 ms[0m
+Single license [5, 2]              [33m941.89 µs[0m/iter   ([36m364.04 µs[0m … [35m2.12 ms[0m)   [90m1.67 ms[0m   [90m1.93 ms[0m   [90m1.95 ms[0m
+Single license [5, 3]              [33m866.29 µs[0m/iter   ([36m362.54 µs[0m … [35m5.05 ms[0m)   [90m1.37 ms[0m   [90m2.14 ms[0m   [90m4.49 ms[0m
+Single license [5, 4]              [33m966.07 µs[0m/iter   ([36m363.46 µs[0m … [35m2.64 ms[0m)   [90m1.67 ms[0m   [90m2.01 ms[0m   [90m2.04 ms[0m
+Single license [5, 5]              [33m941.92 µs[0m/iter   ([36m360.79 µs[0m … [35m4.68 ms[0m)   [90m1.56 ms[0m   [90m2.02 ms[0m   [90m3.48 ms[0m
+Single license [5, 6]                [33m1.03 ms[0m/iter   ([36m363.67 µs[0m … [35m2.04 ms[0m)   [90m1.69 ms[0m   [90m1.95 ms[0m   [90m2.03 ms[0m
+Single license [5, 7]              [33m887.07 µs[0m/iter   ([36m380.88 µs[0m … [35m2.89 ms[0m)   [90m1.45 ms[0m   [90m1.94 ms[0m   [90m2.29 ms[0m
+Single license [5, 8]              [33m963.16 µs[0m/iter   ([36m389.67 µs[0m … [35m2.05 ms[0m)   [90m1.63 ms[0m   [90m1.96 ms[0m      [90m2 ms[0m
+Single license [5, 9]              [33m969.19 µs[0m/iter   ([36m397.04 µs[0m … [35m4.71 ms[0m)   [90m1.66 ms[0m   [90m2.17 ms[0m   [90m2.94 ms[0m
+Single license [6, 2]              [33m819.89 µs[0m/iter    ([36m497.08 µs[0m … [35m2.4 ms[0m) [90m789.83 µs[0m   [90m2.25 ms[0m   [90m2.28 ms[0m
+Single license [6, 3]              [33m887.87 µs[0m/iter   ([36m495.54 µs[0m … [35m5.44 ms[0m)   [90m1.06 ms[0m   [90m2.45 ms[0m    [90m3.4 ms[0m
+Single license [6, 4]              [33m980.06 µs[0m/iter   ([36m498.29 µs[0m … [35m2.58 ms[0m)   [90m1.52 ms[0m   [90m2.33 ms[0m   [90m2.44 ms[0m
+Single license [6, 5]              [33m893.85 µs[0m/iter   ([36m497.83 µs[0m … [35m2.49 ms[0m)   [90m1.15 ms[0m   [90m2.24 ms[0m   [90m2.31 ms[0m
+Single license [6, 6]              [33m978.14 µs[0m/iter   ([36m497.38 µs[0m … [35m2.41 ms[0m)   [90m1.52 ms[0m   [90m2.27 ms[0m   [90m2.34 ms[0m
+Single license [6, 7]              [33m840.63 µs[0m/iter   ([36m498.12 µs[0m … [35m3.96 ms[0m) [90m833.92 µs[0m   [90m2.42 ms[0m   [90m2.82 ms[0m
+Single license [6, 8]              [33m897.05 µs[0m/iter   ([36m511.92 µs[0m … [35m2.45 ms[0m)   [90m1.19 ms[0m   [90m2.35 ms[0m   [90m2.43 ms[0m
+Single license [6, 9]               [33m902.9 µs[0m/iter   ([36m519.96 µs[0m … [35m5.12 ms[0m) [90m962.08 µs[0m   [90m2.43 ms[0m    [90m3.3 ms[0m
+Single license [7, 2]              [33m824.45 µs[0m/iter    ([36m454.96 µs[0m … [35m2.3 ms[0m)   [90m1.15 ms[0m   [90m2.11 ms[0m   [90m2.14 ms[0m
+Single license [7, 3]              [33m763.62 µs[0m/iter   ([36m451.62 µs[0m … [35m5.01 ms[0m) [90m745.67 µs[0m   [90m2.21 ms[0m   [90m2.35 ms[0m
+Single license [7, 4]              [33m790.42 µs[0m/iter   ([36m455.29 µs[0m … [35m4.62 ms[0m) [90m800.17 µs[0m   [90m2.16 ms[0m   [90m2.28 ms[0m
+Single license [7, 5]              [33m709.86 µs[0m/iter   ([36m450.21 µs[0m … [35m5.15 ms[0m) [90m630.75 µs[0m   [90m2.15 ms[0m    [90m2.2 ms[0m
+Single license [7, 6]              [33m756.25 µs[0m/iter   ([36m453.67 µs[0m … [35m2.23 ms[0m) [90m582.29 µs[0m   [90m2.14 ms[0m   [90m2.15 ms[0m
+Single license [7, 7]              [33m751.22 µs[0m/iter   ([36m460.21 µs[0m … [35m3.41 ms[0m) [90m679.83 µs[0m   [90m2.18 ms[0m   [90m2.61 ms[0m
+Single license [7, 8]              [33m874.54 µs[0m/iter   ([36m469.17 µs[0m … [35m5.01 ms[0m)   [90m1.23 ms[0m   [90m2.16 ms[0m   [90m2.23 ms[0m
+Single license [7, 9]              [33m760.49 µs[0m/iter    ([36m473.75 µs[0m … [35m2.8 ms[0m) [90m725.67 µs[0m   [90m2.04 ms[0m   [90m2.13 ms[0m
+Single license [8, 2]              [33m700.22 µs[0m/iter   ([36m371.88 µs[0m … [35m1.88 ms[0m)   [90m1.01 ms[0m    [90m1.8 ms[0m   [90m1.84 ms[0m
+Single license [8, 3]              [33m639.08 µs[0m/iter    ([36m372.5 µs[0m … [35m3.67 ms[0m) [90m636.54 µs[0m   [90m1.72 ms[0m   [90m1.81 ms[0m
+Single license [8, 4]              [33m704.22 µs[0m/iter    ([36m372.38 µs[0m … [35m1.9 ms[0m)   [90m1.01 ms[0m    [90m1.8 ms[0m   [90m1.85 ms[0m
+Single license [8, 5]              [33m631.82 µs[0m/iter    ([36m370.67 µs[0m … [35m4.4 ms[0m) [90m599.38 µs[0m   [90m1.79 ms[0m    [90m2.4 ms[0m
+Single license [8, 6]              [33m677.33 µs[0m/iter   ([36m371.79 µs[0m … [35m1.92 ms[0m) [90m915.62 µs[0m   [90m1.79 ms[0m   [90m1.87 ms[0m
+Single license [8, 7]               [33m672.4 µs[0m/iter   ([36m377.46 µs[0m … [35m2.95 ms[0m) [90m812.79 µs[0m   [90m1.77 ms[0m   [90m1.99 ms[0m
+Single license [8, 8]              [33m704.81 µs[0m/iter   ([36m384.88 µs[0m … [35m1.83 ms[0m) [90m996.04 µs[0m   [90m1.73 ms[0m   [90m1.78 ms[0m
+Single license [8, 9]              [33m679.88 µs[0m/iter   ([36m390.71 µs[0m … [35m4.43 ms[0m) [90m705.25 µs[0m   [90m1.84 ms[0m   [90m2.19 ms[0m
+Single license [9, 2]              [33m551.85 µs[0m/iter   ([36m326.21 µs[0m … [35m3.42 ms[0m) [90m480.54 µs[0m   [90m1.59 ms[0m   [90m1.64 ms[0m
+Single license [9, 3]              [33m538.09 µs[0m/iter   ([36m325.71 µs[0m … [35m3.13 ms[0m) [90m534.54 µs[0m   [90m1.52 ms[0m    [90m1.6 ms[0m
+Single license [9, 4]              [33m591.75 µs[0m/iter   ([36m326.08 µs[0m … [35m1.72 ms[0m) [90m777.38 µs[0m   [90m1.55 ms[0m   [90m1.57 ms[0m
+Single license [9, 5]              [33m569.97 µs[0m/iter   ([36m327.21 µs[0m … [35m1.68 ms[0m) [90m582.04 µs[0m   [90m1.52 ms[0m   [90m1.63 ms[0m
+Single license [9, 6]               [33m573.4 µs[0m/iter   ([36m327.17 µs[0m … [35m1.85 ms[0m) [90m594.96 µs[0m   [90m1.56 ms[0m   [90m1.62 ms[0m
+Single license [9, 7]              [33m584.14 µs[0m/iter   ([36m331.38 µs[0m … [35m2.44 ms[0m) [90m638.08 µs[0m    [90m1.6 ms[0m   [90m1.65 ms[0m
+Single license [9, 8]              [33m651.53 µs[0m/iter   ([36m338.25 µs[0m … [35m1.81 ms[0m)   [90m1.01 ms[0m   [90m1.65 ms[0m   [90m1.67 ms[0m
+Single license [9, 9]              [33m610.47 µs[0m/iter   ([36m342.88 µs[0m … [35m2.21 ms[0m) [90m693.92 µs[0m   [90m1.56 ms[0m   [90m1.68 ms[0m
+Single license [10, 2]             [33m511.06 µs[0m/iter   ([36m283.54 µs[0m … [35m3.11 ms[0m) [90m595.79 µs[0m   [90m1.42 ms[0m   [90m1.51 ms[0m
+Single license [10, 3]                [33m537 µs[0m/iter   ([36m283.92 µs[0m … [35m3.27 ms[0m) [90m761.17 µs[0m   [90m1.46 ms[0m   [90m1.54 ms[0m
+Single license [10, 4]             [33m512.21 µs[0m/iter   ([36m284.21 µs[0m … [35m2.53 ms[0m) [90m588.71 µs[0m   [90m1.46 ms[0m   [90m1.53 ms[0m
+Single license [10, 5]             [33m506.02 µs[0m/iter   ([36m282.62 µs[0m … [35m1.92 ms[0m) [90m543.71 µs[0m    [90m1.4 ms[0m   [90m1.49 ms[0m
+Single license [10, 6]              [33m503.4 µs[0m/iter   ([36m284.29 µs[0m … [35m3.46 ms[0m) [90m499.25 µs[0m   [90m1.46 ms[0m   [90m1.51 ms[0m
+Single license [10, 7]             [33m529.71 µs[0m/iter   ([36m288.88 µs[0m … [35m3.28 ms[0m) [90m643.88 µs[0m   [90m1.44 ms[0m   [90m1.63 ms[0m
+Single license [10, 8]             [33m554.89 µs[0m/iter      ([36m295 µs[0m … [35m1.54 ms[0m) [90m822.71 µs[0m   [90m1.42 ms[0m   [90m1.47 ms[0m
+Single license [10, 9]             [33m536.23 µs[0m/iter   ([36m298.38 µs[0m … [35m1.55 ms[0m) [90m699.46 µs[0m    [90m1.4 ms[0m   [90m1.49 ms[0m
 DetectionScheduler created
 
-Running license detection benchmarks (2023-02-11T14:57:35.128Z).
+Running license detection benchmarks (2023-02-13T09:08:24.164Z).
 Default data set details:
   Amount of licenses: 2046
 
@@ -97,261 +112,261 @@ Legend:
   - Single license [blockSize, fuzzyHashLength] 	 (e.g., Single license [64, 64])
 
 Notes:
-  - The 'Single license [...]' benchmarks has a baseline with 4 as blockSize and 5 as fuzzyHashLength. This conveniently also happens to be the default values for the 'computeLicenseHash' function.
+  - The 'Single license [...]' benchmarks has a baseline with 10 as blockSize and 7 as fuzzyHashLength. This conveniently also happens to be the default values for the 'computeLicenseHash' function.
 
 
 [1msummary[0m
-  [1m[36mSingle license [4, 5] (BASELINE)[0m[0m
-   [31m2.17[0mx slower than [1m[36mSingle license [10, 2][0m[0m
-   [31m2.09[0mx slower than [1m[36mSingle license [10, 6][0m[0m
-   [31m2.05[0mx slower than [1m[36mSingle license [10, 4][0m[0m
-   [31m2.04[0mx slower than [1m[36mSingle license [10, 7][0m[0m
-   [31m2.02[0mx slower than [1m[36mSingle license [9, 8][0m[0m
-   [31m2.01[0mx slower than [1m[36mSingle license [10, 8][0m[0m
-   [31m1.96[0mx slower than [1m[36mSingle license [10, 5][0m[0m
-   [31m1.88[0mx slower than [1m[36mSingle license [10, 3][0m[0m
-   [31m1.88[0mx slower than [1m[36mSingle license [9, 9][0m[0m
-   [31m1.85[0mx slower than [1m[36mSingle license [8, 4][0m[0m
-   [31m1.84[0mx slower than [1m[36mSingle license [9, 7][0m[0m
-   [31m1.84[0mx slower than [1m[36mSingle license [9, 5][0m[0m
-   [31m1.83[0mx slower than [1m[36mSingle license [10, 9][0m[0m
-   [31m1.82[0mx slower than [1m[36mSingle license [9, 2][0m[0m
-   [31m1.79[0mx slower than [1m[36mSingle license [9, 6][0m[0m
-   [31m1.7[0mx slower than [1m[36mSingle license [8, 8][0m[0m
-   [31m1.7[0mx slower than [1m[36mSingle license [8, 2][0m[0m
-   [31m1.66[0mx slower than [1m[36mSingle license [9, 3][0m[0m
-   [31m1.66[0mx slower than [1m[36mSingle license [8, 3][0m[0m
-   [31m1.65[0mx slower than [1m[36mSingle license [9, 4][0m[0m
-   [31m1.56[0mx slower than [1m[36mSingle license [8, 6][0m[0m
-   [31m1.5[0mx slower than [1m[36mSingle license [8, 9][0m[0m
-   [31m1.5[0mx slower than [1m[36mSingle license [8, 7][0m[0m
-   [31m1.49[0mx slower than [1m[36mSingle license [7, 4][0m[0m
-   [31m1.43[0mx slower than [1m[36mSingle license [7, 6][0m[0m
-   [31m1.41[0mx slower than [1m[36mSingle license [8, 5][0m[0m
-   [31m1.4[0mx slower than [1m[36mSingle license [7, 8][0m[0m
-   [31m1.38[0mx slower than [1m[36mSingle license [7, 2][0m[0m
-   [31m1.34[0mx slower than [1m[36mSingle license [6, 5][0m[0m
-   [31m1.32[0mx slower than [1m[36mSingle license [6, 8][0m[0m
-   [31m1.31[0mx slower than [1m[36mSingle license [7, 3][0m[0m
-   [31m1.3[0mx slower than [1m[36mSingle license [7, 5][0m[0m
-   [31m1.29[0mx slower than [1m[36mSingle license [6, 7][0m[0m
-   [31m1.27[0mx slower than [1m[36mSingle license [6, 9][0m[0m
-   [31m1.25[0mx slower than [1m[36mSingle license [6, 3][0m[0m
-   [31m1.24[0mx slower than [1m[36mSingle license [5, 3][0m[0m
-   [31m1.22[0mx slower than [1m[36mSingle license [5, 5][0m[0m
-   [31m1.19[0mx slower than [1m[36mSingle license [6, 2][0m[0m
-   [31m1.19[0mx slower than [1m[36mSingle license [7, 9][0m[0m
-   [31m1.19[0mx slower than [1m[36mSingle license [5, 8][0m[0m
-   [31m1.18[0mx slower than [1m[36mSingle license [5, 7][0m[0m
-   [31m1.15[0mx slower than [1m[36mSingle license [6, 6][0m[0m
-   [31m1.15[0mx slower than [1m[36mSingle license [7, 7][0m[0m
-   [31m1.13[0mx slower than [1m[36mSingle license [6, 4][0m[0m
-   [31m1.05[0mx slower than [1m[36mSingle license [5, 9][0m[0m
-   [31m1.03[0mx slower than [1m[36mSingle license [5, 2][0m[0m
-   [31m1.01[0mx slower than [1m[36mSingle license [4, 3][0m[0m
-   [31m1.01[0mx slower than [1m[36mSingle license [5, 6][0m[0m
-   [32m1.09[0mx faster than [1m[36mSingle license [5, 4][0m[0m
-   [32m1.15[0mx faster than [1m[36mSingle license [4, 7][0m[0m
-   [32m1.17[0mx faster than [1m[36mSingle license [4, 8][0m[0m
-   [32m1.2[0mx faster than [1m[36mSingle license [4, 9][0m[0m
-   [32m1.2[0mx faster than [1m[36mSingle license [4, 5][0m[0m
-   [32m1.22[0mx faster than [1m[36mSingle license [3, 4][0m[0m
-   [32m1.25[0mx faster than [1m[36mSingle license [4, 6][0m[0m
-   [32m1.27[0mx faster than [1m[36mSingle license [4, 2][0m[0m
-   [32m1.37[0mx faster than [1m[36mSingle license [3, 6][0m[0m
-   [32m1.38[0mx faster than [1m[36mSingle license [4, 4][0m[0m
-   [32m1.38[0mx faster than [1m[36mSingle license [3, 8][0m[0m
-   [32m1.46[0mx faster than [1m[36mSingle license [3, 5][0m[0m
-   [32m1.5[0mx faster than [1m[36mSingle license [3, 9][0m[0m
-   [32m1.53[0mx faster than [1m[36mSingle license [3, 2][0m[0m
-   [32m1.58[0mx faster than [1m[36mSingle license [3, 7][0m[0m
-   [32m1.72[0mx faster than [1m[36mSingle license [3, 3][0m[0m
-   [32m1.72[0mx faster than [1m[36mSingle license [2, 2][0m[0m
-   [32m2.06[0mx faster than [1m[36mSingle license [2, 3][0m[0m
-   [32m2.08[0mx faster than [1m[36mSingle license [2, 8][0m[0m
-   [32m2.12[0mx faster than [1m[36mSingle license [2, 9][0m[0m
-   [32m2.16[0mx faster than [1m[36mSingle license [2, 5][0m[0m
-   [32m2.16[0mx faster than [1m[36mSingle license [2, 7][0m[0m
-   [32m2.25[0mx faster than [1m[36mSingle license [2, 6][0m[0m
-   [32m2.33[0mx faster than [1m[36mSingle license [2, 4][0m[0m
+  [1m[36mSingle license [10, 7] (BASELINE)[0m[0m
+   [31m1.01[0mx slower than [1m[36mSingle license [10, 6][0m[0m
+   [31m1[0mx slower than [1m[36mSingle license [10, 5][0m[0m
+   [32m1.01[0mx faster than [1m[36mSingle license [10, 2][0m[0m
+   [32m1.01[0mx faster than [1m[36mSingle license [10, 4][0m[0m
+   [32m1.05[0mx faster than [1m[36mSingle license [10, 7][0m[0m
+   [32m1.06[0mx faster than [1m[36mSingle license [10, 9][0m[0m
+   [32m1.06[0mx faster than [1m[36mSingle license [10, 3][0m[0m
+   [32m1.06[0mx faster than [1m[36mSingle license [9, 3][0m[0m
+   [32m1.09[0mx faster than [1m[36mSingle license [9, 2][0m[0m
+   [32m1.1[0mx faster than [1m[36mSingle license [10, 8][0m[0m
+   [32m1.13[0mx faster than [1m[36mSingle license [9, 5][0m[0m
+   [32m1.13[0mx faster than [1m[36mSingle license [9, 6][0m[0m
+   [32m1.15[0mx faster than [1m[36mSingle license [9, 7][0m[0m
+   [32m1.17[0mx faster than [1m[36mSingle license [9, 4][0m[0m
+   [32m1.21[0mx faster than [1m[36mSingle license [9, 9][0m[0m
+   [32m1.25[0mx faster than [1m[36mSingle license [8, 5][0m[0m
+   [32m1.26[0mx faster than [1m[36mSingle license [8, 3][0m[0m
+   [32m1.29[0mx faster than [1m[36mSingle license [9, 8][0m[0m
+   [32m1.33[0mx faster than [1m[36mSingle license [8, 7][0m[0m
+   [32m1.34[0mx faster than [1m[36mSingle license [8, 6][0m[0m
+   [32m1.34[0mx faster than [1m[36mSingle license [8, 9][0m[0m
+   [32m1.38[0mx faster than [1m[36mSingle license [8, 2][0m[0m
+   [32m1.39[0mx faster than [1m[36mSingle license [8, 4][0m[0m
+   [32m1.39[0mx faster than [1m[36mSingle license [8, 8][0m[0m
+   [32m1.4[0mx faster than [1m[36mSingle license [7, 5][0m[0m
+   [32m1.48[0mx faster than [1m[36mSingle license [7, 7][0m[0m
+   [32m1.49[0mx faster than [1m[36mSingle license [7, 6][0m[0m
+   [32m1.5[0mx faster than [1m[36mSingle license [7, 9][0m[0m
+   [32m1.51[0mx faster than [1m[36mSingle license [7, 3][0m[0m
+   [32m1.56[0mx faster than [1m[36mSingle license [7, 4][0m[0m
+   [32m1.62[0mx faster than [1m[36mSingle license [6, 2][0m[0m
+   [32m1.63[0mx faster than [1m[36mSingle license [7, 2][0m[0m
+   [32m1.66[0mx faster than [1m[36mSingle license [6, 7][0m[0m
+   [32m1.71[0mx faster than [1m[36mSingle license [5, 3][0m[0m
+   [32m1.73[0mx faster than [1m[36mSingle license [7, 8][0m[0m
+   [32m1.75[0mx faster than [1m[36mSingle license [5, 7][0m[0m
+   [32m1.75[0mx faster than [1m[36mSingle license [6, 3][0m[0m
+   [32m1.76[0mx faster than [1m[36mSingle license [6, 5][0m[0m
+   [32m1.77[0mx faster than [1m[36mSingle license [6, 8][0m[0m
+   [32m1.78[0mx faster than [1m[36mSingle license [6, 9][0m[0m
+   [32m1.86[0mx faster than [1m[36mSingle license [5, 2][0m[0m
+   [32m1.86[0mx faster than [1m[36mSingle license [5, 5][0m[0m
+   [32m1.9[0mx faster than [1m[36mSingle license [5, 8][0m[0m
+   [32m1.91[0mx faster than [1m[36mSingle license [5, 4][0m[0m
+   [32m1.91[0mx faster than [1m[36mSingle license [5, 9][0m[0m
+   [32m1.93[0mx faster than [1m[36mSingle license [6, 6][0m[0m
+   [32m1.94[0mx faster than [1m[36mSingle license [6, 4][0m[0m
+   [32m2.03[0mx faster than [1m[36mSingle license [5, 6][0m[0m
+   [32m2.2[0mx faster than [1m[36mSingle license [4, 5][0m[0m
+   [32m2.39[0mx faster than [1m[36mSingle license [4, 6][0m[0m
+   [32m2.4[0mx faster than [1m[36mSingle license [4, 9][0m[0m
+   [32m2.41[0mx faster than [1m[36mSingle license [4, 2][0m[0m
+   [32m2.42[0mx faster than [1m[36mSingle license [4, 3][0m[0m
+   [32m2.43[0mx faster than [1m[36mSingle license [4, 7][0m[0m
+   [32m2.45[0mx faster than [1m[36mSingle license [4, 4][0m[0m
+   [32m2.53[0mx faster than [1m[36mSingle license [4, 8][0m[0m
+   [32m3.04[0mx faster than [1m[36mSingle license [3, 8][0m[0m
+   [32m3.16[0mx faster than [1m[36mSingle license [3, 3][0m[0m
+   [32m3.2[0mx faster than [1m[36mSingle license [3, 2][0m[0m
+   [32m3.28[0mx faster than [1m[36mSingle license [3, 9][0m[0m
+   [32m3.36[0mx faster than [1m[36mSingle license [3, 4][0m[0m
+   [32m3.37[0mx faster than [1m[36mSingle license [3, 7][0m[0m
+   [32m3.38[0mx faster than [1m[36mSingle license [3, 5][0m[0m
+   [32m3.4[0mx faster than [1m[36mSingle license [3, 6][0m[0m
+   [32m4.34[0mx faster than [1m[36mSingle license [2, 8][0m[0m
+   [32m4.71[0mx faster than [1m[36mSingle license [2, 5][0m[0m
+   [32m4.76[0mx faster than [1m[36mSingle license [2, 3][0m[0m
+   [32m5.02[0mx faster than [1m[36mSingle license [2, 7][0m[0m
+   [32m5.05[0mx faster than [1m[36mSingle license [2, 6][0m[0m
+   [32m5.21[0mx faster than [1m[36mSingle license [2, 4][0m[0m
+   [32m5.24[0mx faster than [1m[36mSingle license [2, 2][0m[0m
+   [32m5.28[0mx faster than [1m[36mSingle license [2, 9][0m[0m
 
 [0m[38;5;245mfile:///Users/duartsnel/local/personal_projects/whatlicense/backend/bench/licenseDetect_bench.ts[0m
-benchmark                                     time (avg)             (min … max)       p75       p99      p995
--------------------------------------------------------------------------------- -----------------------------
-Single threaded non existent license      [33m157.84 ms[0m/iter ([36m152.24 ms[0m … [35m181.16 ms[0m) [90m157.76 ms[0m [90m181.16 ms[0m [90m181.16 ms[0m
+benchmark                                      time (avg)             (min … max)       p75       p99      p995
+--------------------------------------------------------------------------------- -----------------------------
+Single threaded non existent license        [33m77.15 ms[0m/iter   ([36m74.42 ms[0m … [35m86.95 ms[0m)  [90m76.57 ms[0m  [90m86.95 ms[0m  [90m86.95 ms[0m
 
-(BASELINE) Non threaded detection [4, 5]  [33m247.35 ms[0m/iter  ([36m241.7 ms[0m … [35m257.97 ms[0m)  [90m250.7 ms[0m [90m257.97 ms[0m [90m257.97 ms[0m
-Threaded detection [4, 5]                  [33m46.43 ms[0m/iter   ([36m39.49 ms[0m … [35m68.06 ms[0m)   [90m48.1 ms[0m  [90m68.06 ms[0m  [90m68.06 ms[0m
+(BASELINE) Non threaded detection [10, 7]  [33m121.04 ms[0m/iter ([36m116.66 ms[0m … [35m138.51 ms[0m) [90m121.55 ms[0m [90m138.51 ms[0m [90m138.51 ms[0m
+Threaded detection [10, 7]                  [33m27.32 ms[0m/iter    ([36m22.6 ms[0m … [35m46.23 ms[0m)  [90m27.36 ms[0m  [90m46.23 ms[0m  [90m46.23 ms[0m
 
 [1msummary[0m
-  [1m[36m(BASELINE) Non threaded detection [4, 5][0m[0m
-   [31m5.33[0mx slower than [1m[36mThreaded detection [4, 5][0m[0m
+  [1m[36m(BASELINE) Non threaded detection [10, 7][0m[0m
+   [31m4.43[0mx slower than [1m[36mThreaded detection [10, 7][0m[0m
 
-Single license [4, 5] (BASELINE)          [33m249.06 ms[0m/iter ([36m242.89 ms[0m … [35m259.33 ms[0m) [90m250.53 ms[0m [90m259.33 ms[0m [90m259.33 ms[0m
-Single license [2, 2]                     [33m553.08 ms[0m/iter ([36m543.72 ms[0m … [35m562.48 ms[0m) [90m560.19 ms[0m [90m562.48 ms[0m [90m562.48 ms[0m
-Single license [2, 3]                      [33m385.3 ms[0m/iter ([36m379.11 ms[0m … [35m393.32 ms[0m) [90m387.24 ms[0m [90m393.32 ms[0m [90m393.32 ms[0m
-Single license [2, 4]                     [33m403.34 ms[0m/iter ([36m392.44 ms[0m … [35m420.71 ms[0m) [90m410.68 ms[0m [90m420.71 ms[0m [90m420.71 ms[0m
-Single license [2, 5]                     [33m485.77 ms[0m/iter ([36m473.24 ms[0m … [35m509.22 ms[0m) [90m487.58 ms[0m [90m509.22 ms[0m [90m509.22 ms[0m
-Single license [2, 6]                     [33m506.96 ms[0m/iter ([36m494.12 ms[0m … [35m518.19 ms[0m) [90m511.19 ms[0m [90m518.19 ms[0m [90m518.19 ms[0m
-Single license [2, 7]                     [33m529.89 ms[0m/iter ([36m523.32 ms[0m … [35m540.08 ms[0m) [90m532.32 ms[0m [90m540.08 ms[0m [90m540.08 ms[0m
-Single license [2, 8]                     [33m547.55 ms[0m/iter ([36m537.38 ms[0m … [35m564.86 ms[0m) [90m553.55 ms[0m [90m564.86 ms[0m [90m564.86 ms[0m
-Single license [2, 9]                     [33m583.47 ms[0m/iter ([36m572.27 ms[0m … [35m605.32 ms[0m) [90m592.73 ms[0m [90m605.32 ms[0m [90m605.32 ms[0m
-Single license [3, 2]                     [33m473.11 ms[0m/iter ([36m460.36 ms[0m … [35m485.05 ms[0m) [90m477.88 ms[0m [90m485.05 ms[0m [90m485.05 ms[0m
-Single license [3, 3]                        [33m334 ms[0m/iter ([36m322.32 ms[0m … [35m347.36 ms[0m) [90m336.41 ms[0m [90m347.36 ms[0m [90m347.36 ms[0m
-Single license [3, 4]                      [33m267.5 ms[0m/iter ([36m259.96 ms[0m … [35m272.96 ms[0m) [90m271.04 ms[0m [90m272.96 ms[0m [90m272.96 ms[0m
-Single license [3, 5]                     [33m325.68 ms[0m/iter ([36m315.13 ms[0m … [35m343.19 ms[0m) [90m329.42 ms[0m [90m343.19 ms[0m [90m343.19 ms[0m
-Single license [3, 6]                     [33m342.31 ms[0m/iter ([36m330.79 ms[0m … [35m397.12 ms[0m) [90m339.81 ms[0m [90m397.12 ms[0m [90m397.12 ms[0m
-Single license [3, 7]                     [33m359.83 ms[0m/iter ([36m345.74 ms[0m … [35m381.79 ms[0m) [90m368.74 ms[0m [90m381.79 ms[0m [90m381.79 ms[0m
-Single license [3, 8]                     [33m371.97 ms[0m/iter  ([36m356.9 ms[0m … [35m393.59 ms[0m) [90m383.05 ms[0m [90m393.59 ms[0m [90m393.59 ms[0m
-Single license [3, 9]                     [33m392.24 ms[0m/iter ([36m381.78 ms[0m … [35m401.79 ms[0m) [90m398.87 ms[0m [90m401.79 ms[0m [90m401.79 ms[0m
-Single license [4, 2]                      [33m441.4 ms[0m/iter  ([36m431.5 ms[0m … [35m455.12 ms[0m) [90m446.09 ms[0m [90m455.12 ms[0m [90m455.12 ms[0m
-Single license [4, 3]                     [33m315.07 ms[0m/iter ([36m300.27 ms[0m … [35m331.15 ms[0m) [90m325.79 ms[0m [90m331.15 ms[0m [90m331.15 ms[0m
-Single license [4, 4]                     [33m240.93 ms[0m/iter ([36m231.36 ms[0m … [35m257.39 ms[0m) [90m251.48 ms[0m [90m257.39 ms[0m [90m257.39 ms[0m
-Single license [4, 5]                     [33m246.31 ms[0m/iter ([36m238.38 ms[0m … [35m267.91 ms[0m) [90m248.28 ms[0m [90m267.91 ms[0m [90m267.91 ms[0m
-Single license [4, 6]                     [33m260.12 ms[0m/iter ([36m248.48 ms[0m … [35m279.85 ms[0m) [90m267.52 ms[0m [90m279.85 ms[0m [90m279.85 ms[0m
-Single license [4, 7]                      [33m271.4 ms[0m/iter ([36m263.15 ms[0m … [35m284.14 ms[0m)  [90m275.5 ms[0m [90m284.14 ms[0m [90m284.14 ms[0m
-Single license [4, 8]                      [33m284.7 ms[0m/iter  ([36m275.3 ms[0m … [35m300.31 ms[0m) [90m287.88 ms[0m [90m300.31 ms[0m [90m300.31 ms[0m
-Single license [4, 9]                     [33m293.59 ms[0m/iter ([36m287.39 ms[0m … [35m301.13 ms[0m) [90m296.02 ms[0m [90m301.13 ms[0m [90m301.13 ms[0m
-Single license [5, 2]                     [33m436.76 ms[0m/iter ([36m419.89 ms[0m … [35m460.56 ms[0m) [90m441.73 ms[0m [90m460.56 ms[0m [90m460.56 ms[0m
-Single license [5, 3]                      [33m307.4 ms[0m/iter ([36m297.23 ms[0m … [35m321.65 ms[0m) [90m316.13 ms[0m [90m321.65 ms[0m [90m321.65 ms[0m
-Single license [5, 4]                     [33m237.91 ms[0m/iter ([36m226.68 ms[0m … [35m259.32 ms[0m) [90m240.54 ms[0m [90m259.32 ms[0m [90m259.32 ms[0m
-Single license [5, 5]                     [33m231.21 ms[0m/iter ([36m222.55 ms[0m … [35m244.86 ms[0m) [90m234.26 ms[0m [90m244.86 ms[0m [90m244.86 ms[0m
-Single license [5, 6]                     [33m201.45 ms[0m/iter ([36m194.84 ms[0m … [35m214.08 ms[0m) [90m204.37 ms[0m [90m214.08 ms[0m [90m214.08 ms[0m
-Single license [5, 7]                     [33m211.33 ms[0m/iter ([36m206.62 ms[0m … [35m222.98 ms[0m) [90m212.58 ms[0m [90m222.98 ms[0m [90m222.98 ms[0m
-Single license [5, 8]                     [33m220.74 ms[0m/iter ([36m213.42 ms[0m … [35m233.21 ms[0m) [90m223.94 ms[0m [90m233.21 ms[0m [90m233.21 ms[0m
-Single license [5, 9]                     [33m234.66 ms[0m/iter ([36m223.15 ms[0m … [35m253.34 ms[0m) [90m237.16 ms[0m [90m253.34 ms[0m [90m253.34 ms[0m
-Single license [6, 2]                     [33m420.92 ms[0m/iter  ([36m407.7 ms[0m … [35m438.85 ms[0m) [90m429.53 ms[0m [90m438.85 ms[0m [90m438.85 ms[0m
-Single license [6, 3]                     [33m290.68 ms[0m/iter ([36m281.11 ms[0m … [35m307.43 ms[0m) [90m292.41 ms[0m [90m307.43 ms[0m [90m307.43 ms[0m
-Single license [6, 4]                     [33m226.89 ms[0m/iter ([36m220.83 ms[0m … [35m235.21 ms[0m) [90m228.14 ms[0m [90m235.21 ms[0m [90m235.21 ms[0m
-Single license [6, 5]                     [33m220.23 ms[0m/iter ([36m214.89 ms[0m … [35m228.38 ms[0m) [90m222.95 ms[0m [90m228.38 ms[0m [90m228.38 ms[0m
-Single license [6, 6]                     [33m201.78 ms[0m/iter ([36m188.63 ms[0m … [35m225.29 ms[0m) [90m206.07 ms[0m [90m225.29 ms[0m [90m225.29 ms[0m
-Single license [6, 7]                     [33m179.14 ms[0m/iter ([36m172.76 ms[0m … [35m188.09 ms[0m)  [90m181.6 ms[0m [90m188.09 ms[0m [90m188.09 ms[0m
-Single license [6, 8]                     [33m187.55 ms[0m/iter ([36m180.99 ms[0m … [35m206.21 ms[0m) [90m188.96 ms[0m [90m206.21 ms[0m [90m206.21 ms[0m
-Single license [6, 9]                     [33m194.41 ms[0m/iter ([36m189.03 ms[0m … [35m202.79 ms[0m) [90m195.26 ms[0m [90m202.79 ms[0m [90m202.79 ms[0m
-Single license [7, 2]                      [33m336.8 ms[0m/iter  ([36m323.8 ms[0m … [35m363.74 ms[0m) [90m341.42 ms[0m [90m363.74 ms[0m [90m363.74 ms[0m
-Single license [7, 3]                     [33m233.61 ms[0m/iter ([36m226.66 ms[0m … [35m249.83 ms[0m)  [90m237.1 ms[0m [90m249.83 ms[0m [90m249.83 ms[0m
-Single license [7, 4]                     [33m188.71 ms[0m/iter ([36m181.17 ms[0m … [35m210.26 ms[0m) [90m195.16 ms[0m [90m210.26 ms[0m [90m210.26 ms[0m
-Single license [7, 5]                     [33m184.43 ms[0m/iter ([36m173.28 ms[0m … [35m212.05 ms[0m) [90m190.17 ms[0m [90m212.05 ms[0m [90m212.05 ms[0m
-Single license [7, 6]                     [33m161.42 ms[0m/iter    ([36m155 ms[0m … [35m173.47 ms[0m) [90m165.49 ms[0m [90m173.47 ms[0m [90m173.47 ms[0m
-Single license [7, 7]                     [33m163.05 ms[0m/iter  ([36m151.11 ms[0m … [35m183.6 ms[0m) [90m169.41 ms[0m  [90m183.6 ms[0m  [90m183.6 ms[0m
-Single license [7, 8]                     [33m171.16 ms[0m/iter ([36m158.91 ms[0m … [35m202.75 ms[0m) [90m182.16 ms[0m [90m202.75 ms[0m [90m202.75 ms[0m
-Single license [7, 9]                     [33m182.71 ms[0m/iter ([36m171.17 ms[0m … [35m210.39 ms[0m) [90m187.58 ms[0m [90m210.39 ms[0m [90m210.39 ms[0m
-Single license [8, 2]                     [33m293.73 ms[0m/iter  ([36m286.9 ms[0m … [35m301.78 ms[0m) [90m298.33 ms[0m [90m301.78 ms[0m [90m301.78 ms[0m
-Single license [8, 3]                     [33m207.48 ms[0m/iter  ([36m196.58 ms[0m … [35m231.1 ms[0m) [90m211.89 ms[0m  [90m231.1 ms[0m  [90m231.1 ms[0m
-Single license [8, 4]                     [33m160.57 ms[0m/iter ([36m153.87 ms[0m … [35m176.62 ms[0m) [90m158.95 ms[0m [90m176.62 ms[0m [90m176.62 ms[0m
-Single license [8, 5]                     [33m158.22 ms[0m/iter ([36m151.59 ms[0m … [35m186.63 ms[0m) [90m160.57 ms[0m [90m186.63 ms[0m [90m186.63 ms[0m
-Single license [8, 6]                     [33m137.51 ms[0m/iter ([36m132.47 ms[0m … [35m142.92 ms[0m) [90m141.33 ms[0m [90m142.92 ms[0m [90m142.92 ms[0m
-Single license [8, 7]                     [33m137.92 ms[0m/iter ([36m132.23 ms[0m … [35m162.55 ms[0m) [90m136.47 ms[0m [90m162.55 ms[0m [90m162.55 ms[0m
-Single license [8, 8]                     [33m146.42 ms[0m/iter ([36m139.01 ms[0m … [35m175.77 ms[0m) [90m144.29 ms[0m [90m175.77 ms[0m [90m175.77 ms[0m
-Single license [8, 9]                      [33m152.6 ms[0m/iter ([36m144.41 ms[0m … [35m181.92 ms[0m) [90m152.32 ms[0m [90m181.92 ms[0m [90m181.92 ms[0m
-Single license [9, 2]                      [33m264.1 ms[0m/iter ([36m255.22 ms[0m … [35m291.25 ms[0m)  [90m265.2 ms[0m [90m291.25 ms[0m [90m291.25 ms[0m
-Single license [9, 3]                     [33m185.96 ms[0m/iter ([36m179.24 ms[0m … [35m192.32 ms[0m) [90m189.96 ms[0m [90m192.32 ms[0m [90m192.32 ms[0m
-Single license [9, 4]                     [33m146.95 ms[0m/iter ([36m138.48 ms[0m … [35m174.34 ms[0m) [90m146.24 ms[0m [90m174.34 ms[0m [90m174.34 ms[0m
-Single license [9, 5]                     [33m142.52 ms[0m/iter  ([36m136.9 ms[0m … [35m152.82 ms[0m) [90m145.19 ms[0m [90m152.82 ms[0m [90m152.82 ms[0m
-Single license [9, 6]                      [33m125.8 ms[0m/iter ([36m121.22 ms[0m … [35m137.76 ms[0m) [90m129.75 ms[0m [90m137.76 ms[0m [90m137.76 ms[0m
-Single license [9, 7]                     [33m129.05 ms[0m/iter  ([36m122.29 ms[0m … [35m149.9 ms[0m) [90m132.41 ms[0m  [90m149.9 ms[0m  [90m149.9 ms[0m
-Single license [9, 8]                     [33m128.33 ms[0m/iter ([36m123.19 ms[0m … [35m140.42 ms[0m) [90m130.01 ms[0m [90m140.42 ms[0m [90m140.42 ms[0m
-Single license [9, 9]                     [33m136.19 ms[0m/iter ([36m129.82 ms[0m … [35m144.82 ms[0m) [90m139.88 ms[0m [90m144.82 ms[0m [90m144.82 ms[0m
-Single license [10, 2]                    [33m239.13 ms[0m/iter ([36m232.69 ms[0m … [35m254.78 ms[0m) [90m240.86 ms[0m [90m254.78 ms[0m [90m254.78 ms[0m
-Single license [10, 3]                    [33m165.53 ms[0m/iter ([36m161.21 ms[0m … [35m173.54 ms[0m) [90m167.79 ms[0m [90m173.54 ms[0m [90m173.54 ms[0m
-Single license [10, 4]                    [33m129.16 ms[0m/iter ([36m125.93 ms[0m … [35m136.74 ms[0m) [90m129.99 ms[0m [90m136.74 ms[0m [90m136.74 ms[0m
-Single license [10, 5]                    [33m126.87 ms[0m/iter ([36m122.19 ms[0m … [35m138.18 ms[0m) [90m128.47 ms[0m [90m138.18 ms[0m [90m138.18 ms[0m
-Single license [10, 6]                     [33m113.4 ms[0m/iter ([36m108.84 ms[0m … [35m134.18 ms[0m) [90m112.81 ms[0m [90m134.18 ms[0m [90m134.18 ms[0m
-Single license [10, 7]                    [33m110.33 ms[0m/iter ([36m107.33 ms[0m … [35m117.17 ms[0m) [90m113.07 ms[0m [90m117.17 ms[0m [90m117.17 ms[0m
-Single license [10, 8]                    [33m117.88 ms[0m/iter  ([36m112.1 ms[0m … [35m132.74 ms[0m) [90m118.06 ms[0m [90m132.74 ms[0m [90m132.74 ms[0m
-Single license [10, 9]                    [33m123.26 ms[0m/iter ([36m117.71 ms[0m … [35m135.85 ms[0m) [90m129.72 ms[0m [90m135.85 ms[0m [90m135.85 ms[0m
+Single license [10, 7] (BASELINE)             [33m119 ms[0m/iter ([36m114.85 ms[0m … [35m128.72 ms[0m) [90m123.76 ms[0m [90m128.72 ms[0m [90m128.72 ms[0m
+Single license [2, 2]                      [33m593.76 ms[0m/iter ([36m584.07 ms[0m … [35m601.97 ms[0m)  [90m597.4 ms[0m [90m601.97 ms[0m [90m601.97 ms[0m
+Single license [2, 3]                       [33m418.7 ms[0m/iter   ([36m409.9 ms[0m … [35m435.8 ms[0m) [90m421.67 ms[0m  [90m435.8 ms[0m  [90m435.8 ms[0m
+Single license [2, 4]                      [33m436.08 ms[0m/iter ([36m426.51 ms[0m … [35m446.88 ms[0m) [90m443.45 ms[0m [90m446.88 ms[0m [90m446.88 ms[0m
+Single license [2, 5]                       [33m514.4 ms[0m/iter ([36m503.46 ms[0m … [35m527.42 ms[0m) [90m523.53 ms[0m [90m527.42 ms[0m [90m527.42 ms[0m
+Single license [2, 6]                      [33m539.87 ms[0m/iter ([36m528.45 ms[0m … [35m552.22 ms[0m) [90m547.52 ms[0m [90m552.22 ms[0m [90m552.22 ms[0m
+Single license [2, 7]                      [33m561.88 ms[0m/iter ([36m552.72 ms[0m … [35m570.94 ms[0m) [90m568.06 ms[0m [90m570.94 ms[0m [90m570.94 ms[0m
+Single license [2, 8]                      [33m584.78 ms[0m/iter ([36m574.15 ms[0m … [35m594.81 ms[0m) [90m593.29 ms[0m [90m594.81 ms[0m [90m594.81 ms[0m
+Single license [2, 9]                      [33m601.29 ms[0m/iter ([36m596.45 ms[0m … [35m604.38 ms[0m) [90m603.13 ms[0m [90m604.38 ms[0m [90m604.38 ms[0m
+Single license [3, 2]                      [33m512.08 ms[0m/iter  ([36m507.6 ms[0m … [35m522.27 ms[0m)  [90m514.4 ms[0m [90m522.27 ms[0m [90m522.27 ms[0m
+Single license [3, 3]                      [33m361.05 ms[0m/iter ([36m354.23 ms[0m … [35m369.61 ms[0m) [90m364.42 ms[0m [90m369.61 ms[0m [90m369.61 ms[0m
+Single license [3, 4]                      [33m290.77 ms[0m/iter ([36m284.32 ms[0m … [35m302.77 ms[0m) [90m293.57 ms[0m [90m302.77 ms[0m [90m302.77 ms[0m
+Single license [3, 5]                      [33m343.35 ms[0m/iter ([36m337.66 ms[0m … [35m356.79 ms[0m) [90m343.84 ms[0m [90m356.79 ms[0m [90m356.79 ms[0m
+Single license [3, 6]                      [33m360.72 ms[0m/iter ([36m353.98 ms[0m … [35m368.25 ms[0m) [90m362.39 ms[0m [90m368.25 ms[0m [90m368.25 ms[0m
+Single license [3, 7]                      [33m377.16 ms[0m/iter ([36m370.31 ms[0m … [35m392.85 ms[0m) [90m379.53 ms[0m [90m392.85 ms[0m [90m392.85 ms[0m
+Single license [3, 8]                      [33m391.85 ms[0m/iter ([36m385.29 ms[0m … [35m401.24 ms[0m) [90m396.61 ms[0m [90m401.24 ms[0m [90m401.24 ms[0m
+Single license [3, 9]                      [33m409.56 ms[0m/iter ([36m400.18 ms[0m … [35m420.96 ms[0m) [90m414.43 ms[0m [90m420.96 ms[0m [90m420.96 ms[0m
+Single license [4, 2]                      [33m486.03 ms[0m/iter ([36m479.15 ms[0m … [35m494.61 ms[0m) [90m488.33 ms[0m [90m494.61 ms[0m [90m494.61 ms[0m
+Single license [4, 3]                      [33m341.81 ms[0m/iter ([36m333.88 ms[0m … [35m351.55 ms[0m) [90m347.35 ms[0m [90m351.55 ms[0m [90m351.55 ms[0m
+Single license [4, 4]                      [33m264.71 ms[0m/iter ([36m256.57 ms[0m … [35m279.06 ms[0m) [90m268.57 ms[0m [90m279.06 ms[0m [90m279.06 ms[0m
+Single license [4, 5]                      [33m260.31 ms[0m/iter    ([36m256 ms[0m … [35m269.08 ms[0m) [90m264.31 ms[0m [90m269.08 ms[0m [90m269.08 ms[0m
+Single license [4, 6]                      [33m271.65 ms[0m/iter ([36m265.84 ms[0m … [35m283.57 ms[0m) [90m276.11 ms[0m [90m283.57 ms[0m [90m283.57 ms[0m
+Single license [4, 7]                      [33m298.08 ms[0m/iter ([36m281.71 ms[0m … [35m349.46 ms[0m)  [90m301.2 ms[0m [90m349.46 ms[0m [90m349.46 ms[0m
+Single license [4, 8]                      [33m296.01 ms[0m/iter ([36m288.72 ms[0m … [35m312.57 ms[0m) [90m300.13 ms[0m [90m312.57 ms[0m [90m312.57 ms[0m
+Single license [4, 9]                      [33m308.49 ms[0m/iter ([36m303.49 ms[0m … [35m320.71 ms[0m) [90m311.72 ms[0m [90m320.71 ms[0m [90m320.71 ms[0m
+Single license [5, 2]                      [33m466.77 ms[0m/iter ([36m458.67 ms[0m … [35m477.84 ms[0m) [90m471.78 ms[0m [90m477.84 ms[0m [90m477.84 ms[0m
+Single license [5, 3]                      [33m328.18 ms[0m/iter ([36m319.49 ms[0m … [35m346.76 ms[0m) [90m331.64 ms[0m [90m346.76 ms[0m [90m346.76 ms[0m
+Single license [5, 4]                      [33m258.37 ms[0m/iter ([36m252.35 ms[0m … [35m268.86 ms[0m) [90m264.68 ms[0m [90m268.86 ms[0m [90m268.86 ms[0m
+Single license [5, 5]                      [33m249.43 ms[0m/iter ([36m242.48 ms[0m … [35m266.33 ms[0m) [90m251.33 ms[0m [90m266.33 ms[0m [90m266.33 ms[0m
+Single license [5, 6]                      [33m218.05 ms[0m/iter ([36m213.91 ms[0m … [35m227.09 ms[0m) [90m218.96 ms[0m [90m227.09 ms[0m [90m227.09 ms[0m
+Single license [5, 7]                      [33m228.35 ms[0m/iter ([36m222.93 ms[0m … [35m239.07 ms[0m) [90m229.61 ms[0m [90m239.07 ms[0m [90m239.07 ms[0m
+Single license [5, 8]                      [33m237.35 ms[0m/iter ([36m232.74 ms[0m … [35m249.52 ms[0m) [90m238.76 ms[0m [90m249.52 ms[0m [90m249.52 ms[0m
+Single license [5, 9]                      [33m248.99 ms[0m/iter ([36m241.81 ms[0m … [35m262.68 ms[0m) [90m255.13 ms[0m [90m262.68 ms[0m [90m262.68 ms[0m
+Single license [6, 2]                      [33m471.01 ms[0m/iter ([36m447.73 ms[0m … [35m498.17 ms[0m) [90m479.85 ms[0m [90m498.17 ms[0m [90m498.17 ms[0m
+Single license [6, 3]                      [33m322.36 ms[0m/iter ([36m308.87 ms[0m … [35m350.47 ms[0m) [90m327.03 ms[0m [90m350.47 ms[0m [90m350.47 ms[0m
+Single license [6, 4]                      [33m249.18 ms[0m/iter ([36m242.09 ms[0m … [35m272.13 ms[0m) [90m248.52 ms[0m [90m272.13 ms[0m [90m272.13 ms[0m
+Single license [6, 5]                      [33m240.16 ms[0m/iter ([36m232.54 ms[0m … [35m255.39 ms[0m) [90m249.33 ms[0m [90m255.39 ms[0m [90m255.39 ms[0m
+Single license [6, 6]                      [33m207.07 ms[0m/iter  ([36m198.68 ms[0m … [35m221.3 ms[0m)  [90m215.4 ms[0m  [90m221.3 ms[0m  [90m221.3 ms[0m
+Single license [6, 7]                      [33m191.99 ms[0m/iter ([36m182.58 ms[0m … [35m212.04 ms[0m)  [90m202.3 ms[0m [90m212.04 ms[0m [90m212.04 ms[0m
+Single license [6, 8]                      [33m197.08 ms[0m/iter ([36m191.43 ms[0m … [35m214.61 ms[0m) [90m195.02 ms[0m [90m214.61 ms[0m [90m214.61 ms[0m
+Single license [6, 9]                       [33m207.2 ms[0m/iter ([36m199.73 ms[0m … [35m231.22 ms[0m) [90m206.36 ms[0m [90m231.22 ms[0m [90m231.22 ms[0m
+Single license [7, 2]                      [33m368.07 ms[0m/iter ([36m356.19 ms[0m … [35m386.41 ms[0m) [90m379.12 ms[0m [90m386.41 ms[0m [90m386.41 ms[0m
+Single license [7, 3]                      [33m260.79 ms[0m/iter ([36m250.37 ms[0m … [35m273.07 ms[0m) [90m268.62 ms[0m [90m273.07 ms[0m [90m273.07 ms[0m
+Single license [7, 4]                      [33m204.39 ms[0m/iter ([36m197.02 ms[0m … [35m224.04 ms[0m) [90m209.05 ms[0m [90m224.04 ms[0m [90m224.04 ms[0m
+Single license [7, 5]                      [33m192.37 ms[0m/iter ([36m184.99 ms[0m … [35m206.94 ms[0m)  [90m198.9 ms[0m [90m206.94 ms[0m [90m206.94 ms[0m
+Single license [7, 6]                       [33m169.8 ms[0m/iter ([36m164.89 ms[0m … [35m183.98 ms[0m) [90m168.31 ms[0m [90m183.98 ms[0m [90m183.98 ms[0m
+Single license [7, 7]                      [33m168.24 ms[0m/iter  ([36m161.49 ms[0m … [35m179.5 ms[0m) [90m175.12 ms[0m  [90m179.5 ms[0m  [90m179.5 ms[0m
+Single license [7, 8]                      [33m174.83 ms[0m/iter   ([36m168.5 ms[0m … [35m187.6 ms[0m) [90m180.07 ms[0m  [90m187.6 ms[0m  [90m187.6 ms[0m
+Single license [7, 9]                      [33m180.44 ms[0m/iter ([36m173.95 ms[0m … [35m194.63 ms[0m) [90m186.48 ms[0m [90m194.63 ms[0m [90m194.63 ms[0m
+Single license [8, 2]                      [33m319.56 ms[0m/iter ([36m310.75 ms[0m … [35m335.17 ms[0m) [90m325.69 ms[0m [90m335.17 ms[0m [90m335.17 ms[0m
+Single license [8, 3]                       [33m224.3 ms[0m/iter ([36m216.46 ms[0m … [35m236.05 ms[0m) [90m229.34 ms[0m [90m236.05 ms[0m [90m236.05 ms[0m
+Single license [8, 4]                      [33m173.89 ms[0m/iter ([36m167.65 ms[0m … [35m187.16 ms[0m) [90m172.76 ms[0m [90m187.16 ms[0m [90m187.16 ms[0m
+Single license [8, 5]                      [33m169.21 ms[0m/iter ([36m161.84 ms[0m … [35m183.42 ms[0m) [90m177.49 ms[0m [90m183.42 ms[0m [90m183.42 ms[0m
+Single license [8, 6]                      [33m146.55 ms[0m/iter  ([36m140.9 ms[0m … [35m163.65 ms[0m) [90m145.12 ms[0m [90m163.65 ms[0m [90m163.65 ms[0m
+Single license [8, 7]                       [33m145.4 ms[0m/iter  ([36m140.49 ms[0m … [35m163.7 ms[0m) [90m144.93 ms[0m  [90m163.7 ms[0m  [90m163.7 ms[0m
+Single license [8, 8]                      [33m150.38 ms[0m/iter ([36m146.34 ms[0m … [35m171.07 ms[0m) [90m148.66 ms[0m [90m171.07 ms[0m [90m171.07 ms[0m
+Single license [8, 9]                      [33m157.05 ms[0m/iter ([36m153.02 ms[0m … [35m166.85 ms[0m) [90m156.47 ms[0m [90m166.85 ms[0m [90m166.85 ms[0m
+Single license [9, 2]                      [33m286.76 ms[0m/iter ([36m278.83 ms[0m … [35m300.71 ms[0m) [90m295.02 ms[0m [90m300.71 ms[0m [90m300.71 ms[0m
+Single license [9, 3]                      [33m199.88 ms[0m/iter ([36m194.01 ms[0m … [35m215.34 ms[0m) [90m198.72 ms[0m [90m215.34 ms[0m [90m215.34 ms[0m
+Single license [9, 4]                      [33m156.65 ms[0m/iter ([36m150.78 ms[0m … [35m171.32 ms[0m) [90m156.39 ms[0m [90m171.32 ms[0m [90m171.32 ms[0m
+Single license [9, 5]                       [33m151.3 ms[0m/iter ([36m144.96 ms[0m … [35m169.55 ms[0m) [90m150.98 ms[0m [90m169.55 ms[0m [90m169.55 ms[0m
+Single license [9, 6]                      [33m132.83 ms[0m/iter ([36m128.15 ms[0m … [35m146.77 ms[0m) [90m135.03 ms[0m [90m146.77 ms[0m [90m146.77 ms[0m
+Single license [9, 7]                      [33m133.02 ms[0m/iter    ([36m126.66 ms[0m … [35m147 ms[0m) [90m137.19 ms[0m    [90m147 ms[0m    [90m147 ms[0m
+Single license [9, 8]                      [33m134.74 ms[0m/iter ([36m130.93 ms[0m … [35m141.25 ms[0m) [90m135.43 ms[0m [90m141.25 ms[0m [90m141.25 ms[0m
+Single license [9, 9]                       [33m139.4 ms[0m/iter ([36m136.39 ms[0m … [35m150.07 ms[0m) [90m139.99 ms[0m [90m150.07 ms[0m [90m150.07 ms[0m
+Single license [10, 2]                     [33m258.46 ms[0m/iter ([36m252.12 ms[0m … [35m277.08 ms[0m) [90m260.76 ms[0m [90m277.08 ms[0m [90m277.08 ms[0m
+Single license [10, 3]                     [33m181.16 ms[0m/iter ([36m176.24 ms[0m … [35m193.92 ms[0m) [90m181.27 ms[0m [90m193.92 ms[0m [90m193.92 ms[0m
+Single license [10, 4]                     [33m142.28 ms[0m/iter ([36m138.21 ms[0m … [35m157.38 ms[0m) [90m141.61 ms[0m [90m157.38 ms[0m [90m157.38 ms[0m
+Single license [10, 5]                     [33m133.36 ms[0m/iter ([36m129.96 ms[0m … [35m145.31 ms[0m) [90m132.77 ms[0m [90m145.31 ms[0m [90m145.31 ms[0m
+Single license [10, 6]                     [33m118.52 ms[0m/iter ([36m114.76 ms[0m … [35m126.59 ms[0m) [90m119.34 ms[0m [90m126.59 ms[0m [90m126.59 ms[0m
+Single license [10, 7]                      [33m117.4 ms[0m/iter ([36m114.67 ms[0m … [35m126.22 ms[0m) [90m118.61 ms[0m [90m126.22 ms[0m [90m126.22 ms[0m
+Single license [10, 8]                     [33m121.68 ms[0m/iter  ([36m118.97 ms[0m … [35m134.4 ms[0m) [90m121.57 ms[0m  [90m134.4 ms[0m  [90m134.4 ms[0m
+Single license [10, 9]                     [33m128.02 ms[0m/iter ([36m123.83 ms[0m … [35m147.02 ms[0m) [90m127.46 ms[0m [90m147.02 ms[0m [90m147.02 ms[0m
 cleaning up temp files...
 
 [1msummary[0m
-  [1m[36mSingle license [4, 5] (BASELINE)[0m[0m
-   [31m2.26[0mx slower than [1m[36mSingle license [10, 7][0m[0m
-   [31m2.2[0mx slower than [1m[36mSingle license [10, 6][0m[0m
-   [31m2.11[0mx slower than [1m[36mSingle license [10, 8][0m[0m
-   [31m2.02[0mx slower than [1m[36mSingle license [10, 9][0m[0m
-   [31m1.98[0mx slower than [1m[36mSingle license [9, 6][0m[0m
-   [31m1.96[0mx slower than [1m[36mSingle license [10, 5][0m[0m
-   [31m1.94[0mx slower than [1m[36mSingle license [9, 8][0m[0m
-   [31m1.93[0mx slower than [1m[36mSingle license [9, 7][0m[0m
-   [31m1.93[0mx slower than [1m[36mSingle license [10, 4][0m[0m
-   [31m1.83[0mx slower than [1m[36mSingle license [9, 9][0m[0m
-   [31m1.81[0mx slower than [1m[36mSingle license [8, 6][0m[0m
-   [31m1.81[0mx slower than [1m[36mSingle license [8, 7][0m[0m
-   [31m1.75[0mx slower than [1m[36mSingle license [9, 5][0m[0m
-   [31m1.7[0mx slower than [1m[36mSingle license [8, 8][0m[0m
-   [31m1.69[0mx slower than [1m[36mSingle license [9, 4][0m[0m
-   [31m1.63[0mx slower than [1m[36mSingle license [8, 9][0m[0m
-   [31m1.57[0mx slower than [1m[36mSingle license [8, 5][0m[0m
-   [31m1.55[0mx slower than [1m[36mSingle license [8, 4][0m[0m
-   [31m1.54[0mx slower than [1m[36mSingle license [7, 6][0m[0m
-   [31m1.53[0mx slower than [1m[36mSingle license [7, 7][0m[0m
-   [31m1.5[0mx slower than [1m[36mSingle license [10, 3][0m[0m
-   [31m1.46[0mx slower than [1m[36mSingle license [7, 8][0m[0m
-   [31m1.39[0mx slower than [1m[36mSingle license [6, 7][0m[0m
-   [31m1.36[0mx slower than [1m[36mSingle license [7, 9][0m[0m
-   [31m1.35[0mx slower than [1m[36mSingle license [7, 5][0m[0m
-   [31m1.34[0mx slower than [1m[36mSingle license [9, 3][0m[0m
-   [31m1.33[0mx slower than [1m[36mSingle license [6, 8][0m[0m
-   [31m1.32[0mx slower than [1m[36mSingle license [7, 4][0m[0m
-   [31m1.28[0mx slower than [1m[36mSingle license [6, 9][0m[0m
-   [31m1.24[0mx slower than [1m[36mSingle license [5, 6][0m[0m
-   [31m1.23[0mx slower than [1m[36mSingle license [6, 6][0m[0m
-   [31m1.2[0mx slower than [1m[36mSingle license [8, 3][0m[0m
-   [31m1.18[0mx slower than [1m[36mSingle license [5, 7][0m[0m
-   [31m1.13[0mx slower than [1m[36mSingle license [6, 5][0m[0m
-   [31m1.13[0mx slower than [1m[36mSingle license [5, 8][0m[0m
-   [31m1.1[0mx slower than [1m[36mSingle license [6, 4][0m[0m
-   [31m1.08[0mx slower than [1m[36mSingle license [5, 5][0m[0m
-   [31m1.07[0mx slower than [1m[36mSingle license [7, 3][0m[0m
-   [31m1.06[0mx slower than [1m[36mSingle license [5, 9][0m[0m
-   [31m1.05[0mx slower than [1m[36mSingle license [5, 4][0m[0m
-   [31m1.04[0mx slower than [1m[36mSingle license [10, 2][0m[0m
-   [31m1.03[0mx slower than [1m[36mSingle license [4, 4][0m[0m
-   [31m1.01[0mx slower than [1m[36mSingle license [4, 5][0m[0m
-   [32m1.04[0mx faster than [1m[36mSingle license [4, 6][0m[0m
-   [32m1.06[0mx faster than [1m[36mSingle license [9, 2][0m[0m
-   [32m1.07[0mx faster than [1m[36mSingle license [3, 4][0m[0m
-   [32m1.09[0mx faster than [1m[36mSingle license [4, 7][0m[0m
-   [32m1.14[0mx faster than [1m[36mSingle license [4, 8][0m[0m
-   [32m1.17[0mx faster than [1m[36mSingle license [6, 3][0m[0m
-   [32m1.18[0mx faster than [1m[36mSingle license [4, 9][0m[0m
-   [32m1.18[0mx faster than [1m[36mSingle license [8, 2][0m[0m
-   [32m1.23[0mx faster than [1m[36mSingle license [5, 3][0m[0m
-   [32m1.27[0mx faster than [1m[36mSingle license [4, 3][0m[0m
-   [32m1.31[0mx faster than [1m[36mSingle license [3, 5][0m[0m
-   [32m1.34[0mx faster than [1m[36mSingle license [3, 3][0m[0m
-   [32m1.35[0mx faster than [1m[36mSingle license [7, 2][0m[0m
-   [32m1.37[0mx faster than [1m[36mSingle license [3, 6][0m[0m
-   [32m1.44[0mx faster than [1m[36mSingle license [3, 7][0m[0m
-   [32m1.49[0mx faster than [1m[36mSingle license [3, 8][0m[0m
-   [32m1.55[0mx faster than [1m[36mSingle license [2, 3][0m[0m
-   [32m1.57[0mx faster than [1m[36mSingle license [3, 9][0m[0m
-   [32m1.62[0mx faster than [1m[36mSingle license [2, 4][0m[0m
-   [32m1.69[0mx faster than [1m[36mSingle license [6, 2][0m[0m
-   [32m1.75[0mx faster than [1m[36mSingle license [5, 2][0m[0m
-   [32m1.77[0mx faster than [1m[36mSingle license [4, 2][0m[0m
-   [32m1.9[0mx faster than [1m[36mSingle license [3, 2][0m[0m
-   [32m1.95[0mx faster than [1m[36mSingle license [2, 5][0m[0m
-   [32m2.04[0mx faster than [1m[36mSingle license [2, 6][0m[0m
-   [32m2.13[0mx faster than [1m[36mSingle license [2, 7][0m[0m
-   [32m2.2[0mx faster than [1m[36mSingle license [2, 8][0m[0m
-   [32m2.22[0mx faster than [1m[36mSingle license [2, 2][0m[0m
-   [32m2.34[0mx faster than [1m[36mSingle license [2, 9][0m[0m
+  [1m[36mSingle license [10, 7] (BASELINE)[0m[0m
+   [31m1.01[0mx slower than [1m[36mSingle license [10, 7][0m[0m
+   [31m1[0mx slower than [1m[36mSingle license [10, 6][0m[0m
+   [32m1.02[0mx faster than [1m[36mSingle license [10, 8][0m[0m
+   [32m1.08[0mx faster than [1m[36mSingle license [10, 9][0m[0m
+   [32m1.12[0mx faster than [1m[36mSingle license [9, 6][0m[0m
+   [32m1.12[0mx faster than [1m[36mSingle license [9, 7][0m[0m
+   [32m1.12[0mx faster than [1m[36mSingle license [10, 5][0m[0m
+   [32m1.13[0mx faster than [1m[36mSingle license [9, 8][0m[0m
+   [32m1.17[0mx faster than [1m[36mSingle license [9, 9][0m[0m
+   [32m1.2[0mx faster than [1m[36mSingle license [10, 4][0m[0m
+   [32m1.22[0mx faster than [1m[36mSingle license [8, 7][0m[0m
+   [32m1.23[0mx faster than [1m[36mSingle license [8, 6][0m[0m
+   [32m1.26[0mx faster than [1m[36mSingle license [8, 8][0m[0m
+   [32m1.27[0mx faster than [1m[36mSingle license [9, 5][0m[0m
+   [32m1.32[0mx faster than [1m[36mSingle license [9, 4][0m[0m
+   [32m1.32[0mx faster than [1m[36mSingle license [8, 9][0m[0m
+   [32m1.41[0mx faster than [1m[36mSingle license [7, 7][0m[0m
+   [32m1.42[0mx faster than [1m[36mSingle license [8, 5][0m[0m
+   [32m1.43[0mx faster than [1m[36mSingle license [7, 6][0m[0m
+   [32m1.46[0mx faster than [1m[36mSingle license [8, 4][0m[0m
+   [32m1.47[0mx faster than [1m[36mSingle license [7, 8][0m[0m
+   [32m1.52[0mx faster than [1m[36mSingle license [7, 9][0m[0m
+   [32m1.52[0mx faster than [1m[36mSingle license [10, 3][0m[0m
+   [32m1.61[0mx faster than [1m[36mSingle license [6, 7][0m[0m
+   [32m1.62[0mx faster than [1m[36mSingle license [7, 5][0m[0m
+   [32m1.66[0mx faster than [1m[36mSingle license [6, 8][0m[0m
+   [32m1.68[0mx faster than [1m[36mSingle license [9, 3][0m[0m
+   [32m1.72[0mx faster than [1m[36mSingle license [7, 4][0m[0m
+   [32m1.74[0mx faster than [1m[36mSingle license [6, 6][0m[0m
+   [32m1.74[0mx faster than [1m[36mSingle license [6, 9][0m[0m
+   [32m1.83[0mx faster than [1m[36mSingle license [5, 6][0m[0m
+   [32m1.88[0mx faster than [1m[36mSingle license [8, 3][0m[0m
+   [32m1.92[0mx faster than [1m[36mSingle license [5, 7][0m[0m
+   [32m1.99[0mx faster than [1m[36mSingle license [5, 8][0m[0m
+   [32m2.02[0mx faster than [1m[36mSingle license [6, 5][0m[0m
+   [32m2.09[0mx faster than [1m[36mSingle license [5, 9][0m[0m
+   [32m2.09[0mx faster than [1m[36mSingle license [6, 4][0m[0m
+   [32m2.1[0mx faster than [1m[36mSingle license [5, 5][0m[0m
+   [32m2.17[0mx faster than [1m[36mSingle license [5, 4][0m[0m
+   [32m2.17[0mx faster than [1m[36mSingle license [10, 2][0m[0m
+   [32m2.19[0mx faster than [1m[36mSingle license [4, 5][0m[0m
+   [32m2.19[0mx faster than [1m[36mSingle license [7, 3][0m[0m
+   [32m2.22[0mx faster than [1m[36mSingle license [4, 4][0m[0m
+   [32m2.28[0mx faster than [1m[36mSingle license [4, 6][0m[0m
+   [32m2.41[0mx faster than [1m[36mSingle license [9, 2][0m[0m
+   [32m2.44[0mx faster than [1m[36mSingle license [3, 4][0m[0m
+   [32m2.49[0mx faster than [1m[36mSingle license [4, 8][0m[0m
+   [32m2.5[0mx faster than [1m[36mSingle license [4, 7][0m[0m
+   [32m2.59[0mx faster than [1m[36mSingle license [4, 9][0m[0m
+   [32m2.69[0mx faster than [1m[36mSingle license [8, 2][0m[0m
+   [32m2.71[0mx faster than [1m[36mSingle license [6, 3][0m[0m
+   [32m2.76[0mx faster than [1m[36mSingle license [5, 3][0m[0m
+   [32m2.87[0mx faster than [1m[36mSingle license [4, 3][0m[0m
+   [32m2.89[0mx faster than [1m[36mSingle license [3, 5][0m[0m
+   [32m3.03[0mx faster than [1m[36mSingle license [3, 6][0m[0m
+   [32m3.03[0mx faster than [1m[36mSingle license [3, 3][0m[0m
+   [32m3.09[0mx faster than [1m[36mSingle license [7, 2][0m[0m
+   [32m3.17[0mx faster than [1m[36mSingle license [3, 7][0m[0m
+   [32m3.29[0mx faster than [1m[36mSingle license [3, 8][0m[0m
+   [32m3.44[0mx faster than [1m[36mSingle license [3, 9][0m[0m
+   [32m3.52[0mx faster than [1m[36mSingle license [2, 3][0m[0m
+   [32m3.66[0mx faster than [1m[36mSingle license [2, 4][0m[0m
+   [32m3.92[0mx faster than [1m[36mSingle license [5, 2][0m[0m
+   [32m3.96[0mx faster than [1m[36mSingle license [6, 2][0m[0m
+   [32m4.08[0mx faster than [1m[36mSingle license [4, 2][0m[0m
+   [32m4.3[0mx faster than [1m[36mSingle license [3, 2][0m[0m
+   [32m4.32[0mx faster than [1m[36mSingle license [2, 5][0m[0m
+   [32m4.54[0mx faster than [1m[36mSingle license [2, 6][0m[0m
+   [32m4.72[0mx faster than [1m[36mSingle license [2, 7][0m[0m
+   [32m4.91[0mx faster than [1m[36mSingle license [2, 8][0m[0m
+   [32m4.99[0mx faster than [1m[36mSingle license [2, 2][0m[0m
+   [32m5.05[0mx faster than [1m[36mSingle license [2, 9][0m[0m
 
 [0m[38;5;245mfile:///Users/duartsnel/local/personal_projects/whatlicense/backend/bench/storage_bench.ts[0m
 benchmark                                    time (avg)             (min … max)       p75       p99      p995
 ------------------------------------------------------------------------------- -----------------------------
 
 
-LicenseStorage base iterator (BASELINE)    [33m6.18 ms[0m/iter    ([36m5.42 ms[0m … [35m17.34 ms[0m)   [90m5.97 ms[0m  [90m17.34 ms[0m  [90m17.34 ms[0m
-LicenseStorage batch 2 iterator            [33m8.83 ms[0m/iter    ([36m7.59 ms[0m … [35m24.45 ms[0m)   [90m8.75 ms[0m  [90m24.45 ms[0m  [90m24.45 ms[0m
-LicenseStorage batch 20 iterator           [33m7.13 ms[0m/iter     ([36m6.46 ms[0m … [35m9.71 ms[0m)   [90m7.36 ms[0m   [90m9.71 ms[0m   [90m9.71 ms[0m
-LicenseStorage batch (200) iterator []      [33m8.1 ms[0m/iter    ([36m6.57 ms[0m … [35m34.48 ms[0m)   [90m7.74 ms[0m  [90m34.48 ms[0m  [90m34.48 ms[0m
+LicenseStorage base iterator (BASELINE)    [33m5.22 ms[0m/iter    ([36m4.71 ms[0m … [35m14.75 ms[0m)   [90m5.19 ms[0m   [90m8.11 ms[0m  [90m14.75 ms[0m
+LicenseStorage batch 2 iterator            [33m6.33 ms[0m/iter    ([36m5.77 ms[0m … [35m12.62 ms[0m)   [90m6.55 ms[0m  [90m12.62 ms[0m  [90m12.62 ms[0m
+LicenseStorage batch 20 iterator           [33m6.01 ms[0m/iter     ([36m5.36 ms[0m … [35m9.64 ms[0m)   [90m5.94 ms[0m   [90m9.64 ms[0m   [90m9.64 ms[0m
+LicenseStorage batch (200) iterator []     [33m5.91 ms[0m/iter     ([36m5.56 ms[0m … [35m8.91 ms[0m)   [90m5.98 ms[0m   [90m8.91 ms[0m   [90m8.91 ms[0m
 
 [1msummary[0m
   [1m[36mLicenseStorage base iterator (BASELINE)[0m[0m
+   [32m1.13[0mx faster than [1m[36mLicenseStorage batch (200) iterator [][0m[0m
    [32m1.15[0mx faster than [1m[36mLicenseStorage batch 20 iterator[0m[0m
-   [32m1.31[0mx faster than [1m[36mLicenseStorage batch (200) iterator [][0m[0m
-   [32m1.43[0mx faster than [1m[36mLicenseStorage batch 2 iterator[0m[0m
+   [32m1.21[0mx faster than [1m[36mLicenseStorage batch 2 iterator[0m[0m
 
 [0m[38;5;245mfile:///Users/duartsnel/local/personal_projects/whatlicense/backend/bench/workerObjHandoff_bench.ts[0m
 benchmark      time (avg)             (min … max)       p75       p99      p995
