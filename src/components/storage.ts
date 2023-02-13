@@ -110,41 +110,12 @@ export default class LicenseStorage {
         const block = `\n${obj.name}\n${obj.hash}\n${obj.blockSize}\n${obj.fuzzyHashLength}\n`
         const blockSize = `${new TextEncoder().encode(block).length.toString().padStart(this.options.MAX_ENTRY_ALLOC_BLOCKS, '0')}`;
 
-        // seek to end, write block
-        // await this.file.seek(0, Deno.SeekMode.End);
-        // const B_WRITTEN = await Deno.write(this.file.rid, new TextEncoder().encode(`${blockSize}${block}`));
-
         // using append mode instead of seek to prevent multiple threads from colliding when writing to file
         Deno.writeTextFileSync(this.filePath, `${blockSize}${block}`, {append: true});
 
         this.setEntryCountSync(this.getEntryCount() + 1);
 
     }
-
-    // test(){
-    //     const ENTRY_COUNT = this.getEntryCount();
-        
-    //     this.file.seekSync(0, Deno.SeekMode.Start);
-    //     this.file.seekSync(this.options.MAX_FILE_ENTRY_BLOCKS+1, Deno.SeekMode.Current) // skip entry count for testing
-        
-
-    //     for(let i = 0; i < ENTRY_COUNT; i++){
-    //         const ENTRY_SIZE_BUFFER = new Uint8Array(this.options.MAX_ENTRY_ALLOC_BLOCKS);
-    //         this.file.readSync(ENTRY_SIZE_BUFFER);
-    //         const ENTRY_SIZE = parseInt(new TextDecoder().decode(ENTRY_SIZE_BUFFER));
-    //         // this.file.seekSync(ENTRY_SIZE_BUFFER.length, Deno.SeekMode.Current)
-    
-    
-    //         const LICENSE_ENTRY_BUFFER = new Uint8Array(ENTRY_SIZE);
-    //         this.file.readSync(LICENSE_ENTRY_BUFFER);
-    //         console.log(new TextDecoder().decode(LICENSE_ENTRY_BUFFER))
-    //     }
-
-    //     console.log('entry count:', ENTRY_COUNT)
-
-
-
-    // }
 
     static *parseEntry(entry: Uint8Array) {
         // multiple entries can be in the same buffer, so we need to split them up and return all.
