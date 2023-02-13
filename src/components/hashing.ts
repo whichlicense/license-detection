@@ -18,7 +18,7 @@
 export function createHash(buffer: Uint8Array, hashLength: number): string {
   const radix = 36;
   let hash = 0;
-  for (let i = 0; i < buffer.length; i++) {
+  for (let i = 0; i < Math.min(hashLength, buffer.length); i++) {
     hash = (hash << 5) - hash + buffer[i];
     hash |= 0;
   }
@@ -30,11 +30,10 @@ export function createHash(buffer: Uint8Array, hashLength: number): string {
 export function compareHashes(
   hash1: string,
   hash2: string,
-  hashLength = 5,
   minConfidence = 0,
 ) {
-  const blocks1 = hash1.match(new RegExp(`.{1,${hashLength}}`, "g")) || [];
-  const blocks2 = hash2.match(new RegExp(`.{1,${hashLength}}`, "g")) || [];
+  const blocks1 = hash1.split(":");
+  const blocks2 = hash2.split(":");
 
   let commonBlocks = 0;
   let uncommonBlocks = 0;
@@ -81,17 +80,15 @@ export function fuzzyHash(
   hashLength: number,
 ): string {
   // const blocks: string[] = new Array(input.length);
-  let blocks = "";
+  const blocks = new Array<string>();
 
   for (let i = 0; i < input.length; i += blockSize) {
     const block = input.slice(i, i + blockSize);
     const hash = createHash(block, hashLength);
-    blocks += hash;
+    blocks.push(hash)
   }
 
-  return blocks;
-
-  // TODO: we can use webworker here to calculate the hashes in parallel. i will only optimize if required.
+  return blocks.join(":");
 }
 
 // TODO: import meta main for further compilation of the code for external calling
