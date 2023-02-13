@@ -17,38 +17,40 @@
 // TODO: test if the detecting of licenses work by making sure the output of comparing licenses is above a certain confidence threshold.
 // TODO: make matrix of test instructions. for each file, test if the license is detected correctly.
 
-
-import { assertEquals, assert } from "https://deno.land/std@0.177.0/testing/asserts.ts";
+import {
+  assert,
+  assertEquals,
+} from "https://deno.land/std@0.177.0/testing/asserts.ts";
 import { stripLicense } from "../src/components/minification.ts";
 import { DetectionScheduler } from "../src/components/offloading/LicenseDetection/DetectionScheduler.ts";
 
 const ds = new DetectionScheduler();
 const TEST_LICENSE_1 = Deno.readFileSync("./licenses/RAW/apache-2.0.LICENSE");
 
+Deno.test("License matching is up to spec", {}, async (t) => {
+  await t.step("Exact license is detected with 100% confidence", async () => {
+    const detected = await ds.detectLicense(TEST_LICENSE_1);
+    assert(detected.length > 0);
+    assertEquals(detected[0].name, "apache-2.0.LICENSE");
+    assertEquals(detected[0].confidence, 1);
+  });
 
-Deno.test("License matching is up to spec", {},
- async (t) => {
-    await t.step("Exact license is detected with 100% confidence", async () => {
-        const detected = await ds.detectLicense(TEST_LICENSE_1)
-        assert(detected.length > 0);
-        assertEquals(detected[0].name, "apache-2.0.LICENSE");
-        assertEquals(detected[0].confidence, 1);
-    });
+  await t.step("Similar license is detected with >90% confidence", async () => {
+    const detected = await ds.detectLicense(
+      new TextEncoder().encode(TEST_LICENSE_2),
+    );
+    assert(detected.length > 0);
+    assertEquals(detected[0].name, "apache-2.0.LICENSE");
+    assert(detected[0].confidence > 0.9);
+  });
 
-    await t.step("Similar license is detected with >90% confidence", async () => {
-        const detected = await ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_2))
-        assert(detected.length > 0);
-        assertEquals(detected[0].name, "apache-2.0.LICENSE");
-        assert(detected[0].confidence > 0.9);
-    });
-
-    await t.step("Unavailable license is not detected", async () => {
-        const detected = await ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_3))
-        assert(detected.length === 0);
-    });
+  await t.step("Unavailable license is not detected", async () => {
+    const detected = await ds.detectLicense(
+      new TextEncoder().encode(TEST_LICENSE_3),
+    );
+    assert(detected.length === 0);
+  });
 });
-
-
 
 const TEST_LICENSE_2 = stripLicense(`
 Apache License
@@ -246,8 +248,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-`)
-
+`);
 
 const TEST_LICENSE_3 = stripLicense(`
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi posuere sagittis metus, sit amet ullamcorper erat ultrices sed. Duis ut tellus malesuada, tempor purus sollicitudin, posuere augue. Pellentesque ornare enim ornare vestibulum porta. Vivamus ac mauris sed libero interdum finibus. Ut vestibulum leo tortor, id iaculis eros porttitor vitae. Nunc eu sagittis odio. Nunc tempus mauris a pellentesque sagittis.
@@ -259,4 +260,4 @@ Maecenas fermentum sagittis laoreet. Aliquam congue dolor tortor, et aliquam eni
 Suspendisse ullamcorper non enim consectetur rhoncus. Nunc sed ultricies libero. Sed quis aliquet ante. Fusce vitae dapibus urna, a malesuada massa. Donec pretium libero non lacus euismod, ac mollis enim consequat. Nunc fermentum neque ante, quis hendrerit risus eleifend et. Ut imperdiet convallis dictum. Phasellus feugiat laoreet scelerisque.
 
 In molestie, odio nec viverra facilisis, enim erat consequat urna, sit amet auctor arcu massa vitae purus. In a nisl a est pretium iaculis. Pellentesque quis interdum erat, eu auctor quam. Nam ullamcorper nisl vitae ligula hendrerit, vitae viverra ipsum sollicitudin. Vestibulum mauris risus, semper in feugiat nec, condimentum sed dolor. Integer pellentesque, elit ut posuere volutpat, metus ligula fermentum massa, at bibendum nisl elit at urna. Vestibulum ullamcorper magna libero, vitae faucibus mauris efficitur ut. Phasellus ornare ultricies rhoncus. Mauris congue nibh ut convallis tincidunt. Ut a purus magna. Maecenas sit amet purus a enim dapibus luctus. Pellentesque venenatis arcu molestie, blandit nisi sed, porttitor ante. In hac habitasse platea dictumst. Curabitur condimentum sodales risus. Aenean dolor massa, pretium ac auctor imperdiet, volutpat aliquam justo.
-`)
+`);

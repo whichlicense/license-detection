@@ -27,7 +27,9 @@ import LicenseStorage from "./storage.ts";
  */
 export function detectLicense(
   incomingLicense: TLicense,
-  licenseDB: LicenseStorage = new LicenseStorage('./licenses/ctph_hashes.wlhdb'),
+  licenseDB: LicenseStorage = new LicenseStorage(
+    "./licenses/ctph_hashes.wlhdb",
+  ),
   confidenceThreshold = 0.1,
 ) {
   // TODO: setting for early exit on high confidence match! (i.e., 100% should exit immediately)
@@ -39,7 +41,9 @@ export function detectLicense(
 
   for (const entry of licenseDB) {
     // We know that this is only one entry, so we can safely destructure it here
-    const { blockSize, hash, hashLength, name } = LicenseStorage.parseEntry(entry).next().value!;
+    const { blockSize, hash, hashLength, name } = LicenseStorage.parseEntry(
+      entry,
+    ).next().value!;
 
     // TODO: we can extract this to a global session-based cache? no need to calculate it multiple times in a single session
     if (!incomingLicenseHashes.has(`${blockSize}-${hashLength}`)) {
@@ -78,7 +82,7 @@ export function detectLicenseRawDB(
   rawLicenseDB: Uint8Array,
   confidenceThreshold = 0.1,
 ) {
-    // TODO: setting for early exit on high confidence match! (i.e., 100% should exit immediately)
+  // TODO: setting for early exit on high confidence match! (i.e., 100% should exit immediately)
   /**
    * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
    */
@@ -86,7 +90,11 @@ export function detectLicenseRawDB(
   const matches: (ReturnType<typeof compareHashes> & { name: string })[] = [];
 
   // We know that this is only one entry, so we can safely destructure it here
-  for(const { blockSize, hash, hashLength, name } of LicenseStorage.parseEntry(rawLicenseDB)){
+  for (
+    const { blockSize, hash, hashLength, name } of LicenseStorage.parseEntry(
+      rawLicenseDB,
+    )
+  ) {
     // console.log(name, hash)
     // TODO: we can extract this to a global session-based cache? no need to calculate it multiple times in a single session
     if (!incomingLicenseHashes.has(`${blockSize}-${hashLength}`)) {

@@ -27,18 +27,25 @@ export function createHash(buffer: Uint8Array, hashLength: number): string {
   return res;
 }
 
-export function compareHashes(hash1: string, hash2: string, hashLength = 5, minConfidence = 0) {
+export function compareHashes(
+  hash1: string,
+  hash2: string,
+  hashLength = 5,
+  minConfidence = 0,
+) {
   const blocks1 = hash1.match(new RegExp(`.{1,${hashLength}}`, "g")) || [];
   const blocks2 = hash2.match(new RegExp(`.{1,${hashLength}}`, "g")) || [];
 
   let commonBlocks = 0;
   let uncommonBlocks = 0;
   const maxBlocks = Math.max(blocks1.length, blocks2.length);
- 
-  const maxUncommonBlocks = minConfidence === 0 ? maxBlocks+maxBlocks : Math.ceil((minConfidence) * Math.max(blocks1.length, blocks2.length));
+
+  const maxUncommonBlocks = minConfidence === 0
+    ? maxBlocks + maxBlocks
+    : Math.ceil((minConfidence) * Math.max(blocks1.length, blocks2.length));
 
   uncommonBlocks = Math.abs(blocks1.length - blocks2.length);
-  if(uncommonBlocks > maxUncommonBlocks) {
+  if (uncommonBlocks > maxUncommonBlocks) {
     return {
       commonBlocks: -1,
       totalBlocks: Math.max(blocks1.length, blocks2.length),
@@ -49,9 +56,9 @@ export function compareHashes(hash1: string, hash2: string, hashLength = 5, minC
   for (let i = 0; i < maxBlocks; i++) {
     if (blocks1[i] === blocks2[i]) {
       commonBlocks++;
-    }else{
+    } else {
       uncommonBlocks++;
-      if(uncommonBlocks > maxUncommonBlocks) {
+      if (uncommonBlocks > maxUncommonBlocks) {
         return {
           commonBlocks: -1,
           totalBlocks: Math.max(blocks1.length, blocks2.length),
@@ -60,7 +67,6 @@ export function compareHashes(hash1: string, hash2: string, hashLength = 5, minC
       }
     }
   }
-
 
   return {
     commonBlocks,

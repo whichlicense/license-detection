@@ -1,6 +1,6 @@
 {
-    "OSET-PL-2.1.txt": {
-        "blockSize":  10,
-        "fuzzyHashLength": 10
-    }
+  "OSET-PL-2.1.txt": {
+    "blockSize": 10,
+    "fuzzyHashLength": 10
+  }
 }

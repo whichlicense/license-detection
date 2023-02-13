@@ -1,9 +1,9 @@
 {
-    "deno.enable": true,
-    "copyrighter.author": "Duart Snel",
-    "copyrighter.license": "Apache2",
-    "copyrighter.newFilesOnly": false,
-    "cSpell.words": [
-        "ctph"
-    ]
+  "deno.enable": true,
+  "copyrighter.author": "Duart Snel",
+  "copyrighter.license": "Apache2",
+  "copyrighter.newFilesOnly": false,
+  "cSpell.words": [
+    "ctph"
+  ]
 }

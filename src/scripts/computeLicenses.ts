@@ -86,8 +86,8 @@ export function computeAllLicenseHashes(
       CTPH_SETTINGS_OVERRIDE[dirEntry.name]?.fuzzyHashLength ||
       options.DEFAULT_FUZZY_HASH_LENGTH;
 
-      const FILE_CONTENTS = Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`);
-      if(FILE_CONTENTS.length < 2) continue;
+    const FILE_CONTENTS = Deno.readFileSync(`./licenses/RAW/${dirEntry.name}`);
+    if (FILE_CONTENTS.length < 2) continue;
 
     if (CTPH_SETTINGS_OVERRIDE[dirEntry.name]) {
       targetLicense = fuzzyHash(
@@ -115,9 +115,16 @@ export function computeAllLicenseHashes(
 
 export function stripAndDumpLicense(folder: string) {
   for (const dirEntry of Deno.readDirSync(folder)) {
-    if(dirEntry.isFile){
-      const license = stripLicense(Deno.readTextFileSync(`${folder}/${dirEntry.name}`).replace(/(---\n)(\n|.)+(---\n)/g, ""))
-      if(license.length > 2) Deno.writeTextFileSync(`${folder}/${dirEntry.name}`, license)
+    if (dirEntry.isFile) {
+      const license = stripLicense(
+        Deno.readTextFileSync(`${folder}/${dirEntry.name}`).replace(
+          /(---\n)(\n|.)+(---\n)/g,
+          "",
+        ),
+      );
+      if (license.length > 2) {
+        Deno.writeTextFileSync(`${folder}/${dirEntry.name}`, license);
+      }
     }
   }
 }
@@ -144,11 +151,11 @@ if (import.meta.main) {
     );
   } else {
     const out = computeAllLicenseHashes("./licenses/RAW");
-    const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb")
-    storage.clear()
+    const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb");
+    storage.clear();
 
-    for(const license of out) {
-      storage.addLicense(license)
+    for (const license of out) {
+      storage.addLicense(license);
     }
 
     const CTPH_SETTINGS_OVERRIDE: {

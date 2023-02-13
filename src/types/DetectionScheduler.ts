@@ -17,65 +17,66 @@
 import { detectLicenseRawDB } from "../components/detecting.ts";
 
 export enum ECoordinationThreadMessageType {
-    detect,
-    result,
-    progress,
-    init
+  detect,
+  result,
+  progress,
+  init,
 }
 
 export type TDetectionResult = ReturnType<typeof detectLicenseRawDB>;
 
 export type TCoordinationThreadMessage = {
-    type: ECoordinationThreadMessageType.result,
-    results: ReturnType<typeof detectLicenseRawDB>
+  type: ECoordinationThreadMessageType.result;
+  results: ReturnType<typeof detectLicenseRawDB>;
 } | {
-    type: ECoordinationThreadMessageType.progress,
-    data: number
+  type: ECoordinationThreadMessageType.progress;
+  data: number;
 } | {
-    type: ECoordinationThreadMessageType.detect,
-    license: ArrayBufferLike,
-    id: string,
+  type: ECoordinationThreadMessageType.detect;
+  license: ArrayBufferLike;
+  id: string;
 
-    /**
-     * Minimum confidence required to be considered a match worthy of returning. anything below this will be ignored.
-     * > This speeds up detection the higher it is set.
-     */
-    minConfidence: number
+  /**
+   * Minimum confidence required to be considered a match worthy of returning. anything below this will be ignored.
+   * > This speeds up detection the higher it is set.
+   */
+  minConfidence: number;
 } | {
-    type: ECoordinationThreadMessageType.init,
-    loadBuffer: SharedArrayBuffer,
-}
-
+  type: ECoordinationThreadMessageType.init;
+  loadBuffer: SharedArrayBuffer;
+};
 
 export enum EDetectionThreadMessageType {
-    RESULT, INIT, DETECT
+  RESULT,
+  INIT,
+  DETECT,
 }
 
 // TODO: unionize this when we have more options
 export type TDetectionThreadMessage = {
-    type: EDetectionThreadMessageType.RESULT,
-    for: string,
-    result: ReturnType<typeof detectLicenseRawDB>
+  type: EDetectionThreadMessageType.RESULT;
+  for: string;
+  result: ReturnType<typeof detectLicenseRawDB>;
 } | {
-    type: EDetectionThreadMessageType.INIT,
-    
-    /**
-     * DB section
-     */
-    db: ArrayBufferLike,
+  type: EDetectionThreadMessageType.INIT;
+
+  /**
+   * DB section
+   */
+  db: ArrayBufferLike;
 } | {
-    type: EDetectionThreadMessageType.DETECT,
-    /**
-     * Source license
-     */
-    srcl: SharedArrayBuffer,
-    /**
-     * ID of the request
-     */
-    id: string,
-    /**
-     * Minimum confidence required to be considered a match worthy of returning. anything below this will be ignored.
-     * > This speeds up detection the higher it is set.
-     */
-    minConfidence: number
-}
+  type: EDetectionThreadMessageType.DETECT;
+  /**
+   * Source license
+   */
+  srcl: SharedArrayBuffer;
+  /**
+   * ID of the request
+   */
+  id: string;
+  /**
+   * Minimum confidence required to be considered a match worthy of returning. anything below this will be ignored.
+   * > This speeds up detection the higher it is set.
+   */
+  minConfidence: number;
+};

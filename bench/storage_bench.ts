@@ -16,41 +16,39 @@
 
 import LicenseStorage from "../src/components/storage.ts";
 
-const storage = new LicenseStorage('./licenses/ctph_hashes.wlhdb')
-
+const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb");
 
 // TODO: print out data set information!!
 let i = 0;
 
 Deno.bench(
-    `LicenseStorage base iterator (BASELINE)`,
-    { group: "iteration", baseline: true },
-    () => {
-        for(const entry of storage){}
-    },
+  `LicenseStorage base iterator (BASELINE)`,
+  { group: "iteration", baseline: true },
+  () => {
+    for (const entry of storage) {}
+  },
 );
 
 Deno.bench(
-    `LicenseStorage batch 2 iterator`,
-    { group: "iteration" },
-    () => {
-        for(const entry of storage.entriesBatched(2)){}
-    },
+  `LicenseStorage batch 2 iterator`,
+  { group: "iteration" },
+  () => {
+    for (const entry of storage.entriesBatched(2)) {}
+  },
 );
 
 Deno.bench(
-    `LicenseStorage batch 20 iterator`,
-    { group: "iteration" },
-    () => {
-        for(const entry of storage.entriesBatched(20)){}
-    },
+  `LicenseStorage batch 20 iterator`,
+  { group: "iteration" },
+  () => {
+    for (const entry of storage.entriesBatched(20)) {}
+  },
 );
 
-
 Deno.bench(
-    `LicenseStorage batch (200) iterator []`,
-    { group: "iteration" },
-    () => {
-        for(const entry of storage.entriesBatched(200)){}
-    },
+  `LicenseStorage batch (200) iterator []`,
+  { group: "iteration" },
+  () => {
+    for (const entry of storage.entriesBatched(200)) {}
+  },
 );

@@ -18,42 +18,40 @@
 import { assert } from "https://deno.land/std@0.177.0/testing/asserts.ts";
 import { compareHashes } from "../src/components/hashing.ts";
 
-Deno.test("Compare hashes", {},
- async (t) => {
-    await t.step("Equal hash matches with high confidense", () => {
-        const res = compareHashes("abcd", "abcd", 2, 0.5)
-        assert(res.confidence === 1);
+Deno.test("Compare hashes", {}, async (t) => {
+  await t.step("Equal hash matches with high confidense", () => {
+    const res = compareHashes("abcd", "abcd", 2, 0.5);
+    assert(res.confidence === 1);
+  });
+
+  await t.step("50% change produces 50% confidence", () => {
+    const res = compareHashes("abcd", "abxx", 2, 0.1);
+    assert(res.confidence === 0.5);
+  });
+
+  await t.step("Cut off confidence tests", async (t) => {
+    await t.step("Does not cut-off when above min confidence", () => {
+      // should be a 50% confidence
+      const res = compareHashes("1234567890", "abcde67890", 1, 0.6);
+      assert(res.confidence !== -1);
     });
 
-    await t.step("50% change produces 50% confidence", () => {
-        const res = compareHashes("abcd", "abxx", 2, 0.1)
-        assert(res.confidence === 0.5);
+    await t.step("Does not cut-off when exactly min confidence", () => {
+      // should be a 50% confidence
+      const res = compareHashes("1234567890", "abcde67890", 1, 0.5);
+      assert(res.confidence !== -1);
     });
 
-    await t.step("Cut off confidence tests", async (t) => {
-        await t.step("Does not cut-off when above min confidence", () => {
-            // should be a 50% confidence
-            const res = compareHashes("1234567890", "abcde67890", 1, 0.6)
-            assert(res.confidence !== -1);
-        });
-
-        await t.step("Does not cut-off when exactly min confidence", () => {
-            // should be a 50% confidence
-            const res = compareHashes("1234567890", "abcde67890", 1, 0.5)
-            assert(res.confidence !== -1);
-        });
-
-
-        await t.step("Cuts off when below min confidence", () => {
-            // should be a 50% confidence
-            const res = compareHashes("OOOOOOOOOO", "XXXXXXOOOO", 1, 0.5)
-            assert(res.confidence === -1);
-        });
-
-        await t.step("No min confidence lets all through", () => {
-            // should be a 50% confidence
-            const res = compareHashes("OOOOOOOOOO", "XXXXXXXXXXXXXXXX", 1)
-            assert(res.confidence !== -1);
-        });
+    await t.step("Cuts off when below min confidence", () => {
+      // should be a 50% confidence
+      const res = compareHashes("OOOOOOOOOO", "XXXXXXOOOO", 1, 0.5);
+      assert(res.confidence === -1);
     });
+
+    await t.step("No min confidence lets all through", () => {
+      // should be a 50% confidence
+      const res = compareHashes("OOOOOOOOOO", "XXXXXXXXXXXXXXXX", 1);
+      assert(res.confidence !== -1);
+    });
+  });
 });

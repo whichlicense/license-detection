@@ -16,20 +16,27 @@
 /// <reference no-default-lib="true" />
 /// <reference lib="deno.worker" />
 // TODO: import map
-import { EDetectionThreadMessageType, TDetectionThreadMessage } from "../../../types/DetectionScheduler.ts";
+import {
+  EDetectionThreadMessageType,
+  TDetectionThreadMessage,
+} from "../../../types/DetectionScheduler.ts";
 import { detectLicenseRawDB } from "../../detecting.ts";
 
 let DB: Uint8Array = new Uint8Array();
 
 // TODO: pass in confidence threshold if required.
 self.onmessage = (e: MessageEvent<TDetectionThreadMessage>) => {
-    if(e.data.type === EDetectionThreadMessageType.INIT){
-        DB = new Uint8Array(e.data.db);
-    }else if(e.data.type === EDetectionThreadMessageType.DETECT) {
-        const RAW_LICENSE = new Uint8Array(e.data.srcl); // memory is shared across threads
-        const matches = detectLicenseRawDB(RAW_LICENSE, DB, e.data.minConfidence);
-    
-        const REPLY: TDetectionThreadMessage = {type: EDetectionThreadMessageType.RESULT, for: e.data.id, result: matches}
-        postMessage(REPLY);
-    }
+  if (e.data.type === EDetectionThreadMessageType.INIT) {
+    DB = new Uint8Array(e.data.db);
+  } else if (e.data.type === EDetectionThreadMessageType.DETECT) {
+    const RAW_LICENSE = new Uint8Array(e.data.srcl); // memory is shared across threads
+    const matches = detectLicenseRawDB(RAW_LICENSE, DB, e.data.minConfidence);
+
+    const REPLY: TDetectionThreadMessage = {
+      type: EDetectionThreadMessageType.RESULT,
+      for: e.data.id,
+      result: matches,
+    };
+    postMessage(REPLY);
+  }
 };

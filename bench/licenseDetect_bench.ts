@@ -43,11 +43,11 @@ const MIN_FUZZY_HASH_LENGTH = 2;
 const CONFIDENCE = 0.5;
 
 // To simulate a real-world scenario, we'll create this ahead of time.
-const DETECTION_SCHEDULER = new DetectionScheduler()
+const DETECTION_SCHEDULER = new DetectionScheduler();
 
 function cloneByteArray(source: Uint8Array): Uint8Array {
   const ab = new ArrayBuffer(source.byteLength);
-  const new_arr = new Uint8Array(ab)
+  const new_arr = new Uint8Array(ab);
   new_arr.set(new Uint8Array(source));
   return new_arr;
 }
@@ -56,7 +56,9 @@ function cloneByteArray(source: Uint8Array): Uint8Array {
 console.log(`
 Running license detection benchmarks (${new Date().toISOString()}).
 Default data set details:
-  Amount of licenses: ${new LicenseStorage('./licenses/ctph_hashes.wlhdb').getEntryCount()}
+  Amount of licenses: ${
+  new LicenseStorage("./licenses/ctph_hashes.wlhdb").getEntryCount()
+}
 
 Legend:
   - Single license [blockSize, fuzzyHashLength] \t (e.g., Single license [64, 64])
@@ -90,10 +92,10 @@ Deno.bench(
 
 Deno.bench(
   `Threaded detection [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}]`,
-  { group: "threaded_vs_nothread", },
+  { group: "threaded_vs_nothread" },
   async () => {
     // awaiting results to make sure we measure till completion
-    await DETECTION_SCHEDULER.detectLicense(cloneByteArray(EXAMPLE_LICENSE))
+    await DETECTION_SCHEDULER.detectLicense(cloneByteArray(EXAMPLE_LICENSE));
   },
 );
 
@@ -122,9 +124,9 @@ for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
       prefix: `license_${blockSize}_${fuzzyHashLength}_`,
     });
 
-    const storage = new LicenseStorage(TMEP_FILE_ENTRY)
-    for(const license of ADJUSTED_LICENSE_DB) {
-      storage.addLicense(license)
+    const storage = new LicenseStorage(TMEP_FILE_ENTRY);
+    for (const license of ADJUSTED_LICENSE_DB) {
+      storage.addLicense(license);
     }
 
     tempFiles.push(TMEP_FILE_ENTRY);

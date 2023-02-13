@@ -14,68 +14,94 @@
  *   limitations under the License.
  */
 
-import { ECoordinationThreadMessageType, TCoordinationThreadMessage } from "../../../types/DetectionScheduler.ts";
+import {
+  ECoordinationThreadMessageType,
+  TCoordinationThreadMessage,
+} from "../../../types/DetectionScheduler.ts";
 import { TLicense } from "../../../types/License.ts";
 import { detectLicenseRawDB } from "../../detecting.ts";
-import {v1} from "https://deno.land/std@0.177.0/uuid/mod.ts";
+import { v1 } from "https://deno.land/std@0.177.0/uuid/mod.ts";
 
 export class DetectionScheduler {
-    private coordinationThreads: {w: Worker, loadView: DataView, load: number}[] = []
+  private coordinationThreads: {
+    w: Worker;
+    loadView: DataView;
+    load: number;
+  }[] = [];
 
-    constructor(coordinationThreads = navigator.hardwareConcurrency) {
-        console.log("DetectionScheduler created")
-        for(let i = 0; i < coordinationThreads; i++){
-            const LOAD_BUFF = new SharedArrayBuffer(4)
-            const temp = {
-                w: new Worker(new URL("./coordinationThread.ts", import.meta.url).href, { type: "module" }),
-                loadView: new DataView(LOAD_BUFF),
-                get load() {
-                    return this.loadView.getUint32(0)
-                }
-            }
-            this.coordinationThreads.push(temp)
-            const INIT_MSG: TCoordinationThreadMessage = {type: ECoordinationThreadMessageType.init, loadBuffer: LOAD_BUFF}
-            temp.w.postMessage(INIT_MSG)
-        }
+  constructor(coordinationThreads = navigator.hardwareConcurrency) {
+    console.log("DetectionScheduler created");
+    for (let i = 0; i < coordinationThreads; i++) {
+      const LOAD_BUFF = new SharedArrayBuffer(4);
+      const temp = {
+        w: new Worker(
+          new URL("./coordinationThread.ts", import.meta.url).href,
+          { type: "module" },
+        ),
+        loadView: new DataView(LOAD_BUFF),
+        get load() {
+          return this.loadView.getUint32(0);
+        },
+      };
+      this.coordinationThreads.push(temp);
+      const INIT_MSG: TCoordinationThreadMessage = {
+        type: ECoordinationThreadMessageType.init,
+        loadBuffer: LOAD_BUFF,
+      };
+      temp.w.postMessage(INIT_MSG);
     }
+  }
 
-    private findFreeCoordinationThread(): Worker {
-        const freeCoordinationThread = this.coordinationThreads[0].load === 0 ? this.coordinationThreads[0] : this.coordinationThreads.sort((a, b) => a.load - b.load)[0]
-        return freeCoordinationThread.w;
-    }
+  private findFreeCoordinationThread(): Worker {
+    const freeCoordinationThread = this.coordinationThreads[0].load === 0
+      ? this.coordinationThreads[0]
+      : this.coordinationThreads.sort((a, b) => a.load - b.load)[0];
+    return freeCoordinationThread.w;
+  }
 
-    getLoadInfo(){
-        return this.coordinationThreads.map((t,i) => {return {id: i, load: t.load}})
-    }
+  getLoadInfo() {
+    return this.coordinationThreads.map((t, i) => {
+      return { id: i, load: t.load };
+    });
+  }
 
-    // TODO: method to re-load all databases in all threads
+  // TODO: method to re-load all databases in all threads
 
-    /**
-     * > **NOTE!**: this method transfers the license buffer to the coordination thread, this means you **can't** use the license buffer after calling this method.
-     * @param license 
-     * @returns 
-     */
-    public detectLicense(license: TLicense, minConfidence = 0.9, timeout?: number): Promise<ReturnType<typeof detectLicenseRawDB>> {
-        return new Promise((resolve, reject) => {
-            const coordinationThread = this.findFreeCoordinationThread()
-            const REQ_TIMEOUT = timeout ? setTimeout(() => {
-                reject("request timed out")
-            }, timeout) : undefined
+  /**
+   * > **NOTE!**: this method transfers the license buffer to the coordination thread, this means you **can't** use the license buffer after calling this method.
+   * @param license
+   * @returns
+   */
+  public detectLicense(
+    license: TLicense,
+    minConfidence = 0.9,
+    timeout?: number,
+  ): Promise<ReturnType<typeof detectLicenseRawDB>> {
+    return new Promise((resolve, reject) => {
+      const coordinationThread = this.findFreeCoordinationThread();
+      const REQ_TIMEOUT = timeout
+        ? setTimeout(() => {
+          reject("request timed out");
+        }, timeout)
+        : undefined;
 
-            coordinationThread.addEventListener('message', (e: MessageEvent<TCoordinationThreadMessage>) => {
-                if (e.data.type === ECoordinationThreadMessageType.result) {
-                    if(REQ_TIMEOUT) clearTimeout(REQ_TIMEOUT)
-                    resolve(e.data.results)
-                }
-            })
+      coordinationThread.addEventListener(
+        "message",
+        (e: MessageEvent<TCoordinationThreadMessage>) => {
+          if (e.data.type === ECoordinationThreadMessageType.result) {
+            if (REQ_TIMEOUT) clearTimeout(REQ_TIMEOUT);
+            resolve(e.data.results);
+          }
+        },
+      );
 
-            const THREAD_MSG: TCoordinationThreadMessage = {
-                    type: ECoordinationThreadMessageType.detect,
-                    license: license.buffer,
-                    id: v1.generate() as string ,
-                    minConfidence
-                }
-            coordinationThread.postMessage(THREAD_MSG, [license.buffer])
-        })
-    }
+      const THREAD_MSG: TCoordinationThreadMessage = {
+        type: ECoordinationThreadMessageType.detect,
+        license: license.buffer,
+        id: v1.generate() as string,
+        minConfidence,
+      };
+      coordinationThread.postMessage(THREAD_MSG, [license.buffer]);
+    });
+  }
 }

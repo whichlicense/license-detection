@@ -15,10 +15,10 @@
  */
 
 export type TLicenseDBEntry = {
-  name: string
+  name: string;
   hash: string;
   blockSize: number;
   fuzzyHashLength: number;
-}
+};
 
 export type TLicense = Uint8Array;
