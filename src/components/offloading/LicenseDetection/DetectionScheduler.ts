@@ -14,30 +14,6 @@
  *   limitations under the License.
  */
 
-// TODO: schedule multithreaded work when detecting licenses from a big pool of options
-// TODO: since we work with 'parts' we can calculate the progress and keep track of it.
-
-/*
-    # option 1: no coordinating thread (main thread has the burden of coordinating)
-    Spawn all threads. keep track of them. once we receive an instruction to detect, we split the work up and send it to the threads.
-    We wait for the individual parts, and then we merge the results.
-    ### <potential> problems:
-    - main thread is blocked every time we wish to detect.
-    - main thread needs to deal with multiple detection requests and merge the results based on who requested what.
-
-    # [optimal] option 2: coordinating thread (main thread is free to do other work)
-    once we receive an instruction to detect, 
-    we send the work to the coordinating thread, which then splits the work up and sends it to the detection threads.
-    the coordinating thread wait for its individual parts, and then it merges the results.
-    after that, it sends the results back to the main thread.
-    ### <potential> problems:
-    - we can't keep track of all threads unless we spawn them from within the coordinating thread. 
-        (we can fix this by pre-spawning the coordinating thread and its detection threads)
-    - ....
-
-    window.navigator.hardwareConcurrency <--- this is the number of threads we can use per CPU.
-*/
-
 import { ECoordinationThreadMessageType, TCoordinationThreadMessage } from "../../../types/DetectionScheduler.ts";
 import { TLicense } from "../../../types/License.ts";
 import { detectLicenseRawDB } from "../../detecting.ts";
@@ -48,7 +24,6 @@ export class DetectionScheduler {
 
     constructor(coordinationThreads = navigator.hardwareConcurrency) {
         console.log("DetectionScheduler created")
-        // TODO: if this url proves to be a problem we can use import  maps with import.meta.resolve
         for(let i = 0; i < coordinationThreads; i++){
             const LOAD_BUFF = new SharedArrayBuffer(4)
             const temp = {
