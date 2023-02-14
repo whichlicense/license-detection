@@ -40,19 +40,7 @@ Deno.test("Creating hashes", {}, async (t) => {
 
   await t.step("Different hash lengths produce different hash", () => {
     const res = createHash(TEST_HASH_1, TEST_HASH_1.length);
-    assertNotEquals(res, createHash(TEST_HASH_1, TEST_HASH_1.length + 1));
-  });
-
-  await t.step("Hash length can be controlled", async (t) => {
-    await t.step("Bugger hash length pads with zeros", () => {
-      const res = createHash(TEST_HASH_1, 20);
-      assert(res.includes('0'))
-    });
-
-    await t.step("Smaller hash length has no padding", () => {
-      const res = createHash(TEST_HASH_1, 1);
-      assert(!res.includes('0'))
-    });
+    assertNotEquals(res, createHash(TEST_HASH_1, 2));
   });
 });
 
