@@ -14,10 +14,9 @@
  *   limitations under the License.
  */
 
-// TODO: make a manager that detects changes and imports them. Do this within a DAO class for better separation of concerns.
-import { TLicense } from "../types/License.ts";
-import { compareHashes, fuzzyHash } from "./hashing.ts";
-import LicenseStorage from "./storage.ts";
+import { TLicense } from "types/License";
+import { compareHashes, fuzzyHash } from "components/hashing";
+import LicenseStorage from "components/storage";
 
 /**
  * Attempts to detect the license of the incoming license text represented as a byte array.
@@ -32,7 +31,6 @@ export function detectLicense(
   ),
   confidenceThreshold = 0.1,
 ) {
-  // TODO: setting for early exit on high confidence match! (i.e., 100% should exit immediately)
   /**
    * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
    */
@@ -82,7 +80,6 @@ export function detectLicenseRawDB(
   rawLicenseDB: Uint8Array,
   confidenceThreshold = 0.1,
 ) {
-  // TODO: setting for early exit on high confidence match! (i.e., 100% should exit immediately)
   /**
    * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
    */

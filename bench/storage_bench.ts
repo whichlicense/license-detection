@@ -14,18 +14,21 @@
  *   limitations under the License.
  */
 
-import LicenseStorage from "../src/components/storage.ts";
+import LicenseStorage from "components/storage";
 
 const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb");
 
-// TODO: print out data set information!!
 let i = 0;
+
+console.log(`Running benchmarks for LicenseStorage
+  Amount of licenses: ${storage.getEntryCount()}
+`);
 
 Deno.bench(
   `LicenseStorage base iterator (BASELINE)`,
   { group: "iteration", baseline: true },
   () => {
-    for (const entry of storage) {}
+    for (const _entry of storage) i++;
   },
 );
 
@@ -33,7 +36,7 @@ Deno.bench(
   `LicenseStorage batch 2 iterator`,
   { group: "iteration" },
   () => {
-    for (const entry of storage.entriesBatched(2)) {}
+    for (const _entry of storage.entriesBatched(2)) i++;
   },
 );
 
@@ -41,7 +44,7 @@ Deno.bench(
   `LicenseStorage batch 20 iterator`,
   { group: "iteration" },
   () => {
-    for (const entry of storage.entriesBatched(20)) {}
+    for (const _entry of storage.entriesBatched(20)) i++;
   },
 );
 
@@ -49,6 +52,6 @@ Deno.bench(
   `LicenseStorage batch (200) iterator []`,
   { group: "iteration" },
   () => {
-    for (const entry of storage.entriesBatched(200)) {}
+    for (const _entry of storage.entriesBatched(200)) i++;
   },
 );

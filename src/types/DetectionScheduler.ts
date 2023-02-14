@@ -21,7 +21,7 @@ export enum ECoordinationThreadMessageType {
   result,
   progress,
   init,
-  syncDatabase
+  syncDatabase,
 }
 
 export type TDetectionResult = ReturnType<typeof detectLicenseRawDB>;
@@ -56,7 +56,6 @@ export enum EDetectionThreadMessageType {
   DETECT,
 }
 
-// TODO: unionize this when we have more options
 export type TDetectionThreadMessage = {
   type: EDetectionThreadMessageType.RESULT;
   for: string;

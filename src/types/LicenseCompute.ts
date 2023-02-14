@@ -15,10 +15,10 @@
  */
 
 export type TLicenseComputeOptions = {
-    DEFAULT_BLOCK_SIZE: number;
-    DEFAULT_FUZZY_HASH_LENGTH: number;
-    CTPH_SETTINGS_OVERRIDE?: string;
-  };
+  DEFAULT_BLOCK_SIZE: number;
+  DEFAULT_FUZZY_HASH_LENGTH: number;
+  CTPH_SETTINGS_OVERRIDE?: string;
+};
 export type TLicenseComputeSettingsOverride = {
-[license: string]: { blockSize?: number; fuzzyHashLength?: number };
+  [license: string]: { blockSize?: number; fuzzyHashLength?: number };
 };

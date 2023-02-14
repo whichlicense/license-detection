@@ -15,9 +15,14 @@
  *   limitations under the License.
  */
 
-import { assert, assertEquals, assertExists, assertNotEquals, assertStrictEquals } from "https://deno.land/std@0.177.0/testing/asserts.ts";
+import {
+  assert,
+  assertEquals,
+  assertExists,
+  assertNotEquals,
+  assertStrictEquals,
+} from "https://deno.land/std@0.177.0/testing/asserts.ts";
 import { compareHashes, createHash } from "components/hashing";
-
 
 const TEST_HASH_1 = new TextEncoder().encode("1234567890");
 const TEST_HASH_2 = new TextEncoder().encode("abcdefghij");
@@ -58,25 +63,40 @@ Deno.test("Compare hashes", {}, async (t) => {
   await t.step("Cut off confidence tests", async (t) => {
     await t.step("Does not cut-off when above min confidence", () => {
       // should be a 50% confidence
-      const res = compareHashes("1:2:3:4:5:6:7:8:9:0", "a:b:c:d:e:6:7:8:9:0", 0.6);
+      const res = compareHashes(
+        "1:2:3:4:5:6:7:8:9:0",
+        "a:b:c:d:e:6:7:8:9:0",
+        0.6,
+      );
       assert(res.confidence !== -1);
     });
 
     await t.step("Does not cut-off when exactly min confidence", () => {
       // should be a 50% confidence
-      const res = compareHashes("1:2:3:4:5:6:7:8:9:0", "a:b:c:d:e:6:7:8:9:0", 0.5);
+      const res = compareHashes(
+        "1:2:3:4:5:6:7:8:9:0",
+        "a:b:c:d:e:6:7:8:9:0",
+        0.5,
+      );
       assert(res.confidence !== -1);
     });
 
     await t.step("Cuts off when below min confidence", () => {
       // should be a 50% confidence
-      const res = compareHashes("O:O:O:O:O:O:O:O:O:O", "X:X:X:X:X:X:O:O:O:O:", 0.5);
+      const res = compareHashes(
+        "O:O:O:O:O:O:O:O:O:O",
+        "X:X:X:X:X:X:O:O:O:O:",
+        0.5,
+      );
       assert(res.confidence === -1);
     });
 
     await t.step("No min confidence lets all through", () => {
       // should be a 50% confidence
-      const res = compareHashes("O:O:O:O:O:O:O:O:O:O", "X:X:X:X:X:X:X:X:X:X:X:X:X:X:X:X");
+      const res = compareHashes(
+        "O:O:O:O:O:O:O:O:O:O",
+        "X:X:X:X:X:X:X:X:X:X:X:X:X:X:X:X",
+      );
       assert(res.confidence !== -1);
     });
   });

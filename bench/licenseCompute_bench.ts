@@ -35,7 +35,6 @@ const MIN_BLOCK_SIZE = 2;
 const MAX_FUZZY_HASH_LENGTH = 9;
 const MIN_FUZZY_HASH_LENGTH = 2;
 
-// TODO: print out time..
 console.log(`
 Running license hash computation benchmarks (${new Date().toISOString()}).
 Legend:

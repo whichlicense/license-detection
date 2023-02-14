@@ -14,9 +14,6 @@
  *   limitations under the License.
  */
 
-// TODO: test if the detecting of licenses work by making sure the output of comparing licenses is above a certain confidence threshold.
-// TODO: make matrix of test instructions. for each file, test if the license is detected correctly.
-
 import {
   assert,
   assertEquals,

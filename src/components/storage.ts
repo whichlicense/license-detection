@@ -66,7 +66,6 @@ export default class LicenseStorage {
     this.filePath = file;
     if (options) this.options = { ...this.options, ...options };
 
-    // TODO: figure out if we need reading..
     this.file = Deno.openSync(file, { create: true, read: true, write: true });
     this.isClosed = false;
     if (this.file.statSync().size <= 2) this.setEntryCountSync(0);
@@ -79,8 +78,6 @@ export default class LicenseStorage {
       this.closeDB();
     });
   }
-
-  // TODO: method to clean file up.. can we use truncate?
 
   // TODO: add documentation, ensure they know that this resets the cursor
   getEntryCount(

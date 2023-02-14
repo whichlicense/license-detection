@@ -14,12 +14,10 @@
  *   limitations under the License.
  */
 
-// TODO: finish this when detecting.ts is finished
-
-import { detectLicense } from "../src/components/detecting.ts";
-import { stripLicense } from "../src/components/minification.ts";
-import { DetectionScheduler } from "../src/components/offloading/LicenseDetection/DetectionScheduler.ts";
-import LicenseStorage from "../src/components/storage.ts";
+import { detectLicense } from "components/detecting";
+import { stripLicense } from "components/minification";
+import { DetectionScheduler } from "DetectionScheduler";
+import LicenseStorage from "components/storage";
 import {
   computeAllLicenseHashes,
   DEFAULT_BLOCK_SIZE,
@@ -52,7 +50,6 @@ function cloneByteArray(source: Uint8Array): Uint8Array {
   return new_arr;
 }
 
-// TODO: print out details about the data set. also print out time
 console.log(`
 Running license detection benchmarks (${new Date().toISOString()}).
 Default data set details:

@@ -29,7 +29,10 @@ export class DetectionScheduler {
     load: number;
   }[] = [];
 
-  constructor(coordinationThreads = navigator.hardwareConcurrency, filePath = "./licenses/ctph_hashes.wlhdb") {
+  constructor(
+    coordinationThreads = navigator.hardwareConcurrency,
+    filePath = "./licenses/ctph_hashes.wlhdb",
+  ) {
     for (let i = 0; i < coordinationThreads; i++) {
       const LOAD_BUFF = new SharedArrayBuffer(4);
       const temp = {
@@ -66,7 +69,7 @@ export class DetectionScheduler {
   }
 
   syncDatabase() {
-    for(const t of this.coordinationThreads) {
+    for (const t of this.coordinationThreads) {
       t.w.postMessage({
         type: ECoordinationThreadMessageType.syncDatabase,
       });

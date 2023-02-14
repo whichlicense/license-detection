@@ -23,7 +23,7 @@ export function createHash(buffer: Uint8Array, hashLength: number): string {
     hash |= 0;
   }
 
-  const res = hash.toString(radix)
+  const res = hash.toString(radix);
   return res;
 }
 
@@ -85,7 +85,7 @@ export function fuzzyHash(
   for (let i = 0; i < input.length; i += blockSize) {
     const block = input.slice(i, i + blockSize);
     const hash = createHash(block, hashLength);
-    blocks.push(hash)
+    blocks.push(hash);
   }
 
   return blocks.join(":");

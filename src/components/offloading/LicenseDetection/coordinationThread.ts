@@ -17,15 +17,14 @@
 /// <reference no-default-lib="true" />
 /// <reference lib="deno.worker" />
 
-// TODO: import maps!!!
 import {
   ECoordinationThreadMessageType,
   EDetectionThreadMessageType,
   TCoordinationThreadMessage,
   TDetectionResult,
   TDetectionThreadMessage,
-} from "../../../types/DetectionScheduler.ts";
-import LicenseStorage from "../../storage.ts";
+} from "types/DetectionScheduler";
+import LicenseStorage from "components/storage";
 
 // TODO: how many workers does the user want to spawn? make this configurable. i believe we can use either env here or a config file.
 const detectionThreads = new Array<Worker>(navigator.hardwareConcurrency);
@@ -50,7 +49,6 @@ for (let i = 0; i < detectionThreads.length; i++) {
           DETECTIONS.get(e.data.for)?.results.length === detectionThreads.length
         ) {
           // all threads have sent the portion of their results. post the results to the main thread
-          // TODO: results don't have an id, so we can't match them to the request.!!
           // TODO: extract into seperate function...
           const REPLY: TCoordinationThreadMessage = {
             type: ECoordinationThreadMessageType.result,
@@ -66,9 +64,7 @@ for (let i = 0; i < detectionThreads.length; i++) {
   );
 }
 
-// TODO: use import maps to make this a bit better
-let licenseDBFilePath = "./licenses/ctph_hashes.wlhdb"
-
+let licenseDBFilePath = "./licenses/ctph_hashes.wlhdb";
 
 /**
  * Distribute the database sections to the workers that need to be concerned with their respective sections.
@@ -91,7 +87,6 @@ function DistributeConcerns() {
   }
 }
 
-// TODO: pre-spawn the threads.. spawnup time can be slow.
 self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
   if (e.data.type === ECoordinationThreadMessageType.init) {
     const { loadBuffer, dbFilePath } = e.data;
@@ -100,7 +95,7 @@ self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
 
     licenseDBFilePath = dbFilePath;
     DistributeConcerns();
-  } else if(e.data.type === ECoordinationThreadMessageType.syncDatabase) {
+  } else if (e.data.type === ECoordinationThreadMessageType.syncDatabase) {
     DistributeConcerns();
   } else if (e.data.type === ECoordinationThreadMessageType.detect) {
     const { id, license, minConfidence } = e.data;

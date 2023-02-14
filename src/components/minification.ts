@@ -14,13 +14,10 @@
  *   limitations under the License.
  */
 
-// TODO: for the low code of stripping: we can allow the passing in of a regex string along with custom text to replace.. then
-// we can use those details to loop over and strip the regex from the text and also the normal (custom) text.
-// we can probably identify the type of the replace action by using an enum in the passed in array of actions (i.e., regex? string? strip?).
 export function stripLicense(text: string): string {
   return text.replaceAll(/( |\t|\n|\r|\n\r|\r\n)/g, "");
 }
-// TODO: maybe we can make use of a builder pattern here to make the API easier to use.
+// TODO: maybe we can make use of a builder pattern here to make the API easier to use. (i..e, what do you want to strip?)
 
 if (import.meta.main) {
   console.log(stripLicense(Deno.readTextFileSync(Deno.args[0])));

@@ -14,12 +14,15 @@
  *   limitations under the License.
  */
 
-import { fuzzyHash } from "../components/hashing.ts";
+import { fuzzyHash } from "components/hashing";
 import { basename } from "https://deno.land/std@0.177.0/path/mod.ts";
-import { TLicenseDBEntry } from "../types/License.ts";
-import LicenseStorage from "../components/storage.ts";
-import { stripLicense } from "../components/minification.ts";
-import { TLicenseComputeOptions,TLicenseComputeSettingsOverride } from "../types/LicenseCompute.ts";
+import { TLicenseDBEntry } from "types/License";
+import LicenseStorage from "components/storage";
+import { stripLicense } from "components/minification";
+import {
+  TLicenseComputeOptions,
+  TLicenseComputeSettingsOverride,
+} from "types/LicenseCompute";
 
 // TODO: make these props come from config file or flags
 /**
@@ -39,7 +42,6 @@ export const DEFAULT_BLOCK_SIZE = 10;
  */
 export const DEFAULT_FUZZY_HASH_LENGTH = 7;
 
-// TODO: separate system to recompile on change
 // TODO: all defaults should come from a settings file!
 export function computeLicenseHash(
   file: Uint8Array,
@@ -129,7 +131,7 @@ if (import.meta.main) {
       blockSize,
       hashLength,
     );
-    // TODO: more efficient data storage system with add and forget functionality (i.e., no loading required)
+    // TODO: outdated code.. add licenseStorage usage here
     const temp = JSON.parse(
       Deno.readTextFileSync("./licenses/ctph_hashes.json"),
     );
