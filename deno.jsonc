@@ -4,7 +4,8 @@
     "recompute-licenses": "deno run --allow-read --allow-write ./src/scripts/computeLicenses.ts",
     "benchmark": "deno bench -A --v8-flags=--max-old-space-size=8000",
     "fmt": "deno fmt ./src ./bench ./tests",
-    "test": "deno test -A --coverage=coverage"
+    "test": "deno test -A --coverage=coverage",
+    "coverage": "deno coverage coverage"
   },
   "imports": {
     "DetectionScheduler": "./src/components/offloading/LicenseDetection/DetectionScheduler.ts",
