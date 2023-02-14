@@ -67,15 +67,14 @@ for (let i = 0; i < detectionThreads.length; i++) {
 }
 
 // TODO: use import maps to make this a bit better
-const licenseDB = new LicenseStorage("./licenses/ctph_hashes.wlhdb");
+let licenseDBFilePath = "./licenses/ctph_hashes.wlhdb"
 
-// TODO: we need a map so that we can distinguish between which computation belongs to which license request
 
-// TODO: add instruction to update thread concerns if license db changes.
 /**
  * Distribute the database sections to the workers that need to be concerned with their respective sections.
  */
 function DistributeConcerns() {
+  const licenseDB = new LicenseStorage(licenseDBFilePath);
   const licenseCount = licenseDB.getEntryCount();
   const licensesPerThread = Math.floor(licenseCount / detectionThreads.length);
   let currentThreadIndex = 0;
@@ -95,10 +94,13 @@ function DistributeConcerns() {
 // TODO: pre-spawn the threads.. spawnup time can be slow.
 self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
   if (e.data.type === ECoordinationThreadMessageType.init) {
-    const { loadBuffer } = e.data;
+    const { loadBuffer, dbFilePath } = e.data;
     LOAD_BUFFER = new DataView(loadBuffer);
     LOAD_BUFFER.setUint32(0, DETECTIONS.size);
 
+    licenseDBFilePath = dbFilePath;
+    DistributeConcerns();
+  } else if(e.data.type === ECoordinationThreadMessageType.syncDatabase) {
     DistributeConcerns();
   } else if (e.data.type === ECoordinationThreadMessageType.detect) {
     const { id, license, minConfidence } = e.data;

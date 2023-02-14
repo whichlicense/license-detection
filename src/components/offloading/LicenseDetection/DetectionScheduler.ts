@@ -29,8 +29,7 @@ export class DetectionScheduler {
     load: number;
   }[] = [];
 
-  constructor(coordinationThreads = navigator.hardwareConcurrency) {
-    console.log("DetectionScheduler created");
+  constructor(coordinationThreads = navigator.hardwareConcurrency, filePath = "./licenses/ctph_hashes.wlhdb") {
     for (let i = 0; i < coordinationThreads; i++) {
       const LOAD_BUFF = new SharedArrayBuffer(4);
       const temp = {
@@ -47,6 +46,7 @@ export class DetectionScheduler {
       const INIT_MSG: TCoordinationThreadMessage = {
         type: ECoordinationThreadMessageType.init,
         loadBuffer: LOAD_BUFF,
+        dbFilePath: filePath,
       };
       temp.w.postMessage(INIT_MSG);
     }
@@ -65,7 +65,15 @@ export class DetectionScheduler {
     });
   }
 
-  // TODO: method to re-load all databases in all threads
+  syncDatabase() {
+    for(const t of this.coordinationThreads) {
+      t.w.postMessage({
+        type: ECoordinationThreadMessageType.syncDatabase,
+      });
+    }
+  }
+
+  // TODO: method to change db?
 
   /**
    * > **NOTE!**: this method transfers the license buffer to the coordination thread, this means you **can't** use the license buffer after calling this method.

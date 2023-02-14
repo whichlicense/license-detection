@@ -21,6 +21,7 @@ export enum ECoordinationThreadMessageType {
   result,
   progress,
   init,
+  syncDatabase
 }
 
 export type TDetectionResult = ReturnType<typeof detectLicenseRawDB>;
@@ -44,6 +45,9 @@ export type TCoordinationThreadMessage = {
 } | {
   type: ECoordinationThreadMessageType.init;
   loadBuffer: SharedArrayBuffer;
+  dbFilePath: string;
+} | {
+  type: ECoordinationThreadMessageType.syncDatabase;
 };
 
 export enum EDetectionThreadMessageType {
