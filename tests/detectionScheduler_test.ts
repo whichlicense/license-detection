@@ -19,9 +19,9 @@ import {
   assert,
   assertEquals,
 } from "https://deno.land/std@0.177.0/testing/asserts.ts";
-import { DetectionScheduler } from "../src/components/offloading/LicenseDetection/DetectionScheduler.ts";
-import LicenseStorage from "../src/components/storage.ts";
-import { computeLicenseHash } from "../src/scripts/computeLicenses.ts";
+import { DetectionScheduler } from "DetectionScheduler";
+import LicenseStorage from "components/storage";
+import { computeLicenseHash } from "scripts/computeLicenses";
 
 // file to store fake data
 const CUSTOM_LICENSE_FILE = Deno.makeTempFileSync();
@@ -70,7 +70,7 @@ Deno.test("Custom license database", {}, async (t) => {
     assertEquals(detected[0].name, "TEST_LICENSE_4");
   });
 });
-
+// TODO: timeout needs to be tested in detectLicense.
 // TODO: load distribution test. spam the scheduler with requests and check if load is distributed roughly evenly
 
 addEventListener("unload", () => {
