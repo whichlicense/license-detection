@@ -90,5 +90,3 @@ export function fuzzyHash(
 
   return blocks.join(":");
 }
-
-// TODO: import meta main for further compilation of the code for external calling
