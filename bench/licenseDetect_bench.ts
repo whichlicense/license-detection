@@ -20,12 +20,28 @@ import { DetectionScheduler } from "DetectionScheduler";
 import LicenseStorage from "components/storage";
 import {
   computeAllLicenseHashes,
+  computeLicenseHash,
   DEFAULT_BLOCK_SIZE,
   DEFAULT_FUZZY_HASH_LENGTH,
-} from "../src/scripts/computeLicenses.ts";
+} from "scripts/computeLicenses";
+import { genRandHalfModifiedLicense } from "../tests/utils.ts";
 
 // --- properties
-const EXAMPLE_LICENSE = Deno.readFileSync("./licenses/RAW/apache-2.0.LICENSE");
+
+const _DB_FILE_COPY = Deno.makeTempFileSync();
+Deno.copyFileSync("./licenses/ctph_hashes.wlhdb", _DB_FILE_COPY)
+
+const _EXAMPLE_LICENSES = genRandHalfModifiedLicense()
+const EXAMPLE_DB = new LicenseStorage(_DB_FILE_COPY);
+EXAMPLE_DB.addLicense({
+  name: "TESTING LICENSE",
+  hash: computeLicenseHash(new TextEncoder().encode(_EXAMPLE_LICENSES.original), DEFAULT_BLOCK_SIZE, DEFAULT_FUZZY_HASH_LENGTH).hash,
+  blockSize: DEFAULT_BLOCK_SIZE,
+  fuzzyHashLength: DEFAULT_FUZZY_HASH_LENGTH,
+})
+
+const EXAMPLE_LICENSE = new TextEncoder().encode(_EXAMPLE_LICENSES.modified)
+
 /**
  * The maximum block size to test against. The program will test all block sizes from MIN_BLOCK_SIZE to this value.
  */
@@ -38,10 +54,10 @@ const MIN_BLOCK_SIZE = 2;
 const MAX_FUZZY_HASH_LENGTH = 9;
 const MIN_FUZZY_HASH_LENGTH = 2;
 
-const CONFIDENCE = 0.5;
+const CONFIDENCE = 0.1;
 
 // To simulate a real-world scenario, we'll create this ahead of time.
-const DETECTION_SCHEDULER = new DetectionScheduler();
+const DETECTION_SCHEDULER = new DetectionScheduler(undefined, _DB_FILE_COPY);
 
 function cloneByteArray(source: Uint8Array): Uint8Array {
   const ab = new ArrayBuffer(source.byteLength);
@@ -52,16 +68,20 @@ function cloneByteArray(source: Uint8Array): Uint8Array {
 
 console.log(`
 Running license detection benchmarks (${new Date().toISOString()}).
+Anything below ${CONFIDENCE} confidence will not show within these benchmarks (min threshold).
 Default data set details:
   Amount of licenses: ${
   new LicenseStorage("./licenses/ctph_hashes.wlhdb").getEntryCount()
 }
 
 Legend:
-  - Single license [blockSize, fuzzyHashLength] \t (e.g., Single license [64, 64])
+  - detectLicense [blockSize, fuzzyHashLength] \t (e.g., Single license [64, 64])
 
 Notes:
-  - The 'Single license [...]' benchmarks has a baseline with ${DEFAULT_BLOCK_SIZE} as blockSize and ${DEFAULT_FUZZY_HASH_LENGTH} as fuzzyHashLength. This conveniently also happens to be the default values for the 'computeLicenseHash' function.
+  - The 'detectLicense [...]' benchmarks has a baseline with ${DEFAULT_BLOCK_SIZE} as blockSize and ${DEFAULT_FUZZY_HASH_LENGTH} as fuzzyHashLength. This conveniently also happens to be the default values for the 'computeLicenseHash' function.
+  - The license used for detection is added at the very end of the database.
+  - The license used for detection has exactly 50% of its content modified (in random places) from the original license.
+    - i.e., this means that the confidence value should be 0.5 (or 50%). or different depending on what one wants to achieve with the fuzzy hashing system
 `);
 
 // --- benchmarks
@@ -76,14 +96,14 @@ const NO_EX_LICENSE = new TextEncoder().encode(
 );
 
 Deno.bench("Single threaded non existent license", () => {
-  detectLicense(NO_EX_LICENSE, undefined, CONFIDENCE);
+  detectLicense(NO_EX_LICENSE, EXAMPLE_DB, CONFIDENCE);
 });
 
 Deno.bench(
   `(BASELINE) Non threaded detection [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}]`,
   { group: "threaded_vs_nothread", baseline: true },
   () => {
-    detectLicense(cloneByteArray(EXAMPLE_LICENSE), undefined, CONFIDENCE);
+    detectLicense(cloneByteArray(EXAMPLE_LICENSE), EXAMPLE_DB, CONFIDENCE);
   },
 );
 
@@ -92,15 +112,16 @@ Deno.bench(
   { group: "threaded_vs_nothread" },
   async () => {
     // awaiting results to make sure we measure till completion
-    await DETECTION_SCHEDULER.detectLicense(cloneByteArray(EXAMPLE_LICENSE));
+    await DETECTION_SCHEDULER.detectLicense(cloneByteArray(EXAMPLE_LICENSE), CONFIDENCE);
   },
 );
 
+const conf: number | undefined = detectLicense(EXAMPLE_LICENSE, undefined, CONFIDENCE)[0]?.confidence;
 Deno.bench(
-  `Single license [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE)`,
+  `detectLicense [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE) - Confidence: ${conf || 'no results'}`,
   { group: "sld", baseline: true },
   () => {
-    detectLicense(EXAMPLE_LICENSE, undefined, CONFIDENCE);
+    detectLicense(EXAMPLE_LICENSE, EXAMPLE_DB, CONFIDENCE);
   },
 );
 
@@ -125,6 +146,12 @@ for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
     for (const license of ADJUSTED_LICENSE_DB) {
       storage.addLicense(license);
     }
+    storage.addLicense({
+      name: "TESTING LICENSE",
+      hash: computeLicenseHash(new TextEncoder().encode(_EXAMPLE_LICENSES.original), blockSize, fuzzyHashLength).hash,
+      blockSize: blockSize,
+      fuzzyHashLength: fuzzyHashLength,
+    })
 
     tempFiles.push(TMEP_FILE_ENTRY);
   }
@@ -133,16 +160,20 @@ for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
 for (const file of tempFiles) {
   const [blockSize, fuzzyHashLength] = file.split("_").slice(1);
   const storageSys = new LicenseStorage(file);
-  Deno.bench(`Single license [${blockSize}, ${fuzzyHashLength}]`, {
+  const conf: number | undefined = detectLicense(EXAMPLE_LICENSE, storageSys, CONFIDENCE)[0]?.confidence;
+  Deno.bench(`detectLicense [${blockSize}, ${fuzzyHashLength}] - Confidence: ${conf || 'no results'}`, {
     group: "sld",
   }, () => {
     detectLicense(EXAMPLE_LICENSE, storageSys, CONFIDENCE);
   });
 }
 
+// TODO: detect difference between first license and last license (can be used to build up a big O notation)
+
 addEventListener("unload", () => {
   console.log("cleaning up temp files...");
   for (const file of tempFiles) {
     Deno.removeSync(file);
   }
+  Deno.removeSync(_DB_FILE_COPY)
 });
