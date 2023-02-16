@@ -123,26 +123,6 @@ export function stripAndDumpLicense(folder: string) {
 }
 
 if (import.meta.main) {
-  if (Deno.args[0]) {
-    const blockSize = parseInt(Deno.args[1]) || DEFAULT_BLOCK_SIZE;
-    const hashLength = parseInt(Deno.args[2]) || DEFAULT_FUZZY_HASH_LENGTH;
-    const out = computeLicenseHash(
-      Deno.readFileSync(Deno.args[0]),
-      blockSize,
-      hashLength,
-    );
-    // TODO: outdated code.. add licenseStorage usage here
-    const temp = JSON.parse(
-      Deno.readTextFileSync("./licenses/ctph_hashes.json"),
-    );
-    temp[basename(Deno.args[0])] = out;
-    Deno.writeTextFileSync("./licenses/ctph_hashes.json", JSON.stringify(temp));
-    console.log(
-      `Computed hash for ${
-        basename(Deno.args[0])
-      } with block size ${blockSize} and hash length ${hashLength}.`,
-    );
-  } else {
     const out = computeAllLicenseHashes("./licenses/RAW");
     const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb");
     storage.clear();
@@ -168,5 +148,4 @@ ${
         `${key}: \n\tBlock size: ${value.blockSize}\n\tFuzzy hash length: ${value.fuzzyHashLength}`
       )
     }`);
-  }
 }
