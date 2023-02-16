@@ -13,3 +13,5 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+
+// TODO: instead of the csv thingies, we can compare hashes just like we do in the csv thingy but with the accuracy in the title of the benchmark.

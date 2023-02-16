@@ -20,7 +20,6 @@ import {
   assertEquals,
   assertExists,
   assertNotEquals,
-  assertStrictEquals,
 } from "https://deno.land/std@0.177.0/testing/asserts.ts";
 import { compareHashes, createHash } from "components/hashing";
 

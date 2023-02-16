@@ -15,7 +15,6 @@
  */
 
 import { fuzzyHash } from "components/hashing";
-import { basename } from "https://deno.land/std@0.177.0/path/mod.ts";
 import { TLicenseDBEntry } from "types/License";
 import LicenseStorage from "components/storage";
 import { stripLicense } from "components/minification";
@@ -123,20 +122,20 @@ export function stripAndDumpLicense(folder: string) {
 }
 
 if (import.meta.main) {
-    const out = computeAllLicenseHashes("./licenses/RAW");
-    const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb");
-    storage.clear();
+  const out = computeAllLicenseHashes("./licenses/RAW");
+  const storage = new LicenseStorage("./licenses/ctph_hashes.wlhdb");
+  storage.clear();
 
-    for (const license of out) {
-      storage.addLicense(license);
-    }
+  for (const license of out) {
+    storage.addLicense(license);
+  }
 
-    const CTPH_SETTINGS_OVERRIDE: {
-      [license: string]: { blockSize?: number; fuzzyHashLength?: number };
-    } = JSON.parse(
-      Deno.readTextFileSync("./licenses/ctph_settings_override.json"),
-    );
-    console.log(`Recompiled ${Object.keys(out).length} licenses.
+  const CTPH_SETTINGS_OVERRIDE: {
+    [license: string]: { blockSize?: number; fuzzyHashLength?: number };
+  } = JSON.parse(
+    Deno.readTextFileSync("./licenses/ctph_settings_override.json"),
+  );
+  console.log(`Recompiled ${Object.keys(out).length} licenses.
 Total db size: ${new TextEncoder().encode(JSON.stringify(out)).length / 1e+6} MB
 
 Default block size: ${DEFAULT_BLOCK_SIZE}
@@ -144,8 +143,8 @@ Default hash length: ${DEFAULT_FUZZY_HASH_LENGTH}
 
 --- CTPH_SETTINGS_OVERRIDE ---
 ${
-      Object.entries(CTPH_SETTINGS_OVERRIDE).map(([key, value]) =>
-        `${key}: \n\tBlock size: ${value.blockSize}\n\tFuzzy hash length: ${value.fuzzyHashLength}`
-      )
-    }`);
+    Object.entries(CTPH_SETTINGS_OVERRIDE).map(([key, value]) =>
+      `${key}: \n\tBlock size: ${value.blockSize}\n\tFuzzy hash length: ${value.fuzzyHashLength}`
+    )
+  }`);
 }

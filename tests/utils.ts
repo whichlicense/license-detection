@@ -18,26 +18,26 @@
 import { stripLicense } from "components/minification";
 
 export function genRandHalfModifiedLicense(length = 8000) {
-    const ORIGINAL_FILE = stripLicense('@'.repeat(length))
+  const ORIGINAL_FILE = stripLicense("@".repeat(length));
 
-    // Should generate a new string based on the original file with exactly half of the @ symbols replaced with # symbols.
-    const halfOfFile = ORIGINAL_FILE.length / 2;
-    function randomArrIndex<T>(arr: T[]): number {
-        return Math.floor(Math.random() * arr.length);
+  // Should generate a new string based on the original file with exactly half of the @ symbols replaced with # symbols.
+  const halfOfFile = ORIGINAL_FILE.length / 2;
+  function randomArrIndex<T>(arr: T[]): number {
+    return Math.floor(Math.random() * arr.length);
+  }
+  const CHAR_SPLIT = ORIGINAL_FILE.split("");
+  for (let i = 0; i < halfOfFile; i++) {
+    const randomItem = randomArrIndex(CHAR_SPLIT);
+    if (CHAR_SPLIT[randomItem] === "@") {
+      CHAR_SPLIT[randomItem] = "#";
+    } else {
+      i--;
     }
-    const CHAR_SPLIT = ORIGINAL_FILE.split("")
-    for (let i = 0; i < halfOfFile; i++) {
-        const randomItem = randomArrIndex(CHAR_SPLIT)
-        if (CHAR_SPLIT[randomItem] === "@") {
-            CHAR_SPLIT[randomItem] = "#"
-        } else {
-            i--
-        }
-    }
+  }
 
-    const HALF_MODIFIED_FILE = CHAR_SPLIT.join("");
-    return {
-        original: ORIGINAL_FILE,
-        modified: HALF_MODIFIED_FILE
-    }
+  const HALF_MODIFIED_FILE = CHAR_SPLIT.join("");
+  return {
+    original: ORIGINAL_FILE,
+    modified: HALF_MODIFIED_FILE,
+  };
 }

@@ -29,18 +29,22 @@ import { genRandHalfModifiedLicense } from "../tests/utils.ts";
 // --- properties
 
 const _DB_FILE_COPY = Deno.makeTempFileSync();
-Deno.copyFileSync("./licenses/ctph_hashes.wlhdb", _DB_FILE_COPY)
+Deno.copyFileSync("./licenses/ctph_hashes.wlhdb", _DB_FILE_COPY);
 
-const _EXAMPLE_LICENSES = genRandHalfModifiedLicense()
+const _EXAMPLE_LICENSES = genRandHalfModifiedLicense();
 const EXAMPLE_DB = new LicenseStorage(_DB_FILE_COPY);
 EXAMPLE_DB.addLicense({
   name: "TESTING LICENSE",
-  hash: computeLicenseHash(new TextEncoder().encode(_EXAMPLE_LICENSES.original), DEFAULT_BLOCK_SIZE, DEFAULT_FUZZY_HASH_LENGTH).hash,
+  hash: computeLicenseHash(
+    new TextEncoder().encode(_EXAMPLE_LICENSES.original),
+    DEFAULT_BLOCK_SIZE,
+    DEFAULT_FUZZY_HASH_LENGTH,
+  ).hash,
   blockSize: DEFAULT_BLOCK_SIZE,
   fuzzyHashLength: DEFAULT_FUZZY_HASH_LENGTH,
-})
+});
 
-const EXAMPLE_LICENSE = new TextEncoder().encode(_EXAMPLE_LICENSES.modified)
+const EXAMPLE_LICENSE = new TextEncoder().encode(_EXAMPLE_LICENSES.modified);
 
 /**
  * The maximum block size to test against. The program will test all block sizes from MIN_BLOCK_SIZE to this value.
@@ -112,13 +116,22 @@ Deno.bench(
   { group: "threaded_vs_nothread" },
   async () => {
     // awaiting results to make sure we measure till completion
-    await DETECTION_SCHEDULER.detectLicense(cloneByteArray(EXAMPLE_LICENSE), CONFIDENCE);
+    await DETECTION_SCHEDULER.detectLicense(
+      cloneByteArray(EXAMPLE_LICENSE),
+      CONFIDENCE,
+    );
   },
 );
 
-const conf: number | undefined = detectLicense(EXAMPLE_LICENSE, undefined, CONFIDENCE)[0]?.confidence;
+const conf: number | undefined = detectLicense(
+  EXAMPLE_LICENSE,
+  undefined,
+  CONFIDENCE,
+)[0]?.confidence;
 Deno.bench(
-  `detectLicense [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE) - Confidence: ${conf || 'no results'}`,
+  `detectLicense [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE) - Confidence: ${
+    conf || "no results"
+  }`,
   { group: "sld", baseline: true },
   () => {
     detectLicense(EXAMPLE_LICENSE, EXAMPLE_DB, CONFIDENCE);
@@ -148,10 +161,14 @@ for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
     }
     storage.addLicense({
       name: "TESTING LICENSE",
-      hash: computeLicenseHash(new TextEncoder().encode(_EXAMPLE_LICENSES.original), blockSize, fuzzyHashLength).hash,
+      hash: computeLicenseHash(
+        new TextEncoder().encode(_EXAMPLE_LICENSES.original),
+        blockSize,
+        fuzzyHashLength,
+      ).hash,
       blockSize: blockSize,
       fuzzyHashLength: fuzzyHashLength,
-    })
+    });
 
     tempFiles.push(TMEP_FILE_ENTRY);
   }
@@ -160,12 +177,22 @@ for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
 for (const file of tempFiles) {
   const [blockSize, fuzzyHashLength] = file.split("_").slice(1);
   const storageSys = new LicenseStorage(file);
-  const conf: number | undefined = detectLicense(EXAMPLE_LICENSE, storageSys, CONFIDENCE)[0]?.confidence;
-  Deno.bench(`detectLicense [${blockSize}, ${fuzzyHashLength}] - Confidence: ${conf || 'no results'}`, {
-    group: "sld",
-  }, () => {
-    detectLicense(EXAMPLE_LICENSE, storageSys, CONFIDENCE);
-  });
+  const conf: number | undefined = detectLicense(
+    EXAMPLE_LICENSE,
+    storageSys,
+    CONFIDENCE,
+  )[0]?.confidence;
+  Deno.bench(
+    `detectLicense [${blockSize}, ${fuzzyHashLength}] - Confidence: ${
+      conf || "no results"
+    }`,
+    {
+      group: "sld",
+    },
+    () => {
+      detectLicense(EXAMPLE_LICENSE, storageSys, CONFIDENCE);
+    },
+  );
 }
 
 // TODO: detect difference between first license and last license (can be used to build up a big O notation)
@@ -175,5 +202,5 @@ addEventListener("unload", () => {
   for (const file of tempFiles) {
     Deno.removeSync(file);
   }
-  Deno.removeSync(_DB_FILE_COPY)
+  Deno.removeSync(_DB_FILE_COPY);
 });
