@@ -81,7 +81,6 @@ Deno.test("Compare hashes", {}, async (t) => {
     });
 
     await t.step("Cuts off when below min confidence", () => {
-      // should be a 50% confidence
       const res = compareHashes(
         "O:O:O:O:O:O:O:O:O:O",
         "X:X:X:X:X:X:O:O:O:O:",
@@ -91,7 +90,6 @@ Deno.test("Compare hashes", {}, async (t) => {
     });
 
     await t.step("No min confidence lets all through", () => {
-      // should be a 50% confidence
       const res = compareHashes(
         "O:O:O:O:O:O:O:O:O:O",
         "X:X:X:X:X:X:X:X:X:X:X:X:X:X:X:X",
