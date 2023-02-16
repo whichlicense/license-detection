@@ -15,7 +15,7 @@
  */
 /// <reference no-default-lib="true" />
 /// <reference lib="deno.worker" />
-// TODO: import map
+
 import {
   EDetectionThreadMessageType,
   TDetectionThreadMessage,
