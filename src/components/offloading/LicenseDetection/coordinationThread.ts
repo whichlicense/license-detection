@@ -26,8 +26,7 @@ import {
 } from "types/DetectionScheduler";
 import LicenseStorage from "components/storage";
 
-// TODO: how many workers does the user want to spawn? make this configurable. i believe we can use either env here or a config file.
-const detectionThreads = new Array<Worker>(navigator.hardwareConcurrency);
+let detectionThreads: Array<Worker> = [];
 const DETECTIONS = new Map<string, {
   results: Array<TDetectionResult>;
 }>();
@@ -36,32 +35,45 @@ let LOAD_BUFFER: DataView | undefined;
 const detectionThreadRef =
   new URL("./detectionThread.ts", import.meta.url).href;
 
-// spawn the threads
-for (let i = 0; i < detectionThreads.length; i++) {
-  detectionThreads[i] = new Worker(detectionThreadRef, { type: "module" });
-
-  detectionThreads[i].addEventListener(
-    "message",
-    (e: MessageEvent<TDetectionThreadMessage>) => {
-      if (e.data.type === EDetectionThreadMessageType.RESULT) {
-        DETECTIONS.get(e.data.for)?.results.push(e.data.result);
-        if (
-          DETECTIONS.get(e.data.for)?.results.length === detectionThreads.length
-        ) {
-          // all threads have sent the portion of their results. post the results to the main thread
-          // TODO: extract into seperate function...
-          const REPLY: TCoordinationThreadMessage = {
-            type: ECoordinationThreadMessageType.result,
-            results: DETECTIONS.get(e.data.for)?.results.flatMap((x) => x) ??
-              [],
-          };
-          postMessage(REPLY);
-          DETECTIONS.delete(e.data.for);
-          LOAD_BUFFER?.setUint32(0, DETECTIONS.size);
-        }
+  /**
+   * Name says it all, don't it?.. 
+   * > Don't call this allot, it's slow... ideally only on init.
+   * @param amount the number of threads to spawn. defaults to the number of reported logical cores.
+   */
+function spawnDetectionThreads(amount = navigator.hardwareConcurrency){
+  const detectionMsgHandler = (e: MessageEvent<TDetectionThreadMessage>) => {
+    if (e.data.type === EDetectionThreadMessageType.RESULT) {
+      DETECTIONS.get(e.data.for)?.results.push(e.data.result);
+      if (
+        DETECTIONS.get(e.data.for)?.results.length === detectionThreads.length
+      ) {
+        // all threads have sent the portion of their results. post the results to the main thread
+        const REPLY: TCoordinationThreadMessage = {
+          type: ECoordinationThreadMessageType.result,
+          results: DETECTIONS.get(e.data.for)?.results.flatMap((x) => x) ??
+            [],
+        };
+        postMessage(REPLY);
+        DETECTIONS.delete(e.data.for);
+        LOAD_BUFFER?.setUint32(0, DETECTIONS.size);
       }
-    },
-  );
+    }
+  }
+
+  // cleanup old threads if any (to avoid dangling threads which potentially causes memory leaks)
+  if (detectionThreads.length > 0) {
+    for(const thread of detectionThreads) {
+      thread.removeEventListener("message", detectionMsgHandler);
+      thread.terminate();
+    }
+  }
+
+  // kind of a slow-esk operation, but we SHOULD only do this once.
+  detectionThreads = new Array<Worker>(amount);
+  for (let i = 0; i < detectionThreads.length; i++) {
+    detectionThreads[i] = new Worker(detectionThreadRef, { type: "module" });
+    detectionThreads[i].addEventListener("message",detectionMsgHandler);
+  }
 }
 
 let licenseDBFilePath = "./licenses/ctph_hashes.wlhdb";
@@ -94,6 +106,8 @@ self.onmessage = (e: MessageEvent<TCoordinationThreadMessage>) => {
     LOAD_BUFFER.setUint32(0, DETECTIONS.size);
 
     licenseDBFilePath = dbFilePath;
+
+    spawnDetectionThreads(e.data.nDetectionThreads);
     DistributeConcerns();
   } else if (e.data.type === ECoordinationThreadMessageType.syncDatabase) {
     DistributeConcerns();
