@@ -16,6 +16,7 @@
 
 import { DetectionScheduler } from "../src/components/offloading/LicenseDetection/DetectionScheduler.ts";
 import LicenseStorage from "../src/components/storage.ts";
+import { cloneByteArray } from "../tests/utils.ts";
 
 /**
  * This will hold all brute force style benchmarks that don't really make sense (like detecting a million licenses in one go or something)
@@ -51,12 +52,7 @@ const PICKED_LICENSES = Array.from(
   () => Deno.readFileSync(randomArrItem(LICENSE_FILES)),
 );
 
-function cloneByteArray(source: Uint8Array): Uint8Array {
-  const ab = new ArrayBuffer(source.byteLength);
-  const new_arr = new Uint8Array(ab);
-  new_arr.set(new Uint8Array(source));
-  return new_arr;
-}
+
 
 Deno.bench(
   `Threaded random license detection (${ITERATIONS} iterations)`,

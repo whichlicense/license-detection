@@ -41,3 +41,10 @@ export function genRandHalfModifiedLicense(length = 8000, chars = ["@", "#"]) {
     modified: HALF_MODIFIED_FILE,
   };
 }
+
+export function cloneByteArray(source: Uint8Array): Uint8Array {
+  const ab = new ArrayBuffer(source.byteLength);
+  const new_arr = new Uint8Array(ab);
+  new_arr.set(new Uint8Array(source));
+  return new_arr;
+}

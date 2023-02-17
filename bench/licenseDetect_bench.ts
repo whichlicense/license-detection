@@ -24,7 +24,7 @@ import {
   DEFAULT_BLOCK_SIZE,
   DEFAULT_FUZZY_HASH_LENGTH,
 } from "scripts/computeLicenses";
-import { genRandHalfModifiedLicense } from "../tests/utils.ts";
+import { cloneByteArray, genRandHalfModifiedLicense } from "../tests/utils.ts";
 
 // --- properties
 const _DB_FILE_COPY = Deno.makeTempFileSync();
@@ -86,12 +86,6 @@ const CONFIDENCE = 0.1;
 // To simulate a real-world scenario, we'll create this ahead of time.
 const DETECTION_SCHEDULER = new DetectionScheduler(undefined, undefined, _DB_FILE_COPY);
 
-function cloneByteArray(source: Uint8Array): Uint8Array {
-  const ab = new ArrayBuffer(source.byteLength);
-  const new_arr = new Uint8Array(ab);
-  new_arr.set(new Uint8Array(source));
-  return new_arr;
-}
 
 console.log(`
 Running license detection benchmarks (${new Date().toISOString()}).
