@@ -27,16 +27,16 @@ import {
 import { genRandHalfModifiedLicense } from "../tests/utils.ts";
 
 // --- properties
-
 const _DB_FILE_COPY = Deno.makeTempFileSync();
-Deno.copyFileSync("./licenses/ctph_hashes.wlhdb", _DB_FILE_COPY);
 
-const _EXAMPLE_LICENSES = genRandHalfModifiedLicense();
+const FIRST_EXAMPLE_LICENSES = genRandHalfModifiedLicense(undefined, ["$", "%"]);
+const LAST_EXAMPLE_LICENSES = genRandHalfModifiedLicense();
+
 const EXAMPLE_DB = new LicenseStorage(_DB_FILE_COPY);
 EXAMPLE_DB.addLicense({
-  name: "TESTING LICENSE",
+  name: "FIRST TESTING LICENSE",
   hash: computeLicenseHash(
-    new TextEncoder().encode(_EXAMPLE_LICENSES.original),
+    new TextEncoder().encode(FIRST_EXAMPLE_LICENSES.original),
     DEFAULT_BLOCK_SIZE,
     DEFAULT_FUZZY_HASH_LENGTH,
   ).hash,
@@ -44,7 +44,30 @@ EXAMPLE_DB.addLicense({
   fuzzyHashLength: DEFAULT_FUZZY_HASH_LENGTH,
 });
 
-const EXAMPLE_LICENSE = new TextEncoder().encode(_EXAMPLE_LICENSES.modified);
+for(const e of new LicenseStorage("./licenses/ctph_hashes.wlhdb").entries()) {
+  for(const l of LicenseStorage.parseEntry(e)){
+    EXAMPLE_DB.addLicense({
+      name: l.name,
+      hash: l.hash,
+      blockSize: l.blockSize,
+      fuzzyHashLength: l.hashLength,
+    });
+  }
+}
+
+EXAMPLE_DB.addLicense({
+  name: "LAST TESTING LICENSE",
+  hash: computeLicenseHash(
+    new TextEncoder().encode(LAST_EXAMPLE_LICENSES.original),
+    DEFAULT_BLOCK_SIZE,
+    DEFAULT_FUZZY_HASH_LENGTH,
+  ).hash,
+  blockSize: DEFAULT_BLOCK_SIZE,
+  fuzzyHashLength: DEFAULT_FUZZY_HASH_LENGTH,
+});
+
+const FIRST_EXAMPLE_LICENSE = new TextEncoder().encode(FIRST_EXAMPLE_LICENSES.modified);
+const LAST_EXAMPLE_LICENSE = new TextEncoder().encode(LAST_EXAMPLE_LICENSES.modified);
 
 /**
  * The maximum block size to test against. The program will test all block sizes from MIN_BLOCK_SIZE to this value.
@@ -107,7 +130,7 @@ Deno.bench(
   `(BASELINE) Non threaded detection [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}]`,
   { group: "threaded_vs_nothread", baseline: true },
   () => {
-    detectLicense(cloneByteArray(EXAMPLE_LICENSE), EXAMPLE_DB, CONFIDENCE);
+    detectLicense(cloneByteArray(LAST_EXAMPLE_LICENSE), EXAMPLE_DB, CONFIDENCE);
   },
 );
 
@@ -117,14 +140,14 @@ Deno.bench(
   async () => {
     // awaiting results to make sure we measure till completion
     await DETECTION_SCHEDULER.detectLicense(
-      cloneByteArray(EXAMPLE_LICENSE),
+      cloneByteArray(LAST_EXAMPLE_LICENSE),
       CONFIDENCE,
     );
   },
 );
 
 const conf: number | undefined = detectLicense(
-  EXAMPLE_LICENSE,
+  LAST_EXAMPLE_LICENSE,
   undefined,
   CONFIDENCE,
 )[0]?.confidence;
@@ -134,9 +157,44 @@ Deno.bench(
   }`,
   { group: "sld", baseline: true },
   () => {
-    detectLicense(EXAMPLE_LICENSE, EXAMPLE_DB, CONFIDENCE);
+    detectLicense(LAST_EXAMPLE_LICENSE, EXAMPLE_DB, CONFIDENCE);
   },
 );
+
+
+
+Deno.bench(
+  `[NON-THREADED] FIRST license in the db (BASELINE)`,
+  {group: "first_vs_last", baseline: true},
+  () => {
+    detectLicense(FIRST_EXAMPLE_LICENSE, EXAMPLE_DB);
+  },
+);
+
+Deno.bench(
+  `[NON-THREADED] LAST license in the db`,
+  {group: "first_vs_last"},
+  () => {
+    detectLicense(LAST_EXAMPLE_LICENSE, EXAMPLE_DB);
+  },
+);
+
+Deno.bench(
+  `[THREADED] FIRST license in the db (BASELINE)`,
+  {group: "first_vs_last"},
+  () => {
+    DETECTION_SCHEDULER.detectLicense(FIRST_EXAMPLE_LICENSE, 0.001);
+  },
+);
+
+Deno.bench(
+  `[THREADED] LAST license in the db`,
+  {group: "first_vs_last"},
+  () => {
+    DETECTION_SCHEDULER.detectLicense(LAST_EXAMPLE_LICENSE, 0.001);
+  },
+);
+
 
 const tempFiles: string[] = [];
 for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
@@ -162,7 +220,7 @@ for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
     storage.addLicense({
       name: "TESTING LICENSE",
       hash: computeLicenseHash(
-        new TextEncoder().encode(_EXAMPLE_LICENSES.original),
+        new TextEncoder().encode(LAST_EXAMPLE_LICENSES.original),
         blockSize,
         fuzzyHashLength,
       ).hash,
@@ -178,7 +236,7 @@ for (const file of tempFiles) {
   const [blockSize, fuzzyHashLength] = file.split("_").slice(1);
   const storageSys = new LicenseStorage(file);
   const conf: number | undefined = detectLicense(
-    EXAMPLE_LICENSE,
+    LAST_EXAMPLE_LICENSE,
     storageSys,
     CONFIDENCE,
   )[0]?.confidence;
@@ -190,13 +248,11 @@ for (const file of tempFiles) {
       group: "sld",
     },
     () => {
-      detectLicense(EXAMPLE_LICENSE, storageSys, CONFIDENCE);
+      detectLicense(LAST_EXAMPLE_LICENSE, storageSys, CONFIDENCE);
     },
   );
 }
 
-// TODO: detect difference between first license and last license (can be used to build up a big O notation). can also prove that first licenses are faster than last licenses
-//       which can be used to warrant an optimization pre-sorting!
 
 
 addEventListener("unload", () => {
