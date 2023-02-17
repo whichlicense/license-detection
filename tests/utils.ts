@@ -17,8 +17,8 @@
 
 import { stripLicense } from "components/minification";
 
-export function genRandHalfModifiedLicense(length = 8000) {
-  const ORIGINAL_FILE = stripLicense("@".repeat(length));
+export function genRandHalfModifiedLicense(length = 8000, chars = ["@", "#"]) {
+  const ORIGINAL_FILE = stripLicense(chars[0].repeat(length));
 
   // Should generate a new string based on the original file with exactly half of the @ symbols replaced with # symbols.
   const halfOfFile = ORIGINAL_FILE.length / 2;
@@ -28,8 +28,8 @@ export function genRandHalfModifiedLicense(length = 8000) {
   const CHAR_SPLIT = ORIGINAL_FILE.split("");
   for (let i = 0; i < halfOfFile; i++) {
     const randomItem = randomArrIndex(CHAR_SPLIT);
-    if (CHAR_SPLIT[randomItem] === "@") {
-      CHAR_SPLIT[randomItem] = "#";
+    if (CHAR_SPLIT[randomItem] === chars[0]) {
+      CHAR_SPLIT[randomItem] = chars[1];
     } else {
       i--;
     }
