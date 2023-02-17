@@ -195,7 +195,9 @@ for (const file of tempFiles) {
   );
 }
 
-// TODO: detect difference between first license and last license (can be used to build up a big O notation)
+// TODO: detect difference between first license and last license (can be used to build up a big O notation). can also prove that first licenses are faster than last licenses
+//       which can be used to warrant an optimization pre-sorting!
+
 
 addEventListener("unload", () => {
   console.log("cleaning up temp files...");
