@@ -110,8 +110,6 @@ Deno.test("DetectionScheduler load distribution is 'fair'", { sanitizeOps: false
 });
 
 
-// TODO: load distribution test. spam the scheduler with requests and check if load is distributed roughly evenly
-
 addEventListener("unload", () => {
   console.log("cleaning up temp files...");
   Deno.removeSync(CUSTOM_LICENSE_FILE);
