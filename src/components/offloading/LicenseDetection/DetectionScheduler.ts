@@ -17,9 +17,9 @@
 import {
   ECoordinationThreadMessageType,
   TCoordinationThreadMessage,
-} from "../../../types/DetectionScheduler.ts";
-import { TLicense } from "../../../types/License.ts";
-import { detectLicenseRawDB } from "../../detecting.ts";
+} from "types/DetectionScheduler";
+import { TLicense } from "types/License";
+import { detectLicenseRawDB } from "components/detecting";
 import { v1 } from "https://deno.land/std@0.177.0/uuid/mod.ts";
 
 export class DetectionScheduler {
@@ -31,6 +31,7 @@ export class DetectionScheduler {
 
   constructor(
     coordinationThreads = navigator.hardwareConcurrency,
+    detectionThreads = navigator.hardwareConcurrency,
     filePath = "./licenses/ctph_hashes.wlhdb",
   ) {
     for (let i = 0; i < coordinationThreads; i++) {
@@ -50,6 +51,7 @@ export class DetectionScheduler {
         type: ECoordinationThreadMessageType.init,
         loadBuffer: LOAD_BUFF,
         dbFilePath: filePath,
+        nDetectionThreads: detectionThreads,
       };
       temp.w.postMessage(INIT_MSG);
     }
