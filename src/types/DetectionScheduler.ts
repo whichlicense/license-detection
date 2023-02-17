@@ -46,6 +46,7 @@ export type TCoordinationThreadMessage = {
   type: ECoordinationThreadMessageType.init;
   loadBuffer: SharedArrayBuffer;
   dbFilePath: string;
+  nDetectionThreads?: number;
 } | {
   type: ECoordinationThreadMessageType.syncDatabase;
 };
