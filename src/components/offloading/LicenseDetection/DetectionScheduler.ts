@@ -96,15 +96,16 @@ export class DetectionScheduler {
         }, timeout)
         : undefined;
 
-      coordinationThread.addEventListener(
-        "message",
-        (e: MessageEvent<TCoordinationThreadMessage>) => {
-          if (e.data.type === ECoordinationThreadMessageType.result) {
-            if (REQ_TIMEOUT) clearTimeout(REQ_TIMEOUT);
-            resolve(e.data.results);
-          }
-        },
-      );
+
+      const listeningCallback = (e: MessageEvent<TCoordinationThreadMessage>) => {
+        if (e.data.type === ECoordinationThreadMessageType.result) {
+          if (REQ_TIMEOUT) clearTimeout(REQ_TIMEOUT);
+          resolve(e.data.results);
+          coordinationThread.removeEventListener("message", listeningCallback);
+        }
+      }
+
+      coordinationThread.addEventListener("message", listeningCallback);
 
       const THREAD_MSG: TCoordinationThreadMessage = {
         type: ECoordinationThreadMessageType.detect,
