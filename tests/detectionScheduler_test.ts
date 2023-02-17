@@ -18,6 +18,7 @@
 import {
   assert,
   assertEquals,
+assertRejects,
 } from "https://deno.land/std@0.177.0/testing/asserts.ts";
 import { DetectionScheduler } from "DetectionScheduler";
 import LicenseStorage from "components/storage";
@@ -70,7 +71,19 @@ Deno.test("Custom license database", {}, async (t) => {
     assertEquals(detected[0].name, "TEST_LICENSE_4");
   });
 });
-// TODO: timeout needs to be tested in detectLicense.
+
+Deno.test("detectLicense times-out with rejection", { sanitizeOps: false }, () => {
+    const _ds = new DetectionScheduler(1, 1);
+
+    // spam the scheduler a bit to ensure we timeout (since this thing is really fast...)
+    for(let i = 0; i < 100; i++) {
+      _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), 0.00001);
+    }
+
+    assertRejects(() => _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), 0.00001, 0))
+});
+
+
 // TODO: load distribution test. spam the scheduler with requests and check if load is distributed roughly evenly
 
 addEventListener("unload", () => {
