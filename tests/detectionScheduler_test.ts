@@ -84,6 +84,32 @@ Deno.test("detectLicense times-out with rejection", { sanitizeOps: false }, () =
 });
 
 
+Deno.test("DetectionScheduler load distribution is 'fair'", { sanitizeOps: false }, () => {
+  const num_scheduler_threads = 3;
+  /**
+   * each deviation is a single license queue. so a deviation of 2 means 2 licenses in the queue
+   * > The deviation is expected to grow as the number of requests increases. This increase is normal as the database is spread across multiple threads, with
+   * some threads getting a section of the database which contains smaller licenses and thus less hashes to check against (faster).
+   * 
+   * > **TLDR: some threads are faster than others. this is normal.**
+   */
+  const deviation_tolerance = 15;
+  const _ds = new DetectionScheduler(num_scheduler_threads, 1);
+
+  // spam the scheduler a bit to ensure we timeout (since this thing is really fast...)
+  for(let i = 0; i < 9701; i++) {
+    _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), 0.00001);
+  }
+
+  const loadInfo = _ds.getLoadInfo();
+  const avg = loadInfo.reduce((a, b) => a + b.load, 0) / loadInfo.length;
+
+  for(const t of loadInfo) {
+    assert(t.load >= avg - deviation_tolerance && t.load <= avg + deviation_tolerance, `load of ${t.id} (${t.load}) is outside the range ${avg-deviation_tolerance}}, ${avg+deviation_tolerance}}`)
+  }
+});
+
+
 // TODO: load distribution test. spam the scheduler with requests and check if load is distributed roughly evenly
 
 addEventListener("unload", () => {
