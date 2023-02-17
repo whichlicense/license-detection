@@ -79,7 +79,12 @@ export default class LicenseStorage {
     });
   }
 
-  // TODO: add documentation, ensure they know that this resets the cursor
+  /**
+   * Gets the amount of licenses stored within the file attached to this instance.
+   * > NOTE: This method resets the cursor to the start of the file. this might not be a problem, but it is something to be aware of.
+   * @param resetCursor This optional parameter will put the cursor back to the provided position after the operation is complete.
+   * @param seekMode This optional parameter will set the seek mode of the resetCursor position.
+   */
   getEntryCount(
     resetCursor?: number,
     seekMode: Deno.SeekMode = Deno.SeekMode.Start,
@@ -110,6 +115,9 @@ export default class LicenseStorage {
     this.setEntryCountSync(0);
   }
 
+  /**
+   * Appends a license at the very end of the database.
+   */
   addLicense(obj: TLicenseDBEntry) {
     // max section size in bytes: 0000000
     const block =
@@ -129,6 +137,10 @@ export default class LicenseStorage {
     this.setEntryCountSync(this.getEntryCount() + 1);
   }
 
+  /**
+   * Parses one or more entries received from the symbol.iterator, entries or entriesBatched methods.
+   * > This method is able to parse batched entries!
+   */
   static *parseEntry(entry: Uint8Array) {
     // multiple entries can be in the same buffer, so we need to split them up and return all.
     const res = new TextDecoder().decode(entry).matchAll(
@@ -149,7 +161,7 @@ export default class LicenseStorage {
 
   /**
    * Closes the file handle.. use this when you're done with the database.
-   * > calling this method will prevent you from using the database again until you create a new instance
+   * > calling this method will prevent you from using the database again until you create a new instance (throws).
    */
   closeDB() {
     if (!this.isClosed) this.file.close();
@@ -172,6 +184,10 @@ export default class LicenseStorage {
     return combinedArray;
   }
 
+  /**
+   * Gets all entries in the database in batches of batchEntryCount. (i.e., if batchEntryCount is 2, it will return 2 entries at a time)
+   * @see parseEntry
+   */
   *entriesBatched(batchEntryCount: number) {
     const ENTRY_COUNT = this.getEntryCount();
     // group results from the iterator into buckets of size batchEntryCount
@@ -190,6 +206,9 @@ export default class LicenseStorage {
     if (chunk.length > 0) yield this.combineUint8Arrays(chunk);
   }
 
+  /**
+   * Gets all entries in the database.
+   */
   *entries() {
     for (const entry of this) yield entry;
   }
