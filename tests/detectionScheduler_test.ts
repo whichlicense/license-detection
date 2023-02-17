@@ -28,7 +28,7 @@ const CUSTOM_LICENSE_FILE = Deno.makeTempFileSync();
 // load this file to add new data to it
 const LS = new LicenseStorage(CUSTOM_LICENSE_FILE);
 // detection scheduler that shall have access to the custom data
-const ds = new DetectionScheduler(undefined, CUSTOM_LICENSE_FILE);
+const ds = new DetectionScheduler(undefined, undefined, CUSTOM_LICENSE_FILE);
 
 const TEST_LICENSE_1 = `abc`;
 const TEST_LICENSE_2 = `123`;

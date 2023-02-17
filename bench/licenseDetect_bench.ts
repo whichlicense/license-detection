@@ -61,7 +61,7 @@ const MIN_FUZZY_HASH_LENGTH = 2;
 const CONFIDENCE = 0.1;
 
 // To simulate a real-world scenario, we'll create this ahead of time.
-const DETECTION_SCHEDULER = new DetectionScheduler(undefined, _DB_FILE_COPY);
+const DETECTION_SCHEDULER = new DetectionScheduler(undefined, undefined, _DB_FILE_COPY);
 
 function cloneByteArray(source: Uint8Array): Uint8Array {
   const ab = new ArrayBuffer(source.byteLength);
