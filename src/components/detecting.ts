@@ -21,7 +21,7 @@ import LicenseStorage from "components/storage";
 /**
  * Attempts to detect the license of the incoming license text represented as a byte array.
  * @param incomingLicense The license text, represented as a byte array
- * @param confidenceThreshold The minimum confidence threshold for a match to be considered a match
+ * @param minConfidenceThreshold The minimum confidence threshold for a match to be considered a match
  * @returns an array of matches; empty array if no matches were found
  */
 export function detectLicense(
@@ -29,7 +29,8 @@ export function detectLicense(
   licenseDB: LicenseStorage = new LicenseStorage(
     "./licenses/ctph_hashes.wlhdb",
   ),
-  confidenceThreshold = 0.1,
+  minConfidenceThreshold = 0.1,
+  // TODO: exitAbove param that will exit the loop if the confidence is above a certain threshold
 ) {
   /**
    * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
@@ -56,7 +57,7 @@ export function detectLicense(
       hash,
       hashLength,
     );
-    if (similarity.confidence > confidenceThreshold) {
+    if (similarity.confidence > minConfidenceThreshold) {
       matches.push({
         name,
         confidence: similarity.confidence,
