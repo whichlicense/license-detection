@@ -17,7 +17,6 @@
 export function stripLicense(text: string): string {
   return text.replaceAll(/( |\t|\n|\r|\n\r|\r\n)/g, "");
 }
-// TODO: maybe we can make use of a builder pattern here to make the API easier to use. (i..e, what do you want to strip?)
 
 if (import.meta.main) {
   console.log(stripLicense(Deno.readTextFileSync(Deno.args[0])));

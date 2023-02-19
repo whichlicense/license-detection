@@ -44,7 +44,6 @@ export function detectLicense(
       entry,
     ).next().value!;
 
-    // TODO: we can extract this to a global session-based cache? no need to calculate it multiple times in a single session
     if (!incomingLicenseHashes.has(`${blockSize}-${hashLength}`)) {
       incomingLicenseHashes.set(
         `${blockSize}-${hashLength}`,
@@ -93,8 +92,6 @@ export function detectLicenseRawDB(
       rawLicenseDB,
     )
   ) {
-    // console.log(name, hash)
-    // TODO: we can extract this to a global session-based cache? no need to calculate it multiple times in a single session
     if (!incomingLicenseHashes.has(`${blockSize}-${hashLength}`)) {
       incomingLicenseHashes.set(
         `${blockSize}-${hashLength}`,
