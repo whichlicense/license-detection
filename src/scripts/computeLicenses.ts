@@ -23,7 +23,6 @@ import {
   TLicenseComputeSettingsOverride,
 } from "types/LicenseCompute";
 
-// TODO: make these props come from config file or flags
 /**
  * ```BLOCK_SIZE``` is a property used to control the size of the blocks into which the input data is divided before being hashed.
  * The larger the block size, the fewer blocks will be created, and the higher the likelihood that similar files will
@@ -41,7 +40,6 @@ export const DEFAULT_BLOCK_SIZE = 10;
  */
 export const DEFAULT_FUZZY_HASH_LENGTH = 7;
 
-// TODO: all defaults should come from a settings file!
 export function computeLicenseHash(
   file: Uint8Array,
   blockSize = DEFAULT_BLOCK_SIZE,
