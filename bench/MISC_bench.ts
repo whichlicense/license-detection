@@ -47,3 +47,20 @@ Deno.bench(
         bArr.BYTES_PER_ELEMENT === 1
     }
 );
+
+
+// --------- object assigning ---------
+Deno.bench(
+    `Object.assign check`, { group: "object_assigning" }, () => {
+        // deno-lint-ignore no-explicit-any
+        const incoming: any = {a: 1, b: 2, c: 3 };
+        const t = Object.assign({a: 0, x: 1}, incoming);
+    }
+);
+Deno.bench(
+    `{..., X:Y} check`, { group: "object_assigning" }, () => {
+        // deno-lint-ignore no-explicit-any
+        const incoming: any = {a: 1, b: 2, c: 3 };
+        const t = {a: 0, x: 1, ...incoming};
+    }
+);
