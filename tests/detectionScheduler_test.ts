@@ -87,6 +87,7 @@ Deno.test("detectLicense times-out with rejection", { sanitizeOps: false }, () =
     }))
 });
 
+// TODO: add test for early exit options. these are similar to the non-threaded early exit tests so we can copy some of those
 
 Deno.test("DetectionScheduler load distribution is 'fair'", { sanitizeOps: false }, () => {
   const num_scheduler_threads = 3;
