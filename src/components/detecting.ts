@@ -25,8 +25,6 @@ export const LICENSE_DETECT_DEFAULTS: Required<TLicenseDetectOptions> = Object.f
   licenseDB: new LicenseStorage("./licenses/ctph_hashes.wlhdb"),
 })
 
-// TODO: merge the two functions together.. just do the slow type array checking..
-
 /**
  * Attempts to detect the license of the incoming license text represented as a byte array.
  * @param incomingLicense The license text, represented as a byte array
@@ -47,12 +45,9 @@ export function detectLicense(
   const incomingLicenseHashes = new Map<string, string>();
   const matches: (ReturnType<typeof compareHashes> & { name: string })[] = [];
 
-  for (const entry of options.licenseDB!) {
-    // We know that this is only one entry, so we can safely destructure it here
-    const { blockSize, hash, hashLength, name } = LicenseStorage.parseEntry(
-      entry,
-    ).next().value!;
+  const isRawDB = options.licenseDB!.constructor === Uint8Array;
 
+  const compareAndStore = (blockSize: number, hashLength: number, hash: string, name: string) => {
     if (!incomingLicenseHashes.has(`${blockSize}-${hashLength}`)) {
       incomingLicenseHashes.set(
         `${blockSize}-${hashLength}`,
@@ -65,7 +60,8 @@ export function detectLicense(
       hash,
       options.minConfidenceThreshold!,
     );
-    if (similarity.confidence > options.minConfidenceThreshold!) {
+
+    if (similarity.confidence >= options.minConfidenceThreshold!) {
       matches.push({
         name,
         confidence: similarity.confidence,
@@ -74,62 +70,26 @@ export function detectLicense(
       });
     }
 
-    if(similarity.confidence >= options.earlyExitThreshold!) break;
+    return similarity.confidence;
   }
 
-  return matches;
-}
-
-/**
- * Detects a license from a raw license database. This can be used to pass in partial databases (i.e., subsection of database).
- * @param incomingLicense The license text, represented as a byte array
- * @param confidenceThreshold The minimum confidence threshold for a match to be considered a match
- * @returns an array of matches; empty array if no matches were found
- */
-export function detectLicenseRawDB(
-  incomingLicense: TLicense,
-  rawLicenseDB: Uint8Array,
-  options: Omit<TLicenseDetectOptions, 'licenseDB'> = {},
-) {
-  options = {
-    ...LICENSE_DETECT_DEFAULTS,
-    ...options,
-  }
-  /**
-   * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
-   */
-  const incomingLicenseHashes = new Map<string, string>();
-  const matches: (ReturnType<typeof compareHashes> & { name: string })[] = [];
-
-  // We know that this is only one entry, so we can safely destructure it here
-  for (
-    const { blockSize, hash, hashLength, name } of LicenseStorage.parseEntry(
-      rawLicenseDB,
-    )
-  ) {
-    if (!incomingLicenseHashes.has(`${blockSize}-${hashLength}`)) {
-      incomingLicenseHashes.set(
-        `${blockSize}-${hashLength}`,
-        fuzzyHash(incomingLicense, blockSize, hashLength),
-      );
+  if(isRawDB) {
+    for (
+      const { blockSize, hash, hashLength, name } of LicenseStorage.parseEntry(options.licenseDB! as Uint8Array)
+    ) {
+      const confidence = compareAndStore(blockSize, hashLength, hash, name);
+      if(confidence >= options.earlyExitThreshold!) break;
     }
-
-    const similarity = compareHashes(
-      incomingLicenseHashes.get(`${blockSize}-${hashLength}`)!,
-      hash,
-      options.minConfidenceThreshold!,
-    );
-    if (similarity.confidence > options.minConfidenceThreshold!) {
-      matches.push({
-        name,
-        confidence: similarity.confidence,
-        commonBlocks: similarity.commonBlocks,
-        totalBlocks: similarity.totalBlocks,
-      });
+  }else{
+    for (const entry of options.licenseDB! as LicenseStorage) {
+      // We know that this is only one entry, so we can safely destructure it here (see below).
+      // > its a single entry because we don't have any batch instructions.
+      const { blockSize, hash, hashLength, name } = LicenseStorage.parseEntry(
+        entry,
+      ).next().value!;
+      const confidence = compareAndStore(blockSize, hashLength, hash, name);
+      if(confidence >= options.earlyExitThreshold!) break;
     }
-
-    if(similarity.confidence >= options.earlyExitThreshold!) break;
   }
-
   return matches;
 }
