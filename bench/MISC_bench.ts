@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 /*
  *   Copyright (c) 2023 Duart Snel
 
@@ -14,6 +13,8 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+
+// deno-lint-ignore-file
 
 /**
  * Basically everything else that is small and needs to benchmarking to make decisions.
