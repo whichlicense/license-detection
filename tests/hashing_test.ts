@@ -49,7 +49,7 @@ Deno.test("Creating hashes", {}, async (t) => {
 });
 
 Deno.test("Compare hashes", {}, async (t) => {
-  await t.step("Equal hash matches with high confidense", () => {
+  await t.step("Equal hash matches with 100% confidence", () => {
     const res = compareHashes("a:b:c:d", "a:b:c:d", 0.5);
     assert(res.confidence === 1);
   });
@@ -59,12 +59,32 @@ Deno.test("Compare hashes", {}, async (t) => {
     assertEquals(res.confidence, 0.5);
   });
 
+  await t.step("0.1 lets higher confidence (0.5) through", () => {
+    const res = compareHashes("0:0:0:0:0:0:0:0:0:0", "0:0:0:0:0:X:X:X:X:X", 0.1);
+    console.log(res);
+    assert(res.confidence === 0.5);
+  });
+
+  await t.step("0.01 lets higher confidence (0.5) through", () => {
+    const res = compareHashes("a:b:c:d", "a:b:x:x", 0.01);
+    assert(res.confidence === 0.5);
+  });
+
+  await t.step("0 lets higher confidence (0.5) through", () => {
+    const res = compareHashes("a:b:c:d", "a:b:x:x", 0);
+    assert(res.confidence === 0.5);
+  });
+
+  await t.step("1 stops lower confidence (0.5) from going through", () => {
+    const res = compareHashes("a:b:c:d", "a:b:x:x", 1);
+    assert(res.confidence === -1);
+  });
+
   await t.step("Cut off confidence tests", async (t) => {
     await t.step("Does not cut-off when above min confidence", () => {
-      // should be a 50% confidence
       const res = compareHashes(
-        "1:2:3:4:5:6:7:8:9:0",
-        "a:b:c:d:e:6:7:8:9:0",
+        "0:0:0:0:0:0:0:0:0:0",
+        "0:0:0:0:0:0:0:X:X:X",
         0.6,
       );
       assert(res.confidence !== -1);
