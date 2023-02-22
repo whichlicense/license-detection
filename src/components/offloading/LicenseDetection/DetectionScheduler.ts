@@ -19,8 +19,9 @@ import {
   TCoordinationThreadMessage,
 } from "types/DetectionScheduler";
 import { TLicense } from "types/License";
-import { detectLicenseRawDB } from "components/detecting";
+import { detectLicenseRawDB, LICENSE_DETECT_DEFAULTS } from "components/detecting";
 import { v1 } from "https://deno.land/std@0.177.0/uuid/mod.ts";
+import { TLicenseDetectOptions } from "../../../types/LicenseDetect.ts";
 
 export class DetectionScheduler {
   private coordinationThreads: {
@@ -88,15 +89,18 @@ export class DetectionScheduler {
    */
   public detectLicense(
     license: TLicense,
-    minConfidence = 0.9,
-    timeout?: number, // TODO: convert to the new license detect options
+    options: Omit<TLicenseDetectOptions, "licenseDB"> & {timeout?: number} = {},
   ): Promise<ReturnType<typeof detectLicenseRawDB>> {
+    options = {
+      ...LICENSE_DETECT_DEFAULTS,
+      ...options,
+    }
     return new Promise((resolve, reject) => {
       const coordinationThread = this.findFreeCoordinationThread();
-      const REQ_TIMEOUT = timeout
+      const REQ_TIMEOUT = options.timeout
         ? setTimeout(() => {
           reject("request timed out");
-        }, timeout)
+        }, options.timeout)
         : undefined;
 
 
@@ -114,7 +118,8 @@ export class DetectionScheduler {
         type: ECoordinationThreadMessageType.detect,
         license: license.buffer,
         id: v1.generate() as string,
-        minConfidence,
+        minConfidence: options.minConfidenceThreshold!,
+        // TODO: pass in exit early option
       };
       coordinationThread.postMessage(THREAD_MSG, [license.buffer]);
     });
