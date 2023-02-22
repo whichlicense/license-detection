@@ -44,3 +44,5 @@ export type {
   TLicenseComputeOptions,
   TLicenseComputeSettingsOverride,
 } from "types/LicenseCompute";
+
+export type { TLicenseDetectOptions } from "types/LicenseDetect";

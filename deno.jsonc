@@ -17,6 +17,7 @@
 
     "types/DetectionScheduler": "./src/types/DetectionScheduler.ts",
     "types/License": "./src/types/License.ts",
-    "types/LicenseCompute": "./src/types/LicenseCompute.ts"
+    "types/LicenseCompute": "./src/types/LicenseCompute.ts",
+    "types/LicenseDetect": "./src/types/LicenseDetect.ts"
   }
 }
