@@ -117,14 +117,20 @@ const NO_EX_LICENSE = new TextEncoder().encode(
 );
 
 Deno.bench("Single threaded non existent license", () => {
-  detectLicense(NO_EX_LICENSE, EXAMPLE_DB, CONFIDENCE);
+  detectLicense(NO_EX_LICENSE, {
+    minConfidenceThreshold: CONFIDENCE,
+    licenseDB: EXAMPLE_DB,
+  });
 });
 
 Deno.bench(
   `(BASELINE) Non threaded detection [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}]`,
   { group: "threaded_vs_nothread", baseline: true },
   () => {
-    detectLicense(cloneByteArray(LAST_EXAMPLE_LICENSE), EXAMPLE_DB, CONFIDENCE);
+    detectLicense(cloneByteArray(LAST_EXAMPLE_LICENSE), {
+      minConfidenceThreshold: CONFIDENCE,
+      licenseDB: EXAMPLE_DB,
+    });
   },
 );
 
@@ -142,8 +148,7 @@ Deno.bench(
 
 const conf: number | undefined = detectLicense(
   LAST_EXAMPLE_LICENSE,
-  undefined,
-  CONFIDENCE,
+  {minConfidenceThreshold: CONFIDENCE}
 )[0]?.confidence;
 Deno.bench(
   `detectLicense [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE) - Confidence: ${
@@ -151,7 +156,10 @@ Deno.bench(
   }`,
   { group: "sld", baseline: true },
   () => {
-    detectLicense(LAST_EXAMPLE_LICENSE, EXAMPLE_DB, CONFIDENCE);
+    detectLicense(LAST_EXAMPLE_LICENSE, {
+      minConfidenceThreshold: CONFIDENCE,
+      licenseDB: EXAMPLE_DB,
+    });
   },
 );
 
@@ -161,7 +169,9 @@ Deno.bench(
   `[NON-THREADED] FIRST license in the db (BASELINE)`,
   {group: "first_vs_last", baseline: true},
   () => {
-    detectLicense(FIRST_EXAMPLE_LICENSE, EXAMPLE_DB);
+    detectLicense(FIRST_EXAMPLE_LICENSE, {
+      licenseDB: EXAMPLE_DB,
+    });
   },
 );
 
@@ -169,7 +179,9 @@ Deno.bench(
   `[NON-THREADED] LAST license in the db`,
   {group: "first_vs_last"},
   () => {
-    detectLicense(LAST_EXAMPLE_LICENSE, EXAMPLE_DB);
+    detectLicense(LAST_EXAMPLE_LICENSE, {
+      licenseDB: EXAMPLE_DB,
+    });
   },
 );
 
@@ -231,8 +243,10 @@ for (const file of tempFiles) {
   const storageSys = new LicenseStorage(file);
   const conf: number | undefined = detectLicense(
     LAST_EXAMPLE_LICENSE,
-    storageSys,
-    CONFIDENCE,
+    {
+      licenseDB: storageSys,
+      minConfidenceThreshold: CONFIDENCE,
+    }
   )[0]?.confidence;
   Deno.bench(
     `detectLicense [${blockSize}, ${fuzzyHashLength}] - Confidence: ${
@@ -242,7 +256,10 @@ for (const file of tempFiles) {
       group: "sld",
     },
     () => {
-      detectLicense(LAST_EXAMPLE_LICENSE, storageSys, CONFIDENCE);
+      detectLicense(LAST_EXAMPLE_LICENSE, {
+        licenseDB: storageSys,
+        minConfidenceThreshold: CONFIDENCE,
+      });
     },
   );
 }

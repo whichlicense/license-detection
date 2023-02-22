@@ -32,7 +32,9 @@ self.onmessage = (e: MessageEvent<TDetectionThreadMessage>) => {
     const matches = detectLicenseRawDB(
       RAW_LICENSE,
       DB,
-      e.data.minConfidence || 0.9,
+      {
+        minConfidenceThreshold: e.data.minConfidence || 0.9
+      },
     );
 
     const REPLY: TDetectionThreadMessage = {
