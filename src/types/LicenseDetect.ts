@@ -18,6 +18,14 @@ import LicenseStorage from "components/storage";
 
 export type TLicenseDetectOptions = {
     licenseDB?: LicenseStorage;
+    /**
+     * The minimum confidence required for a license to be detected.
+     * If the confidence is below this threshold, the detection will not include this license.
+     **/
     minConfidenceThreshold?: number
+    
+    /**
+     * If the confidence is above this threshold, the detection will stop early and return the results up until this point.
+     */
     earlyExitAboveThreshold?: number
 }
