@@ -47,6 +47,14 @@ export function detectLicense(
 
   const isRawDB = options.licenseDB!.constructor === Uint8Array;
 
+  /**
+   * Compares the incoming license with a given block size and hash length against a given hash.
+   * #### Rule-set:
+   * - If the confidence is at or above the minimum confidence threshold, the match is stored in the matches array.
+   * - If the incomingLicenseHashes does not contain a hash for the given block size and hash length, it is calculated and stored for future reference.
+   * 
+   * @returns The confidence of the match in percentage (between 0 and 1).
+   */
   const compareAndStore = (blockSize: number, hashLength: number, hash: string, name: string) => {
     if (!incomingLicenseHashes.has(`${blockSize}-${hashLength}`)) {
       incomingLicenseHashes.set(
@@ -73,12 +81,14 @@ export function detectLicense(
     return similarity.confidence;
   }
 
+  const shouldBreak = (confidence: number) => confidence >= options.earlyExitThreshold!;
+
   if(isRawDB) {
     for (
       const { blockSize, hash, hashLength, name } of LicenseStorage.parseEntry(options.licenseDB! as Uint8Array)
     ) {
       const confidence = compareAndStore(blockSize, hashLength, hash, name);
-      if(confidence >= options.earlyExitThreshold!) break;
+      if(shouldBreak(confidence)) break;
     }
   }else{
     for (const entry of options.licenseDB! as LicenseStorage) {
@@ -88,7 +98,7 @@ export function detectLicense(
         entry,
       ).next().value!;
       const confidence = compareAndStore(blockSize, hashLength, hash, name);
-      if(confidence >= options.earlyExitThreshold!) break;
+      if(shouldBreak(confidence)) break;
     }
   }
   return matches;
