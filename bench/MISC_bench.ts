@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 /*
  *   Copyright (c) 2023 Duart Snel
 
