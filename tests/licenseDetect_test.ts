@@ -18,8 +18,11 @@ import {
   assert,
   assertEquals,
 } from "https://deno.land/std@0.177.0/testing/asserts.ts";
-import { stripLicense } from "../src/components/minification.ts";
-import { DetectionScheduler } from "../src/components/offloading/LicenseDetection/DetectionScheduler.ts";
+import { stripLicense } from "components/minification";
+import { DetectionScheduler } from "DetectionScheduler";
+import LicenseStorage from "components/storage";
+import { detectLicense } from "components/detecting";
+import { computeLicenseHash } from "scripts/computeLicenses";
 
 const ds = new DetectionScheduler();
 const TEST_LICENSE_1 = Deno.readFileSync("./licenses/RAW/apache-2.0.LICENSE");
@@ -46,6 +49,76 @@ Deno.test("License matching is up to spec", {}, async (t) => {
       new TextEncoder().encode(TEST_LICENSE_3),
     );
     assert(detected.length === 0);
+  });
+
+  await t.step("Early exit above exits early", async (t) => {
+    const temp_file = Deno.makeTempFileSync();
+    const temp_storage = new LicenseStorage(temp_file)
+
+    
+
+    temp_storage.addLicense({
+      name: "TEST_LICENSE_1",
+      hash: computeLicenseHash(new TextEncoder().encode("0111111111"), 1, 2).hash,
+      blockSize: 1,
+      fuzzyHashLength: 2,
+    })
+
+    temp_storage.addLicense({
+      name: "TEST_LICENSE_1.1",
+      hash: computeLicenseHash(new TextEncoder().encode("0111111112"), 1, 2).hash,
+      blockSize: 1,
+      fuzzyHashLength: 2,
+    })
+
+    temp_storage.addLicense({
+      name: "TEST_LICENSE_2",
+      hash: computeLicenseHash(new TextEncoder().encode("0000011111"), 1, 2).hash,
+      blockSize: 1,
+      fuzzyHashLength: 2,
+    })
+
+    temp_storage.addLicense({
+      name: "TEST_LICENSE_3",
+      hash: computeLicenseHash(new TextEncoder().encode("0000000000"), 1, 2).hash,
+      blockSize: 1,
+      fuzzyHashLength: 2,
+    })
+
+    await t.step("Early exit >= 90% works", () => {
+      const  res = detectLicense(new TextEncoder().encode("0111111111"), {
+        licenseDB: temp_storage,
+        minConfidenceThreshold: 0, // include everything by default
+        earlyExitThreshold: 0.9, // exit early if we have a match at or above 90%
+      })
+
+      assertEquals(res.length, 1); // the first license should match with 100% confidence. the second license should match with 90% confidence, but we exit early
+      assertEquals(res[0].confidence, 1);
+    });
+
+    await t.step("Early exits on exact match", () => {
+      const  res = detectLicense(new TextEncoder().encode("0111111112"), {
+        licenseDB: temp_storage,
+        minConfidenceThreshold: 0, // include everything by default
+        earlyExitThreshold: 1, // exit early if we have a match at 100% (exact match)
+      })
+
+      assertEquals(res.length, 2); // the first two licenses should match with 90% confidence and 100% confidence respectively
+      assertEquals(res[0].confidence, 0.9);
+      assertEquals(res[1].confidence, 1); // no more matches after this!
+    });
+
+    await t.step("Default lets all in", () => {
+      const  res = detectLicense(new TextEncoder().encode("0111111112"), {
+        licenseDB: temp_storage,
+        minConfidenceThreshold: 0, // include everything by default
+      })
+
+      assertEquals(res.length, temp_storage.getEntryCount()); // the first two licenses should match with 90% confidence and 100% confidence respectively
+    });
+
+    temp_storage.closeDB()
+    Deno.removeSync(temp_file)
   });
 });
 
