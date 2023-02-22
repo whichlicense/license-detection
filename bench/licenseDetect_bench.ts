@@ -141,7 +141,7 @@ Deno.bench(
     // awaiting results to make sure we measure till completion
     await DETECTION_SCHEDULER.detectLicense(
       cloneByteArray(LAST_EXAMPLE_LICENSE),
-      CONFIDENCE,
+      {minConfidenceThreshold: CONFIDENCE},
     );
   },
 );
@@ -174,7 +174,9 @@ Deno.bench(
   `[THREADED] FIRST license in the db (BASELINE)`,
   {group: "first_vs_last"},
   () => {
-    DETECTION_SCHEDULER.detectLicense(FIRST_EXAMPLE_LICENSE, 0.001);
+    DETECTION_SCHEDULER.detectLicense(FIRST_EXAMPLE_LICENSE, {
+      minConfidenceThreshold: 0.001,
+    });
   },
 );
 
@@ -182,7 +184,9 @@ Deno.bench(
   `[THREADED] LAST license in the db`,
   {group: "first_vs_last"},
   () => {
-    DETECTION_SCHEDULER.detectLicense(LAST_EXAMPLE_LICENSE, 0.001);
+    DETECTION_SCHEDULER.detectLicense(LAST_EXAMPLE_LICENSE, {
+      minConfidenceThreshold: 0.001,
+    });
   },
 );
 
