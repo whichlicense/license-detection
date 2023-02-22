@@ -21,7 +21,7 @@ import { TLicenseDetectOptions } from "types/LicenseDetect";
 
 const LICENSE_DETECT_DEFAULTS: TLicenseDetectOptions = {
   minConfidenceThreshold: 0.1,
-  earlyExitAboveThreshold: 0.9,
+  earlyExitAboveThreshold: 1.1,
   licenseDB: new LicenseStorage("./licenses/ctph_hashes.wlhdb"),
 }
 
