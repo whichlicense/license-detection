@@ -18,7 +18,7 @@ import LicenseStorage from "components/storage";
 export { LicenseStorage };
 
 export { DetectionScheduler } from "DetectionScheduler";
-export { detectLicense, detectLicenseRawDB } from "components/detecting";
+export { detectLicense } from "components/detecting";
 export { compareHashes, createHash, fuzzyHash } from "components/hashing";
 export { stripLicense } from "components/minification";
 

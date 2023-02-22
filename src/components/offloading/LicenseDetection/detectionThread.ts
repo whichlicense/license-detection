@@ -20,7 +20,7 @@ import {
   EDetectionThreadMessageType,
   TDetectionThreadMessage,
 } from "types/DetectionScheduler";
-import { detectLicenseRawDB } from "components/detecting";
+import { detectLicense } from "components/detecting";
 
 let DB: Uint8Array = new Uint8Array();
 
@@ -29,11 +29,11 @@ self.onmessage = (e: MessageEvent<TDetectionThreadMessage>) => {
     DB = new Uint8Array(e.data.db);
   } else if (e.data.type === EDetectionThreadMessageType.DETECT) {
     const RAW_LICENSE = new Uint8Array(e.data.srcl); // memory is shared across threads
-    const matches = detectLicenseRawDB(
+    const matches = detectLicense(
       RAW_LICENSE,
-      DB,
       {
-        minConfidenceThreshold: e.data.minConfidence || 0.9
+        minConfidenceThreshold: e.data.minConfidence || 0.9,
+        licenseDB: DB,
       },
     );
 

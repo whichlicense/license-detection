@@ -19,7 +19,7 @@ import {
   TCoordinationThreadMessage,
 } from "types/DetectionScheduler";
 import { TLicense } from "types/License";
-import { detectLicenseRawDB, LICENSE_DETECT_DEFAULTS } from "components/detecting";
+import { detectLicense, LICENSE_DETECT_DEFAULTS } from "components/detecting";
 import { v1 } from "https://deno.land/std@0.177.0/uuid/mod.ts";
 import { TLicenseDetectOptions } from "../../../types/LicenseDetect.ts";
 
@@ -90,7 +90,7 @@ export class DetectionScheduler {
   public detectLicense(
     license: TLicense,
     options: Omit<TLicenseDetectOptions, "licenseDB"> & {timeout?: number} = {},
-  ): Promise<ReturnType<typeof detectLicenseRawDB>> {
+  ): Promise<ReturnType<typeof detectLicense>> {
     options = {
       ...LICENSE_DETECT_DEFAULTS,
       ...options,

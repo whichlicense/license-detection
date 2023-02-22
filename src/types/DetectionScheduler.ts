@@ -14,7 +14,8 @@
  *   limitations under the License.
  */
 
-import { detectLicenseRawDB } from "../components/detecting.ts";
+import { detectLicense } from "../components/detecting.ts";
+
 
 export enum ECoordinationThreadMessageType {
   detect,
@@ -24,11 +25,11 @@ export enum ECoordinationThreadMessageType {
   syncDatabase,
 }
 
-export type TDetectionResult = ReturnType<typeof detectLicenseRawDB>;
+export type TDetectionResult = ReturnType<typeof detectLicense>;
 
 export type TCoordinationThreadMessage = {
   type: ECoordinationThreadMessageType.result;
-  results: ReturnType<typeof detectLicenseRawDB>;
+  results: ReturnType<typeof detectLicense>;
 } | {
   type: ECoordinationThreadMessageType.progress;
   data: number;
@@ -60,7 +61,7 @@ export enum EDetectionThreadMessageType {
 export type TDetectionThreadMessage = {
   type: EDetectionThreadMessageType.RESULT;
   for: string;
-  result: ReturnType<typeof detectLicenseRawDB>;
+  result: ReturnType<typeof detectLicense>;
 } | {
   type: EDetectionThreadMessageType.INIT;
 

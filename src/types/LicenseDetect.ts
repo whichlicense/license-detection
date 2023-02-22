@@ -17,7 +17,7 @@
 import LicenseStorage from "components/storage";
 
 export type TLicenseDetectOptions = {
-    licenseDB?: LicenseStorage;
+    licenseDB?: LicenseStorage | Uint8Array;
     /**
      * The minimum confidence required for a license to be detected.
      * If the confidence is below this threshold, the detection will not include this license.
