@@ -17,28 +17,34 @@
 import { TLicense } from "types/License";
 import { compareHashes, fuzzyHash } from "components/hashing";
 import LicenseStorage from "components/storage";
+import { TLicenseDetectOptions } from "types/LicenseDetect";
+
+const LICENSE_DETECT_DEFAULTS: TLicenseDetectOptions = {
+  minConfidenceThreshold: 0.1,
+  earlyExitAboveThreshold: 0.9,
+  licenseDB: new LicenseStorage("./licenses/ctph_hashes.wlhdb"),
+}
 
 /**
  * Attempts to detect the license of the incoming license text represented as a byte array.
  * @param incomingLicense The license text, represented as a byte array
  * @param minConfidenceThreshold The minimum confidence threshold for a match to be considered a match
+ * @param earlyExitAboveThreshold Indicates if the loop should exit early if a match is found with a confidence above this threshold. put 
  * @returns an array of matches; empty array if no matches were found
  */
 export function detectLicense(
   incomingLicense: TLicense,
-  licenseDB: LicenseStorage = new LicenseStorage(
-    "./licenses/ctph_hashes.wlhdb",
-  ),
-  minConfidenceThreshold = 0.1,
-  // TODO: exitAbove param that will exit the loop if the confidence is above a certain threshold
+  options: TLicenseDetectOptions = LICENSE_DETECT_DEFAULTS,
 ) {
+  Object.assign(LICENSE_DETECT_DEFAULTS, options);
+
   /**
    * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
    */
   const incomingLicenseHashes = new Map<string, string>();
   const matches: (ReturnType<typeof compareHashes> & { name: string })[] = [];
 
-  for (const entry of licenseDB) {
+  for (const entry of options.licenseDB!) {
     // We know that this is only one entry, so we can safely destructure it here
     const { blockSize, hash, hashLength, name } = LicenseStorage.parseEntry(
       entry,
@@ -56,7 +62,7 @@ export function detectLicense(
       hash,
       hashLength,
     );
-    if (similarity.confidence > minConfidenceThreshold) {
+    if (similarity.confidence > options.minConfidenceThreshold!) {
       matches.push({
         name,
         confidence: similarity.confidence,
@@ -78,8 +84,9 @@ export function detectLicense(
 export function detectLicenseRawDB(
   incomingLicense: TLicense,
   rawLicenseDB: Uint8Array,
-  confidenceThreshold = 0.1,
+  options: Omit<TLicenseDetectOptions, 'licenseDB'> = LICENSE_DETECT_DEFAULTS,
 ) {
+  Object.assign(LICENSE_DETECT_DEFAULTS, options);
   /**
    * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
    */
@@ -104,7 +111,7 @@ export function detectLicenseRawDB(
       hash,
       hashLength,
     );
-    if (similarity.confidence > confidenceThreshold) {
+    if (similarity.confidence > options.minConfidenceThreshold!) {
       matches.push({
         name,
         confidence: similarity.confidence,
