@@ -28,6 +28,7 @@ export class DetectionScheduler {
     loadView: DataView;
     load: number;
   }[] = [];
+  private tidx = 0;
 
   constructor(
     coordinationThreads = navigator.hardwareConcurrency,
@@ -58,9 +59,9 @@ export class DetectionScheduler {
   }
 
   private findFreeCoordinationThread(): Worker {
-    const freeCoordinationThread = this.coordinationThreads[0].load === 0
-      ? this.coordinationThreads[0]
-      : this.coordinationThreads.sort((a, b) => a.load - b.load)[0];
+    const freeCoordinationThread = this.coordinationThreads[this.tidx];
+    this.tidx = (this.tidx + 1) % this.coordinationThreads.length; 
+      
     return freeCoordinationThread.w;
   }
 
