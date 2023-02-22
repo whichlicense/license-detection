@@ -90,6 +90,7 @@ Deno.test("DetectionScheduler load distribution is 'fair'", { sanitizeOps: false
    * each deviation is a single license queue. so a deviation of 2 means 2 licenses in the queue
    * > The deviation is expected to grow as the number of requests increases. This increase is normal as the database is spread across multiple threads, with
    * some threads getting a section of the database which contains smaller licenses and thus less hashes to check against (faster).
+   * Another point is that your OS or some other app might just be starving some of your threads.. this could also give you a uneven load distribution.
    * 
    * > **TLDR: some threads are faster than others. this is normal.**
    */
@@ -102,6 +103,7 @@ Deno.test("DetectionScheduler load distribution is 'fair'", { sanitizeOps: false
   }
 
   const loadInfo = _ds.getLoadInfo();
+  // we want the loads to be close to each other on average
   const avg = loadInfo.reduce((a, b) => a + b.load, 0) / loadInfo.length;
 
   for(const t of loadInfo) {
