@@ -70,6 +70,8 @@ export function detectLicense(
         totalBlocks: similarity.totalBlocks,
       });
     }
+
+    if(similarity.confidence > options.earlyExitAboveThreshold!) break;
   }
 
   return matches;
@@ -119,6 +121,8 @@ export function detectLicenseRawDB(
         totalBlocks: similarity.totalBlocks,
       });
     }
+
+    if(similarity.confidence > options.earlyExitAboveThreshold!) break;
   }
 
   return matches;
