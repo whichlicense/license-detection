@@ -146,22 +146,7 @@ Deno.bench(
   },
 );
 
-const conf: number | undefined = detectLicense(
-  LAST_EXAMPLE_LICENSE,
-  {minConfidenceThreshold: CONFIDENCE}
-)[0]?.confidence;
-Deno.bench(
-  `detectLicense [${DEFAULT_BLOCK_SIZE}, ${DEFAULT_FUZZY_HASH_LENGTH}] (BASELINE) - Confidence: ${
-    conf || "no results"
-  }`,
-  { group: "sld", baseline: true },
-  () => {
-    detectLicense(LAST_EXAMPLE_LICENSE, {
-      minConfidenceThreshold: CONFIDENCE,
-      licenseDB: EXAMPLE_DB,
-    });
-  },
-);
+
 
 
 
@@ -237,6 +222,7 @@ for (let blockSize = MIN_BLOCK_SIZE; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
     tempFiles.push(TMEP_FILE_ENTRY);
   }
 }
+
 
 for (const file of tempFiles) {
   const [blockSize, fuzzyHashLength] = file.split("_").slice(1);
