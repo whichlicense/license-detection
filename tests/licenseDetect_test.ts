@@ -19,33 +19,30 @@ import {
   assertEquals,
 } from "https://deno.land/std@0.177.0/testing/asserts.ts";
 import { stripLicense } from "components/minification";
-import { DetectionScheduler } from "DetectionScheduler";
-import LicenseStorage from "components/storage";
 import { detectLicense } from "components/detecting";
-import { computeLicenseHash } from "scripts/computeLicenses";
+import LicenseStorage from "../src/components/storage.ts";
+import { computeLicenseHash } from "../src/scripts/computeLicenses.ts";
 
-const ds = new DetectionScheduler();
 const TEST_LICENSE_1 = Deno.readFileSync("./licenses/RAW/apache-2.0.LICENSE");
 
 Deno.test("License matching is up to spec", {}, async (t) => {
-  await t.step("Exact license is detected with 100% confidence", async () => {
-    const detected = await ds.detectLicense(TEST_LICENSE_1);
+  await t.step("Exact license is detected with 100% confidence", () => {
+    const detected = detectLicense(TEST_LICENSE_1);
+
     assert(detected.length > 0);
     assertEquals(detected[0].name, "apache-2.0.LICENSE");
     assertEquals(detected[0].confidence, 1);
   });
 
-  await t.step("Similar license is detected with >90% confidence", async () => {
-    const detected = await ds.detectLicense(
-      new TextEncoder().encode(TEST_LICENSE_2),
-    );
+  await t.step("Similar license is detected with >90% confidence", () => {
+    const detected = detectLicense(new TextEncoder().encode(stripLicense(TEST_LICENSE_2)));
     assert(detected.length > 0);
     assertEquals(detected[0].name, "apache-2.0.LICENSE");
     assert(detected[0].confidence > 0.9);
   });
 
-  await t.step("Unavailable license is not detected", async () => {
-    const detected = await ds.detectLicense(
+  await t.step("Unavailable license is not detected", () => {
+    const detected = detectLicense(
       new TextEncoder().encode(TEST_LICENSE_3),
     );
     assert(detected.length === 0);
