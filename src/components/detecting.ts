@@ -21,15 +21,15 @@ import { TLicenseDetectOptions } from "types/LicenseDetect";
 
 const LICENSE_DETECT_DEFAULTS: TLicenseDetectOptions = {
   minConfidenceThreshold: 0.1,
-  earlyExitAboveThreshold: 1.1,
+  earlyExitThreshold: 1.1,
   licenseDB: new LicenseStorage("./licenses/ctph_hashes.wlhdb"),
 }
+
+// TODO: merge the two functions together.. just do the slow type array checking..
 
 /**
  * Attempts to detect the license of the incoming license text represented as a byte array.
  * @param incomingLicense The license text, represented as a byte array
- * @param minConfidenceThreshold The minimum confidence threshold for a match to be considered a match
- * @param earlyExitAboveThreshold Indicates if the loop should exit early if a match is found with a confidence above this threshold. put 
  * @returns an array of matches; empty array if no matches were found
  */
 export function detectLicense(
@@ -71,7 +71,7 @@ export function detectLicense(
       });
     }
 
-    if(similarity.confidence > options.earlyExitAboveThreshold!) break;
+    if(similarity.confidence >= options.earlyExitThreshold!) break;
   }
 
   return matches;
@@ -122,7 +122,7 @@ export function detectLicenseRawDB(
       });
     }
 
-    if(similarity.confidence > options.earlyExitAboveThreshold!) break;
+    if(similarity.confidence >= options.earlyExitThreshold!) break;
   }
 
   return matches;
