@@ -19,11 +19,11 @@ import { compareHashes, fuzzyHash } from "components/hashing";
 import LicenseStorage from "components/storage";
 import { TLicenseDetectOptions } from "types/LicenseDetect";
 
-const LICENSE_DETECT_DEFAULTS: TLicenseDetectOptions = {
+export const LICENSE_DETECT_DEFAULTS: Required<TLicenseDetectOptions> = Object.freeze({
   minConfidenceThreshold: 0.1,
   earlyExitThreshold: 1.1,
   licenseDB: new LicenseStorage("./licenses/ctph_hashes.wlhdb"),
-}
+})
 
 // TODO: merge the two functions together.. just do the slow type array checking..
 
@@ -34,9 +34,12 @@ const LICENSE_DETECT_DEFAULTS: TLicenseDetectOptions = {
  */
 export function detectLicense(
   incomingLicense: TLicense,
-  options: TLicenseDetectOptions = LICENSE_DETECT_DEFAULTS,
+  options: TLicenseDetectOptions = {},
 ) {
-  Object.assign(LICENSE_DETECT_DEFAULTS, options);
+  options = {
+    ...LICENSE_DETECT_DEFAULTS,
+    ...options,
+  }
 
   /**
    * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
@@ -86,9 +89,12 @@ export function detectLicense(
 export function detectLicenseRawDB(
   incomingLicense: TLicense,
   rawLicenseDB: Uint8Array,
-  options: Omit<TLicenseDetectOptions, 'licenseDB'> = LICENSE_DETECT_DEFAULTS,
+  options: Omit<TLicenseDetectOptions, 'licenseDB'> = {},
 ) {
-  Object.assign(LICENSE_DETECT_DEFAULTS, options);
+  options = {
+    ...LICENSE_DETECT_DEFAULTS,
+    ...options,
+  }
   /**
    * Stores all the hash variations of the incoming license in a map, so we don't have to calculate them every time.
    */
