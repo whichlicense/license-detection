@@ -77,10 +77,14 @@ Deno.test("detectLicense times-out with rejection", { sanitizeOps: false }, () =
 
     // spam the scheduler a bit to ensure we timeout (since this thing is really fast...)
     for(let i = 0; i < 100; i++) {
-      _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), 0.00001);
+      _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), {
+        minConfidenceThreshold: 0.00001,
+      });
     }
 
-    assertRejects(() => _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), 0.00001, 0))
+    assertRejects(() => _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), {
+      minConfidenceThreshold: 0.00001, timeout: 0
+    }))
 });
 
 
@@ -99,7 +103,7 @@ Deno.test("DetectionScheduler load distribution is 'fair'", { sanitizeOps: false
 
   // spam the scheduler a bit to ensure we timeout (since this thing is really fast...)
   for(let i = 0; i < 9701; i++) {
-    _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), 0.00001);
+    _ds.detectLicense(new TextEncoder().encode(TEST_LICENSE_1), { minConfidenceThreshold: 0.00001 });
   }
 
   const loadInfo = _ds.getLoadInfo();
