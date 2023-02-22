@@ -89,7 +89,7 @@ export class DetectionScheduler {
   public detectLicense(
     license: TLicense,
     minConfidence = 0.9,
-    timeout?: number,
+    timeout?: number, // TODO: convert to the new license detect options
   ): Promise<ReturnType<typeof detectLicenseRawDB>> {
     return new Promise((resolve, reject) => {
       const coordinationThread = this.findFreeCoordinationThread();
