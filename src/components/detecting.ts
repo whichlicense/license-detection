@@ -60,6 +60,7 @@ export function detectLicense(
     const similarity = compareHashes(
       incomingLicenseHashes.get(`${blockSize}-${hashLength}`)!,
       hash,
+      options.minConfidenceThreshold!,
     );
     if (similarity.confidence > options.minConfidenceThreshold!) {
       matches.push({
@@ -107,7 +108,8 @@ export function detectLicenseRawDB(
 
     const similarity = compareHashes(
       incomingLicenseHashes.get(`${blockSize}-${hashLength}`)!,
-      hash
+      hash,
+      options.minConfidenceThreshold!,
     );
     if (similarity.confidence > options.minConfidenceThreshold!) {
       matches.push({
