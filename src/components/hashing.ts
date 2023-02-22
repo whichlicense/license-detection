@@ -27,6 +27,10 @@ export function createHash(buffer: Uint8Array, hashLength: number): string {
   return res;
 }
 
+function calcMaxUncommonBlocks(minConfidence: number, nBlocks: number){
+  return nBlocks - Math.ceil(minConfidence * nBlocks);
+}
+
 export function compareHashes(
   hash1: string,
   hash2: string,
@@ -41,7 +45,7 @@ export function compareHashes(
 
   const maxUncommonBlocks = minConfidence === 0
     ? maxBlocks + maxBlocks
-    : Math.ceil((minConfidence) * Math.max(blocks1.length, blocks2.length));
+    : calcMaxUncommonBlocks(minConfidence, maxBlocks);
 
   uncommonBlocks = Math.abs(blocks1.length - blocks2.length);
   if (uncommonBlocks > maxUncommonBlocks) {
