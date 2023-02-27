@@ -114,6 +114,7 @@ fn detect_hashed_license(
             }
         }
     }
+    matches.sort_unstable_by(|a, b| b.confidence.cmp(&a.confidence));
     matches
 }
 
