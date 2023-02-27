@@ -6,30 +6,9 @@ This is a library to facilitate the detection of licenses in source code.
 
 ### Multi-threaded detection
 
-The multi-threaded detection works by spawning a number of scheduling threads
-which subsequently spawns a number of detection threads. The scheduling threads
-are responsible for splitting the license database into sections and handing
-them off to the detection threads. The detection threads are responsible for
-detecting the licenses in the given section of the license database.
-
-Most operating systems will spread the scheduling threads across the available
-cores whilst the detection threads will be spread across the available threads.
-
-```typescript
-const ds = new DetectionScheduler();
-const detected = await ds.detectLicense(SOME_LICENSE);
-```
-
-> Note: once an instance of the detection scheduler has been created, it should
-> be reused for all subsequent detections. The detection scheduler will spawn
-> the scheduling and detection threads once and reuse them for all subsequent
-> detections.
 
 ### Single-threaded detection
 
-```typescript
-detectLicense(SOME_LICENSE);
-```
 
 # Attributions
 
