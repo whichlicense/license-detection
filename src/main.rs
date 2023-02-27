@@ -95,6 +95,7 @@ fn detect_hashed_license(
     incoming_license_hash: &str,
     known_licenses: &LicenseList,
     min_confidence: u8,
+    exit_on_exact_match: bool,
 ) -> Vec<LicenseMatch> {
     let mut matches: Vec<LicenseMatch> = Vec::new();
     for license in known_licenses.licenses.iter() {
@@ -103,12 +104,14 @@ fn detect_hashed_license(
             Ok(r) => r as u8,
             Err(_e) => 0,
         };
-
-        if res >= min_confidence {
+       if res >= min_confidence {
             matches.push(LicenseMatch {
                 name: license.name.to_string(),
                 confidence: res,
             });
+            if exit_on_exact_match && res == 100 {
+                break;
+            }
         }
     }
     matches
@@ -118,11 +121,13 @@ fn detect_license(
     incoming_license: &str,
     known_licenses: &LicenseList,
     min_confidence: u8,
+    exit_on_exact_match: bool
 ) -> Vec<LicenseMatch> {
     detect_hashed_license(
         &FuzzyHash::new(strip_license(&strip_spdx_heading(&incoming_license))).to_string(),
         known_licenses,
         min_confidence,
+        exit_on_exact_match
     )
 }
 
@@ -136,7 +141,8 @@ fn main() {
     let res = detect_license(
         &fs::read_to_string("./licenses/RAW/bsd-dpt.LICENSE").unwrap(),
         &lres,
-        90,
+        10,
+        true
     );
 
     println!("{} matches found", res.len());
