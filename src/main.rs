@@ -119,7 +119,6 @@ fn detect_license(
     known_licenses: &LicenseList,
     min_confidence: u8,
 ) -> Vec<LicenseMatch> {
-    // TODO: test me
     detect_hashed_license(
         &FuzzyHash::new(strip_license(&strip_spdx_heading(&incoming_license))).to_string(),
         known_licenses,
