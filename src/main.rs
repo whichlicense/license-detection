@@ -121,18 +121,27 @@ fn detect_license(
 ) -> Vec<LicenseMatch> {
     // TODO: test me
     detect_hashed_license(
-        &strip_license(incoming_license),
+        &FuzzyHash::new(strip_license(&strip_spdx_heading(&incoming_license))).to_string(),
         known_licenses,
         min_confidence,
     )
 }
 
 fn main() {
-    let ll = process_all_licenses("./licenses/RAW");
-    create_license_db(ll, "./licenses/licenses.json");
+    // let ll = process_all_licenses("./licenses/RAW");
+    // create_license_db(ll, "./licenses/licenses.json");
     let lres = load_license_db("./licenses/licenses.json");
     // println!("{:?}", lres.licenses[0].fuzzy);
 
-    let res = detect_hashed_license(&lres.licenses[2000].fuzzy, &lres, 50);
-    println!("{:?}", res[0].name);
+    // let res = detect_hashed_license(&lres.licenses[2000].fuzzy, &lres, 90);
+    let res = detect_license(
+        &fs::read_to_string("./licenses/RAW/bsd-dpt.LICENSE").unwrap(),
+        &lres,
+        90,
+    );
+
+    println!("{} matches found", res.len());
+    for r in res {
+        println!("{}: {}", r.name, r.confidence);
+    }
 }
