@@ -21,7 +21,8 @@ use std::fs;
 pub mod detecting;
 pub mod hashing;
 
-pub use crate::detecting::detecting::{load_license_db, detect_license};
+pub use crate::detecting::detecting::*;
+pub use crate::hashing::hashing::*;
 
 
 fn main() {
@@ -30,13 +31,11 @@ fn main() {
     let lres = load_license_db("./licenses/licenses.json");
     // println!("{:?}", lres.licenses[0].fuzzy);
 
-    // let res = detect_hashed_license(&lres.licenses[2000].fuzzy, &lres, 90);
-    let res = detect_license(
-        &fs::read_to_string("./licenses/RAW/bsd-dpt.LICENSE").unwrap(),
-        &lres,
-        10,
-        true
-    );
+    // measure time it takes to execute..
+    let now = std::time::Instant::now();
+    let res = detect_hashed_license(&lres.licenses[2000].fuzzy, &lres, 90, false);
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
 
     println!("{} matches found", res.len());
     for r in res {
