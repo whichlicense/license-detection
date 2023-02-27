@@ -1,5 +1,5 @@
 [package]
-name = "rust_detection"
+name = "whichlicense_detection"
 version = "0.1.0"
 edition = "2021"
 authors = ["Duart Snel <duartsnel@icloud.com>"]

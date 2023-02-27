@@ -65,16 +65,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "456c603be3e8d448b072f410900c09faf164fbce2d480456f50eea6e25f9c848"
 
 [[package]]
-name = "rust_detection"
-version = "0.1.0"
-dependencies = [
- "fuzzyhash",
- "regex",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "ryu"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -127,3 +117,13 @@ name = "unicode-ident"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84a22b9f218b40614adcb3f4ff08b703773ad44fa9423e4e0d346d5db86e4ebc"
+
+[[package]]
+name = "whichlicense_detection"
+version = "0.1.0"
+dependencies = [
+ "fuzzyhash",
+ "regex",
+ "serde",
+ "serde_json",
+]
