@@ -15,18 +15,13 @@
 *   limitations under the License.
 */
 
-use fuzzyhash::FuzzyHash;
-use regex::Regex;
-use serde::{Deserialize, Serialize};
-use serde_json;
-use std::{
-    fs::{self, File},
-    io::{Read, Write},
-};
+use std::fs;
 
-mod detecting;
-mod hashing;
-use crate::detecting::detecting::{load_license_db, detect_license};
+
+pub mod detecting;
+pub mod hashing;
+
+pub use crate::detecting::detecting::{load_license_db, detect_license};
 
 
 fn main() {
