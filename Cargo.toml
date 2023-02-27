@@ -1,0 +1,13 @@
+[package]
+name = "rust_detection"
+version = "0.1.0"
+edition = "2021"
+authors = ["Duart Snel <duartsnel@icloud.com>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+fuzzyhash = "0.2.1"
+regex = "1.7.1"
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.93"
