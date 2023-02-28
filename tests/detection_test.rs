@@ -17,7 +17,7 @@
 
 use hashing::hashing::{strip_license, hash_license};
 use rand::Rng;
-use std::{fs::File, io::Read};
+use std::{fs::File, io::{Read, BufReader}};
 use whichlicense_detection::*;
 
 // fn random_vec_item<T>(arr: Vec<T>) -> T {
@@ -250,4 +250,50 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
     assert!(matches[0].confidence > 90);
 }
 
-// TODO: the other stuff
+#[test]
+fn it_fails_on_unknown(){
+    let unknown_license = "This is not a license. lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+
+    let known_licenses = load_license_db("./licenses/licenses.json");
+
+    let matches = detect_hashed_license(
+        &hash_license(&strip_license(unknown_license)),
+        &known_licenses,
+        1,
+        false,
+    );
+    assert!(matches.len() == 0, "Found a match for an unknown license!");
+}
+
+#[test]
+fn it_filters_on_min_confidence(){
+    let file = File::open("./LICENSE").unwrap();
+    let mut reader = BufReader::new(file);
+    let mut license = String::new();
+    reader.read_to_string(&mut license).unwrap();
+
+    let known_licenses = load_license_db("./licenses/licenses.json");
+
+    let matches = detect_hashed_license(
+        &hash_license(&strip_license(&license)),
+        &known_licenses,
+        100,
+        false,
+    );
+    assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
+
+    assert!(matches[0].confidence == 100);
+    assert_eq!(matches[0].name, "apache-2.0.LICENSE");
+
+
+    let matches = detect_hashed_license(
+        &hash_license(&strip_license(&license)),
+        &known_licenses,
+        50,
+        false,
+    );
+
+    for m in matches.iter(){
+        assert!(m.confidence >= 50, "Confidence was lower than the supplied minimum confidence!");
+    }
+}
