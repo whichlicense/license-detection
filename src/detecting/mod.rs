@@ -22,8 +22,9 @@ pub mod detecting {
         fs::File,
         io::{Read, Write},
     };
-
     use crate::hashing::hashing::{LicenseList, strip_spdx_heading, strip_license};
+
+    #[derive(Debug)]
     pub struct LicenseMatch {
         pub name: String,
         pub confidence: u8,
