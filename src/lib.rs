@@ -15,30 +15,10 @@
 *   limitations under the License.
 */
 
-use std::fs;
-
-
 pub mod detecting;
 pub mod hashing;
+pub mod offloading;
 
 pub use crate::detecting::detecting::*;
 pub use crate::hashing::hashing::*;
-
-
-fn main() {
-    // let ll = process_all_licenses("./licenses/RAW");
-    // create_license_db(ll, "./licenses/licenses.json");
-    let lres = load_license_db("./licenses/licenses.json");
-    // println!("{:?}", lres.licenses[0].fuzzy);
-
-    // measure time it takes to execute..
-    let now = std::time::Instant::now();
-    let res = detect_hashed_license(&lres.licenses[2000].fuzzy, &lres, 90, false);
-    let elapsed = now.elapsed();
-    println!("Elapsed: {:.2?}", elapsed);
-
-    println!("{} matches found", res.len());
-    for r in res {
-        println!("{}: {}", r.name, r.confidence);
-    }
-}
+pub use crate::offloading::threaded_detection::*;
