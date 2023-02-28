@@ -16,13 +16,8 @@
 */
 
 use hashing::hashing::{strip_license, hash_license};
-use rand::Rng;
 use std::{fs::File, io::{Read, BufReader}};
 use whichlicense_detection::*;
-
-// fn random_vec_item<T>(arr: Vec<T>) -> T {
-//     arr[rand::thread_rng().gen_range(0..arr.len())]
-// }
 
 #[test]
 fn it_finds_exact_match() {
