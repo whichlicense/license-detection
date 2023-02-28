@@ -19,6 +19,7 @@ pub mod threaded_detection {
     use crate::{detecting::detecting::*, hashing::hashing::LicenseList};
     use std::{thread, sync::mpsc};
 
+    /// # Do not use this function! it is slower than the non-threaded version and only serves as a placeholder for my mid-term report!!!.
     pub fn detect_license_threaded(
         n_threads: usize,
         incoming_license_hash: String,
