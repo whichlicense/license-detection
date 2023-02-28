@@ -23,13 +23,13 @@ pub mod hashing {
     use serde::{Deserialize, Serialize};
 
 
-    #[derive(Serialize, Deserialize, Debug)]
+    #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct License {
         pub name: String,
         pub fuzzy: String,
     }
 
-    #[derive(Serialize, Deserialize, Debug)]
+    #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct LicenseList {
         pub licenses: Vec<License>,
     }
@@ -47,6 +47,11 @@ pub mod hashing {
             .unwrap()
             .replace_all(l, "")
             .to_string()
+    }
+
+    pub fn hash_license(l: &str) -> String {
+        let fuzzy = FuzzyHash::new(l);
+        fuzzy.to_string()
     }
 
     pub fn process_all_licenses(folder_path: &str) -> LicenseList {
