@@ -35,12 +35,12 @@ fn benchmark(name: &str, it: &dyn Fn() -> ()) -> Duration {
 
 fn main() {
     let known_licenses = load_license_db("./licenses/licenses.json");
-    let known_licenses1 = known_licenses.clone();
+    // let known_licenses1 = known_licenses.clone();
 
     let single_threaded_license_detection = benchmark("detect_license", &|| {
         detect_hashed_license(
             &String::from("48:watOOhWmk79mRnsbiRIv13Q9rhvpy879PjBpMHWKeEf3NNUfesh/UeUMrI0WPaUg:lomWPJW6OhBjBMHx3NUn/UUCA8cRCY"),
-            &known_licenses,
+            &known_licenses.clone(),
             50,
             false
         );
@@ -50,7 +50,6 @@ fn main() {
         detect_license_threaded(
             32,
             String::from("48:watOOhWmk79mRnsbiRIv13Q9rhvpy879PjBpMHWKeEf3NNUfesh/UeUMrI0WPaUg:lomWPJW6OhBjBMHx3NUn/UUCA8cRCY"),
-            // TODO: potentially unfair benchmark because clone is required here
             known_licenses.clone(),
             50,
             false
