@@ -49,12 +49,12 @@ pub mod threaded_detection {
                 let license_db_slice = &known_licenses.licenses
                     [i * licenses_per_thread..(i + 1) * licenses_per_thread];
                 let res = detect_hashed_license(
-                    &Arc::clone(&incoming_license_hash),
+                    &incoming_license_hash,
                     &LicenseList {
                         licenses: license_db_slice.to_vec(),
                     },
-                    *Arc::clone(&min_confidence),
-                    *Arc::clone(&exit_on_exact_match),
+                    *min_confidence,
+                    *exit_on_exact_match,
                 );
                 // send results
                 personal_tx.send(res).unwrap();
