@@ -46,7 +46,7 @@ fn main() {
         );
     });
 
-    let multi_threaded_license_detection = benchmark("threaded detect_license",  &|| {
+    let multi_32_threaded_license_detection = benchmark("threaded detect_license with 32 threads",  &|| {
         detect_license_threaded(
             32,
             String::from("48:watOOhWmk79mRnsbiRIv13Q9rhvpy879PjBpMHWKeEf3NNUfesh/UeUMrI0WPaUg:lomWPJW6OhBjBMHx3NUn/UUCA8cRCY"),
@@ -56,6 +56,28 @@ fn main() {
         );
     });
 
+    let multi_16_threaded_license_detection = benchmark("threaded detect_license with 16 threads",  &|| {
+        detect_license_threaded(
+            16,
+            String::from("48:watOOhWmk79mRnsbiRIv13Q9rhvpy879PjBpMHWKeEf3NNUfesh/UeUMrI0WPaUg:lomWPJW6OhBjBMHx3NUn/UUCA8cRCY"),
+            known_licenses.clone(),
+            50,
+            false
+        );
+    });
+
+    let multi_8_threaded_license_detection = benchmark("threaded detect_license with 8 threads",  &|| {
+        detect_license_threaded(
+            8,
+            String::from("48:watOOhWmk79mRnsbiRIv13Q9rhvpy879PjBpMHWKeEf3NNUfesh/UeUMrI0WPaUg:lomWPJW6OhBjBMHx3NUn/UUCA8cRCY"),
+            known_licenses.clone(),
+            50,
+            false
+        );
+    });
+
     println!("1000 licenses would take an average of {:.2?} seconds to detect with a single thread", single_threaded_license_detection.as_secs_f32() * 1000.0);
-    println!("1000 licenses would take an average of {:.2?} seconds to detect with 32 threads", multi_threaded_license_detection.as_secs_f32() * 1000.0);
+    println!("1000 licenses would take an average of {:.2?} seconds to detect with 32 threads", multi_32_threaded_license_detection.as_secs_f32() * 1000.0);
+    println!("1000 licenses would take an average of {:.2?} seconds to detect with 16 threads", multi_16_threaded_license_detection.as_secs_f32() * 1000.0);
+    println!("1000 licenses would take an average of {:.2?} seconds to detect with 8 threads", multi_8_threaded_license_detection.as_secs_f32() * 1000.0);
 }
