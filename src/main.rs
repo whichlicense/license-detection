@@ -19,22 +19,25 @@ pub mod detecting;
 pub mod hashing;
 pub mod offloading;
 
+use std::time::Duration;
+
 use whichlicense_detection::{
     detect_hashed_license, load_license_db, offloading::threaded_detection::detect_license_threaded,
 };
 
-fn benchmark(name: &str, it: &dyn Fn() -> ()){
+fn benchmark(name: &str, it: &dyn Fn() -> ()) -> Duration {
     let now = std::time::Instant::now();
     it();
     let elapsed = now.elapsed();
     println!("Time elapsed to execute {}: {:.2?}", name, elapsed);
+    elapsed
 }
 
 fn main() {
     let known_licenses = load_license_db("./licenses/licenses.json");
     let known_licenses1 = known_licenses.clone();
 
-    benchmark("detect_license", &|| {
+    let single_threaded_license_detection = benchmark("detect_license", &|| {
         detect_hashed_license(
             &String::from("48:watOOhWmk79mRnsbiRIv13Q9rhvpy879PjBpMHWKeEf3NNUfesh/UeUMrI0WPaUg:lomWPJW6OhBjBMHx3NUn/UUCA8cRCY"),
             &known_licenses,
@@ -43,14 +46,17 @@ fn main() {
         );
     });
 
-    benchmark("threaded detect_license", &|| {
+    let multi_threaded_license_detection = benchmark("threaded detect_license",  &|| {
         detect_license_threaded(
             32,
             String::from("48:watOOhWmk79mRnsbiRIv13Q9rhvpy879PjBpMHWKeEf3NNUfesh/UeUMrI0WPaUg:lomWPJW6OhBjBMHx3NUn/UUCA8cRCY"),
-            &known_licenses1,
+            // TODO: potentially unfair benchmark because clone is required here
+            known_licenses.clone(),
             50,
             false
         );
-    })
+    });
 
+    println!("1000 licenses would take an average of {:.2?} seconds to detect with a single thread", single_threaded_license_detection.as_secs_f32() * 1000.0);
+    println!("1000 licenses would take an average of {:.2?} seconds to detect with 32 threads", multi_threaded_license_detection.as_secs_f32() * 1000.0);
 }
