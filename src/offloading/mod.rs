@@ -17,13 +17,13 @@
 
 pub mod threaded_detection {
     use crate::{detecting::detecting::*, hashing::hashing::LicenseList};
-    use std::{thread, sync::mpsc};
+    use std::{thread, sync::{mpsc, Arc}, rc::Rc};
 
     /// # Do not use this function! it is slower than the non-threaded version and only serves as a placeholder for my mid-term report!!!.
     pub fn detect_license_threaded(
         n_threads: usize,
         incoming_license_hash: String,
-        known_licenses: &LicenseList,
+        known_licenses: LicenseList,
         min_confidence: u8,
         exit_on_exact_match: bool,
     ) -> Vec<LicenseMatch> {
@@ -31,23 +31,30 @@ pub mod threaded_detection {
             (known_licenses.licenses.len() as f32 / n_threads as f32).floor() as usize;
         let (tx, rx) = mpsc::channel(); 
 
+
+        let incoming_license_hash = Arc::new(incoming_license_hash);
+        let min_confidence = Arc::new(min_confidence);
+        let exit_on_exact_match = Arc::new(exit_on_exact_match);
+        let known_licenses = Arc::new(known_licenses);
+
         let mut threads = vec![];
         for i in 0..n_threads {
-            let incoming_license_hash = incoming_license_hash.clone();
-            let min_confidence = min_confidence.clone();
-            let exit_on_exact_match = exit_on_exact_match.clone();
-            let known_licenses = known_licenses.clone();
+            let incoming_license_hash = Arc::clone(&incoming_license_hash);
+            let min_confidence = Arc::clone(&min_confidence);
+            let exit_on_exact_match = Arc::clone(&exit_on_exact_match);
+            let known_licenses = Arc::clone(&known_licenses);
             let personal_tx = tx.clone();
             threads.push(thread::spawn(move || {
+                let known_licenses = known_licenses;
                 let license_db_slice = &known_licenses.licenses
                     [i * licenses_per_thread..(i + 1) * licenses_per_thread];
                 let res = detect_hashed_license(
-                    &incoming_license_hash,
+                    &Arc::clone(&incoming_license_hash),
                     &LicenseList {
                         licenses: license_db_slice.to_vec(),
                     },
-                    min_confidence,
-                    exit_on_exact_match,
+                    *Arc::clone(&min_confidence),
+                    *Arc::clone(&exit_on_exact_match),
                 );
                 // send results
                 personal_tx.send(res).unwrap();
