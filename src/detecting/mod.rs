@@ -16,13 +16,13 @@
 */
 
 pub mod detecting {
+    use crate::hashing::hashing::{strip_license, strip_spdx_heading, LicenseList};
     use fuzzyhash::FuzzyHash;
     use serde_json;
     use std::{
         fs::File,
         io::{Read, Write},
     };
-    use crate::hashing::hashing::{LicenseList, strip_spdx_heading, strip_license};
 
     #[derive(Debug)]
     pub struct LicenseMatch {
@@ -82,5 +82,132 @@ pub mod detecting {
             min_confidence,
             exit_on_exact_match,
         )
+    }
+
+    pub mod pipeline {
+        pub enum PipelineTriggerCondition {
+            GreaterThan,
+            LessThan,
+            GreaterThanOrEqual,
+            LessThanOrEqual,
+            Equal,
+            NotEqual,
+        }
+        pub trait ConditionalPipeline {
+            /// Returns true if the given pipe should be run
+            ///
+            /// The confidence parameter is the confidence of the previous pipe or, if this is the initial pipe,
+            /// the confidence of the license detection results.
+            fn should_run(&self, confidence: u8) -> bool;
+        }
+
+        /// The trigger indicates based on its properties if the given pipe should be run or not.
+        ///
+        /// The formula is: ```should_run``` = ```C``` ```condition``` ```V```
+        ///
+        /// where condition is one of: >, <, >=, <=, =, !=
+        ///
+        /// - ```C``` represents the confidence
+        /// - ```V``` represents the value
+        /// - ```should_run``` is a boolean which determines if the given pipe should be run or not
+        pub struct PipelineTriggerInstruction {
+            pub condition: PipelineTriggerCondition,
+            pub value: u8,
+        }
+
+        pub enum PipelineActionType {
+            Add,
+            Subtract,
+            Set,
+        }
+        pub struct PipeLineAction {
+            pub action: PipelineActionType,
+            pub value: u8,
+        }
+        pub trait RunnablePipeLineAction {
+            fn run(&self, confidence: u8) -> u8;
+        }
+        impl RunnablePipeLineAction for PipeLineAction {
+            /// Runs the given action on the given confidence
+            /// and returns the new confidence.
+            fn run(&self, confidence: u8) -> u8 {
+                match self.action {
+                    PipelineActionType::Add => {
+                        // clamp the confidence to 0-100
+                        let res = confidence + self.value;
+                        match res {
+                            0..=100 => res,
+                            101..=u8::MAX => 100,
+                        }
+                    }
+                    PipelineActionType::Subtract => {
+                        let res = confidence - self.value;
+                        match res {
+                            0..=100 => res,
+                            101..=u8::MAX => 100,
+                        }
+                    }
+                    PipelineActionType::Set => match self.value {
+                        0..=100 => self.value,
+                        101..=u8::MAX => 100,
+                    },
+                }
+            }
+        }
+
+        impl ConditionalPipeline for PipelineTriggerInstruction {
+            fn should_run(&self, confidence: u8) -> bool {
+                match self.condition {
+                    PipelineTriggerCondition::GreaterThan => confidence > self.value,
+                    PipelineTriggerCondition::LessThan => confidence < self.value,
+                    PipelineTriggerCondition::GreaterThanOrEqual => confidence >= self.value,
+                    PipelineTriggerCondition::LessThanOrEqual => confidence <= self.value,
+                    PipelineTriggerCondition::Equal => confidence == self.value,
+                    PipelineTriggerCondition::NotEqual => confidence != self.value,
+                }
+            }
+        }
+
+        pub trait RunnablePipeLine {
+            fn run(&self, confidence: u8) -> u8;
+        }
+
+        pub mod regex_pipeline {
+            use super::{ConditionalPipeline, RunnablePipeLineAction};
+
+            /// Regex pipeline pipe which contains a regex to be matched.
+            ///
+            /// If the regex matches, the given PipeLineAction is executed.
+            pub struct RegexPipeLine {
+                /// The regex to be matched
+                pub regex: String,
+                /// The license text to be matched against the regex
+                pub license_text: String,
+
+                /// The condition which determines if tis pipeline should be run or not
+                pub run_condition: super::PipelineTriggerInstruction,
+                /// The action to be executed if the regex matches
+                pub action: super::PipeLineAction,
+            }
+
+            impl super::RunnablePipeLine for RegexPipeLine {
+                fn run(&self, confidence: u8) -> u8 {
+                    // TODO: this might panic? i'm handing off the value but its not giving me IDE errors
+                    if self.run_condition.should_run(confidence) {
+                        // if regex matches, run the action
+                        if regex::Regex::new(&self.regex)
+                            .unwrap()
+                            .is_match(&self.license_text)
+                        {
+                            self.action.run(confidence)
+                        } else {
+                            confidence
+                        }
+                    } else {
+                        confidence
+                    }
+                }
+            }
+        }
     }
 }
