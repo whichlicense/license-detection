@@ -292,3 +292,18 @@ fn it_filters_on_min_confidence(){
         assert!(m.confidence >= 50, "Confidence was lower than the supplied minimum confidence!");
     }
 }
+
+#[test]
+fn it_allows_plain_text_license_detection() {
+    let file = File::open("./LICENSE").unwrap();
+    let mut reader = BufReader::new(file);
+    let mut license = String::new();
+    reader.read_to_string(&mut license).unwrap();
+
+    let known_licenses = load_license_db("./licenses/licenses.json");
+
+    let matches = detect_license(&license, &known_licenses, 50, false);
+    assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
+    assert_eq!(matches[0].name, "apache-2.0.LICENSE");
+    assert!(matches[0].confidence > 90);
+}
