@@ -22,3 +22,10 @@ pub mod offloading;
 pub use crate::detecting::detecting::*;
 pub use crate::hashing::hashing::*;
 pub use crate::offloading::threaded_detection::*;
+
+
+// // C mappings
+// #[no_mangle]
+// pub extern "C" fn e_strip_license(l: &str) -> String {
+//     strip_license(l)
+// }
