@@ -14,8 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-use hashing::hashing::{strip_license, hash_license};
-use std::{fs::File, io::{Read, BufReader}};
+use hashing::hashing::hash_license;
 use whichlicense_detection::*;
 
 #[test]
