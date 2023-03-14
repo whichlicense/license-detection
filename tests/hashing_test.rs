@@ -14,4 +14,23 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+use hashing::hashing::{strip_license, hash_license};
+use std::{fs::File, io::{Read, BufReader}};
+use whichlicense_detection::*;
 
+#[test]
+fn same_text_produce_same_hash() {
+    let text = "This is a test";
+    let hash1 = hash_license(text);
+    let hash2 = hash_license(text);
+    assert_eq!(hash1, hash2);
+}
+
+#[test]
+fn similar_text_produce_different_hash() {
+    let text1 = "This is a test";
+    let text2 = "This is a tesu";
+    let hash1 = hash_license(text1);
+    let hash2 = hash_license(text2);
+    assert_ne!(hash1, hash2);
+}
