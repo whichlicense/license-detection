@@ -192,7 +192,6 @@ pub mod detecting {
 
             impl super::RunnablePipeLine for RegexPipeLine {
                 fn run(&self, confidence: u8) -> u8 {
-                    // TODO: this might panic? i'm handing off the value but its not giving me IDE errors
                     if self.run_condition.should_run(confidence) {
                         // if regex matches, run the action
                         if regex::Regex::new(&self.regex)
