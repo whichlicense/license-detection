@@ -203,7 +203,3 @@ fn pipeline_action_modifies_correctly(){
     assert_eq!(action_set.run(100), 100);
     assert_eq!(action_set.run(255), 100);
 }
-
-// TODO: test pipeline action add
-// TODO: test pipeline action subtract
-// TODO: test pipeline action set
