@@ -92,6 +92,8 @@ pub mod detecting {
             LessThanOrEqual,
             Equal,
             NotEqual,
+            /// Always runs the pipe regardless of the confidence
+            Always,
         }
         pub trait ConditionalPipeline {
             /// Returns true if the given pipe should be run
@@ -134,14 +136,14 @@ pub mod detecting {
                 match self.action {
                     PipelineActionType::Add => {
                         // clamp the confidence to 0-100
-                        let res = confidence + self.value;
+                        let res = confidence.saturating_add(self.value);
                         match res {
                             0..=100 => res,
                             101..=u8::MAX => 100,
                         }
                     }
                     PipelineActionType::Subtract => {
-                        let res = confidence - self.value;
+                        let res = confidence.saturating_sub(self.value);
                         match res {
                             0..=100 => res,
                             101..=u8::MAX => 100,
@@ -164,6 +166,7 @@ pub mod detecting {
                     PipelineTriggerCondition::LessThanOrEqual => confidence <= self.value,
                     PipelineTriggerCondition::Equal => confidence == self.value,
                     PipelineTriggerCondition::NotEqual => confidence != self.value,
+                    PipelineTriggerCondition::Always => true,
                 }
             }
         }
