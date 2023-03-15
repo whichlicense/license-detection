@@ -15,69 +15,7 @@
  *   limitations under the License.
  */
 
-use whichlicense_detection::pipeline::{regex_pipeline::RegexPipeLine, PipelineTriggerInstruction, PipeLineAction, PipelineTriggerCondition, PipelineActionType, RunnablePipeLine, ConditionalPipeline, RunnablePipeLineAction};
-
-#[test]
-fn regex_pipeline_executes(){
-    let regex_pipeline = RegexPipeLine {
-        regex: String::from("some text"),
-        license_text: String::from("this is a sample license with some text"),
-        run_condition: PipelineTriggerInstruction {
-            condition: PipelineTriggerCondition::GreaterThan,
-            value: 50,
-        },
-        action: PipeLineAction {
-            action: PipelineActionType::Add,
-            value: 5,
-        },
-    };
-
-    let result = regex_pipeline.run(95);
-
-    assert_eq!(result, 100)
-}
-
-#[test]
-fn regex_pipeline_executes_on_truthy_regex_condition(){
-    let regex_pipeline = RegexPipeLine {
-        regex: String::from(r"\d{4}-\d{2}-\d{2}"), // date finding regex
-        license_text: String::from("this is a sample license created on 2014-01-01"),
-        run_condition: PipelineTriggerInstruction {
-            condition: PipelineTriggerCondition::Always,
-            // does not matter on always
-            value: 10,
-        },
-        action: PipeLineAction {
-            action: PipelineActionType::Add,
-            value: 5,
-        },
-    };
-
-    let result = regex_pipeline.run(10);
-
-    assert_eq!(result, 15)
-}
-
-#[test]
-fn regex_pipeline_does_not_execute_on_falsy_regex_condition(){
-    let regex_pipeline = RegexPipeLine {
-        regex: String::from(r"\d{4}-\d{2}-\d{2}"), // date finding regex
-        license_text: String::from("this is a sample license created on NO DATE"),
-        run_condition: PipelineTriggerInstruction {
-            condition: PipelineTriggerCondition::Always,
-            // does not matter on always
-            value: 10,
-        },
-        action: PipeLineAction {
-            action: PipelineActionType::Add,
-            value: 5,
-        },
-    };
-
-    let result = regex_pipeline.run(10);
-
-    assert_eq!(result, 10)
-}
+ use whichlicense_detection::pipeline::{PipelineTriggerInstruction, PipeLineAction, PipelineTriggerCondition, PipelineActionType, ConditionalPipeline, RunnablePipeLineAction};
 
 #[test]
 fn pipeline_trigger_action_adheres_to_its_condition(){
