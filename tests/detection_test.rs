@@ -25,7 +25,7 @@ fn it_finds_exact_match() {
     assert_eq!(
         known_licenses.licenses[0].name,
         detect_hashed_license(
-            &known_licenses.licenses[0].fuzzy,
+            &known_licenses.licenses[0].hash,
             &known_licenses,
             100,
             false

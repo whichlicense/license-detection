@@ -51,7 +51,7 @@ pub mod detecting {
     ) -> Vec<LicenseMatch> {
         let mut matches: Vec<LicenseMatch> = Vec::new();
         for license in known_licenses.licenses.iter() {
-            let res = FuzzyHash::compare(incoming_license_hash, license.fuzzy.as_str());
+            let res = FuzzyHash::compare(incoming_license_hash, license.hash.as_str());
             let res = match res {
                 Ok(r) => r as u8,
                 Err(_e) => 0,

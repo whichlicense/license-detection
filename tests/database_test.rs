@@ -31,7 +31,7 @@ fn it_creates_a_license_db(){
         licenses: vec![ 
             License {
                 name: String::from("Apache-2.0"),
-                fuzzy: hashed_license_1.clone(),
+                hash: hashed_license_1.clone(),
             }
         ]
     };
@@ -53,7 +53,7 @@ fn it_loads_a_license_db(){
 
     assert!(license_list.licenses.len() == 1);
     assert_eq!(license_list.licenses[0].name, "Apache-2.0");
-    assert!(license_list.licenses[0].fuzzy.len() > 0);
+    assert!(license_list.licenses[0].hash.len() > 0);
 
     let file = File::open("./LICENSE").unwrap();
     let mut reader = BufReader::new(file);
@@ -62,6 +62,6 @@ fn it_loads_a_license_db(){
 
     let hashed_license_1 = hash_license(&strip_license(&license));
 
-    assert!(license_list.licenses[0].fuzzy.contains(&hashed_license_1));
+    assert!(license_list.licenses[0].hash.contains(&hashed_license_1));
 
 }

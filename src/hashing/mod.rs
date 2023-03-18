@@ -26,7 +26,7 @@ pub mod hashing {
     #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct License {
         pub name: String,
-        pub fuzzy: String,
+        pub hash: String,
     }
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -68,7 +68,7 @@ pub mod hashing {
             let fuzzy = FuzzyHash::new(stripped);
             licenses.push(License {
                 name: path.unwrap().file_name().to_str().unwrap().to_string(),
-                fuzzy: fuzzy.to_string(),
+                hash: fuzzy.to_string(),
             });
         }
 
@@ -76,4 +76,23 @@ pub mod hashing {
             LicenseList { licenses }
         }
     }
+
+    // pub fn read_and_strip_all_licenses(folder_path: &str) -> LicenseList {
+    //     let paths = fs::read_dir(folder_path).unwrap();
+    //     let mut licenses: Vec<License> = Vec::new();
+
+    //     for path in paths {
+    //         let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
+    //         let mut contents = String::new();
+    //         file.read_to_string(&mut contents).unwrap();
+
+    //         let stripped = strip_license(&strip_spdx_heading(&contents)); // TODO: less borrowing, more taking
+
+    //         let fuzzy = FuzzyHash::new(stripped);
+    //         licenses.push(License {
+    //             name: path.unwrap().file_name().to_str().unwrap().to_string(),
+    //             hash: fuzzy.to_string(),
+    //         });
+    //     }
+    // }
 }
