@@ -16,7 +16,7 @@
 */
 
 pub mod detecting {
-    use crate::hashing::hashing::{strip_license, strip_spdx_heading, LicenseList};
+    use crate::hashing::hashing::{strip_license, strip_spdx_heading, ComputedLicenseList};
     use fuzzyhash::FuzzyHash;
     use serde_json;
     use std::{
@@ -30,13 +30,13 @@ pub mod detecting {
         pub confidence: u8,
     }
 
-    pub fn create_license_db(licenses: LicenseList, file: &str) {
+    pub fn create_license_db(licenses: ComputedLicenseList, file: &str) {
         let serialized = serde_json::to_string(&licenses).unwrap();
         let mut file = File::create(file).unwrap();
         file.write_all(serialized.as_bytes()).unwrap();
     }
 
-    pub fn load_license_db(file: &str) -> LicenseList {
+    pub fn load_license_db(file: &str) -> ComputedLicenseList {
         let mut file = File::open(file).unwrap();
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
@@ -45,7 +45,7 @@ pub mod detecting {
 
     pub fn detect_hashed_license(
         incoming_license_hash: &str,
-        known_licenses: &LicenseList,
+        known_licenses: &ComputedLicenseList,
         min_confidence: u8,
         exit_on_exact_match: bool,
     ) -> Vec<LicenseMatch> {
@@ -72,7 +72,7 @@ pub mod detecting {
 
     pub fn detect_license(
         incoming_license: &str,
-        known_licenses: &LicenseList,
+        known_licenses: &ComputedLicenseList,
         min_confidence: u8,
         exit_on_exact_match: bool,
     ) -> Vec<LicenseMatch> {

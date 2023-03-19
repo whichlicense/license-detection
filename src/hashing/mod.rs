@@ -30,7 +30,7 @@ pub mod hashing {
     }
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
-    pub struct LicenseList {
+    pub struct ComputedLicenseList {
         pub licenses: Vec<License>,
     }
 
@@ -54,7 +54,7 @@ pub mod hashing {
         fuzzy.to_string()
     }
 
-    pub fn process_all_licenses(folder_path: &str) -> LicenseList {
+    pub fn process_all_licenses(folder_path: &str) -> ComputedLicenseList {
         let paths = fs::read_dir(folder_path).unwrap();
         let mut licenses: Vec<License> = Vec::new();
 
@@ -73,11 +73,11 @@ pub mod hashing {
         }
 
         {
-            LicenseList { licenses }
+            ComputedLicenseList { licenses }
         }
     }
 
-    pub fn process_all_licenses_manual(folder_path: &str, hash_fn: fn(plain_text: String) -> String ) -> LicenseList {
+    pub fn process_all_licenses_manual(folder_path: &str, hash_fn: fn(plain_text: String) -> String ) -> ComputedLicenseList {
         let paths = fs::read_dir(folder_path).unwrap();
         let mut licenses: Vec<License> = Vec::new();
 
@@ -95,7 +95,7 @@ pub mod hashing {
         }
             
         {
-            LicenseList { licenses }
+            ComputedLicenseList { licenses }
         }
     }
 }

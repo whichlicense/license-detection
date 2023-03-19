@@ -16,14 +16,14 @@
 */
 
 pub mod threaded_detection {
-    use crate::{detecting::detecting::*, hashing::hashing::LicenseList};
+    use crate::{detecting::detecting::*, hashing::hashing::ComputedLicenseList};
     use std::{thread, sync::{mpsc, Arc}};
 
     /// # Do not use this function! it is slower than the non-threaded version and only serves as a placeholder for my mid-term report!!!.
     pub fn detect_license_threaded(
         n_threads: usize,
         incoming_license_hash: String,
-        known_licenses: LicenseList,
+        known_licenses: ComputedLicenseList,
         min_confidence: u8,
         exit_on_exact_match: bool,
     ) -> Vec<LicenseMatch> {
@@ -50,7 +50,7 @@ pub mod threaded_detection {
                     [i * licenses_per_thread..(i + 1) * licenses_per_thread];
                 let res = detect_hashed_license(
                     &incoming_license_hash,
-                    &LicenseList {
+                    &ComputedLicenseList {
                         licenses: license_db_slice.to_vec(),
                     },
                     *min_confidence,

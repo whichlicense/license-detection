@@ -27,7 +27,7 @@ fn it_creates_a_license_db(){
 
     let hashed_license_1 = hash_license(&strip_license(&license));
 
-    let license_list: LicenseList = LicenseList {
+    let license_list: ComputedLicenseList = ComputedLicenseList {
         licenses: vec![ 
             License {
                 name: String::from("Apache-2.0"),

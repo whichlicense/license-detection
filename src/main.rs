@@ -25,7 +25,7 @@ use std::time::Duration;
 
 use whichlicense_detection::{
     create_license_db, hash_license, process_all_licenses,
-    strip_license, strip_spdx_heading, License, LicenseList,
+    strip_license, strip_spdx_heading, License, ComputedLicenseList,
 };
 use whichlicense_detection::{
     detect_hashed_license, load_license_db, offloading::threaded_detection::detect_license_threaded,
