@@ -17,8 +17,6 @@
 
 pub mod license_tools {
     use std::{fs::{self, File}, io::Read};
-
-    use fuzzyhash::FuzzyHash;
     use regex::Regex;
     use serde::{Deserialize, Serialize};
 
@@ -73,53 +71,27 @@ pub mod license_tools {
             .to_string()
     }
 
-    pub fn hash_license(l: &str) -> String {
-        let fuzzy = FuzzyHash::new(l);
-        fuzzy.to_string()
+    pub struct RawLicense {
+        pub name: String,
+        pub text: String,
     }
 
-    pub fn process_all_licenses(folder_path: &str) -> ComputedLicenseList {
+    /// loads and returns a vector of RawLicense structs containing the name and plain text of each license.
+    pub fn load_licenses_from_folder(folder_path: &str) -> Vec<RawLicense> {
         let paths = fs::read_dir(folder_path).unwrap();
-        let mut licenses: Vec<ComputedLicense> = Vec::new();
+        let mut licenses: Vec<RawLicense> = Vec::new();
 
         for path in paths {
             let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
 
-            let stripped = strip_license(&strip_spdx_heading(&contents)); // TODO: less borrowing, more taking
-
-            let fuzzy = FuzzyHash::new(stripped);
-            licenses.push(ComputedLicense {
+            licenses.push(RawLicense {
                 name: path.unwrap().file_name().to_str().unwrap().to_string(),
-                hash: fuzzy.to_string(),
+                text: contents,
             });
         }
 
-        {
-            ComputedLicenseList { licenses }
-        }
-    }
-
-    pub fn process_all_licenses_manual(folder_path: &str, hash_fn: fn(plain_text: String) -> String ) -> ComputedLicenseList {
-        let paths = fs::read_dir(folder_path).unwrap();
-        let mut licenses: Vec<ComputedLicense> = Vec::new();
-
-        for path in paths {
-            let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
-            let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
-
-            let stripped = strip_license(&strip_spdx_heading(&contents)); // TODO: less borrowing, more taking
-
-            licenses.push(ComputedLicense {
-                name: path.unwrap().file_name().to_str().unwrap().to_string(),
-                hash: hash_fn(stripped),
-            });
-        }
-            
-        {
-            ComputedLicenseList { licenses }
-        }
+        licenses
     }
 }
