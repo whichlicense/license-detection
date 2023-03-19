@@ -239,7 +239,7 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
 
     assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
     assert_eq!(matches[0].name, "apache-2.0.LICENSE");
-    assert!(matches[0].confidence > 90);
+    assert!(matches[0].confidence > 90.0);
 }
 
 #[test]
@@ -276,10 +276,10 @@ fn it_filters_on_min_confidence(){
     let matches = fuzzy.match_by_plain_text(license);
     assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
 
-    assert!(matches[0].confidence == 100);
+    assert!(matches[0].confidence == 100.0);
     assert_eq!(matches[0].name, "apache-2.0.LICENSE");
 
     for m in matches.iter(){
-        assert!(m.confidence >= 50, "Confidence was lower than the supplied minimum confidence!");
+        assert!(m.confidence >= 50.0, "Confidence was lower than the supplied minimum confidence!");
     }
 }
