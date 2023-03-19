@@ -17,7 +17,7 @@
 
 pub mod fuzzy_implementation;
 pub mod detecting {
-    use crate::hashing::hashing::{strip_license, strip_spdx_heading, ComputedLicenseList};
+    use crate::hashing::license_tools::{strip_license, strip_spdx_heading, ComputedLicenseList};
     use fuzzyhash::FuzzyHash;
     use serde_json;
     use std::{

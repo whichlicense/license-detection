@@ -20,7 +20,7 @@ pub mod hashing;
 pub mod offloading;
 
 pub use crate::detecting::detecting::*;
-pub use crate::hashing::hashing::*;
+pub use crate::hashing::license_tools::*;
 pub use crate::offloading::threaded_detection::*;
 
 

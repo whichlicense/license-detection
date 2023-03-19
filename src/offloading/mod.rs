@@ -16,7 +16,7 @@
 */
 
 pub mod threaded_detection {
-    use crate::{detecting::detecting::*, hashing::hashing::ComputedLicenseList};
+    use crate::{detecting::detecting::*, hashing::license_tools::ComputedLicenseList};
     use std::{thread, sync::{mpsc, Arc}};
 
     /// # Do not use this function! it is slower than the non-threaded version and only serves as a placeholder for my mid-term report!!!.

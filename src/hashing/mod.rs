@@ -15,7 +15,7 @@
 *   limitations under the License.
 */
 
-pub mod hashing {
+pub mod license_tools {
     use std::{fs::{self, File}, io::Read};
 
     use fuzzyhash::FuzzyHash;

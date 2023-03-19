@@ -14,7 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-use hashing::hashing::hash_license;
+use hashing::license_tools::hash_license;
 use whichlicense_detection::*;
 
 #[test]
