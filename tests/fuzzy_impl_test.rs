@@ -15,7 +15,6 @@
 *   limitations under the License.
 */
 
-use license_tools::license_tools::{hash_license};
 use std::{fs::File, io::{Read, BufReader}};
 use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection};
 
