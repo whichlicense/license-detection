@@ -77,22 +77,25 @@ pub mod hashing {
         }
     }
 
-    // pub fn read_and_strip_all_licenses(folder_path: &str) -> LicenseList {
-    //     let paths = fs::read_dir(folder_path).unwrap();
-    //     let mut licenses: Vec<License> = Vec::new();
+    pub fn process_all_licenses_manual(folder_path: &str, hash_fn: fn(plain_text: String) -> String ) -> LicenseList {
+        let paths = fs::read_dir(folder_path).unwrap();
+        let mut licenses: Vec<License> = Vec::new();
 
-    //     for path in paths {
-    //         let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
-    //         let mut contents = String::new();
-    //         file.read_to_string(&mut contents).unwrap();
+        for path in paths {
+            let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
+            let mut contents = String::new();
+            file.read_to_string(&mut contents).unwrap();
 
-    //         let stripped = strip_license(&strip_spdx_heading(&contents)); // TODO: less borrowing, more taking
+            let stripped = strip_license(&strip_spdx_heading(&contents)); // TODO: less borrowing, more taking
 
-    //         let fuzzy = FuzzyHash::new(stripped);
-    //         licenses.push(License {
-    //             name: path.unwrap().file_name().to_str().unwrap().to_string(),
-    //             hash: fuzzy.to_string(),
-    //         });
-    //     }
-    // }
+            licenses.push(License {
+                name: path.unwrap().file_name().to_str().unwrap().to_string(),
+                hash: hash_fn(stripped),
+            });
+        }
+            
+        {
+            LicenseList { licenses }
+        }
+    }
 }
