@@ -29,7 +29,7 @@ fn it_creates_a_license_db(){
 
     let license_list: ComputedLicenseList = ComputedLicenseList {
         licenses: vec![ 
-            License {
+            ComputedLicense {
                 name: String::from("Apache-2.0"),
                 hash: hashed_license_1.clone(),
             }

@@ -24,14 +24,14 @@ pub mod hashing {
 
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
-    pub struct License {
+    pub struct ComputedLicense {
         pub name: String,
         pub hash: String,
     }
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct ComputedLicenseList {
-        pub licenses: Vec<License>,
+        pub licenses: Vec<ComputedLicense>,
     }
 
     pub fn strip_spdx_heading(l: &str) -> String {
@@ -56,7 +56,7 @@ pub mod hashing {
 
     pub fn process_all_licenses(folder_path: &str) -> ComputedLicenseList {
         let paths = fs::read_dir(folder_path).unwrap();
-        let mut licenses: Vec<License> = Vec::new();
+        let mut licenses: Vec<ComputedLicense> = Vec::new();
 
         for path in paths {
             let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
@@ -66,7 +66,7 @@ pub mod hashing {
             let stripped = strip_license(&strip_spdx_heading(&contents)); // TODO: less borrowing, more taking
 
             let fuzzy = FuzzyHash::new(stripped);
-            licenses.push(License {
+            licenses.push(ComputedLicense {
                 name: path.unwrap().file_name().to_str().unwrap().to_string(),
                 hash: fuzzy.to_string(),
             });
@@ -79,7 +79,7 @@ pub mod hashing {
 
     pub fn process_all_licenses_manual(folder_path: &str, hash_fn: fn(plain_text: String) -> String ) -> ComputedLicenseList {
         let paths = fs::read_dir(folder_path).unwrap();
-        let mut licenses: Vec<License> = Vec::new();
+        let mut licenses: Vec<ComputedLicense> = Vec::new();
 
         for path in paths {
             let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
@@ -88,7 +88,7 @@ pub mod hashing {
 
             let stripped = strip_license(&strip_spdx_heading(&contents)); // TODO: less borrowing, more taking
 
-            licenses.push(License {
+            licenses.push(ComputedLicense {
                 name: path.unwrap().file_name().to_str().unwrap().to_string(),
                 hash: hash_fn(stripped),
             });
