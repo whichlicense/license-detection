@@ -39,7 +39,7 @@ pub mod fuzzy_implementation {
         pub min_confidence: u8,
         pub exit_on_exact_match: bool,
     }
-    impl LicenseListActions for FuzzyDetection {
+    impl LicenseListActions<String> for FuzzyDetection {
         fn match_by_plain_text(&self, plain_text: String) -> Vec<LicenseMatch> {
             self.match_by_hash(
                 FuzzyHash::new(strip_license(&strip_spdx_heading(&plain_text))).to_string(),
@@ -57,14 +57,14 @@ pub mod fuzzy_implementation {
                 if res >= self.min_confidence {
                     matches.push(LicenseMatch {
                         name: license.name.to_string(),
-                        confidence: res,
+                        confidence: res as f32,
                     });
                     if self.exit_on_exact_match && res == 100 {
                         break;
                     }
                 }
             }
-            matches.sort_unstable_by(|a, b| b.confidence.cmp(&a.confidence));
+            matches.sort_unstable_by(|a, b| b.confidence.partial_cmp(&a.confidence).unwrap());
             matches
         }
 
