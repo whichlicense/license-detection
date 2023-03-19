@@ -24,7 +24,7 @@ pub mod detecting {
     #[derive(Debug)]
     pub struct LicenseMatch {
         pub name: String,
-        pub confidence: u8,
+        pub confidence: f32,
     }
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -37,13 +37,13 @@ pub mod detecting {
     pub struct ComputedLicenseList {
         pub licenses: Vec<ComputedLicense>,
     }
-    pub trait LicenseListActions {
+    pub trait LicenseListActions<T> {
         /// Converts the plain text into a representation that can be used to find a license
         /// then runs the match_by_hash function on that representation.
         fn match_by_plain_text(&self, plain_text: String) -> Vec<LicenseMatch>;
 
         /// Attempts to find one or more matching licenses by hash.
-        fn match_by_hash(&self, hash: String) -> Vec<LicenseMatch>;
+        fn match_by_hash(&self, hash: T) -> Vec<LicenseMatch>;
 
         /// Saves the computed license list to a file.
         fn save_to_file(&self, file_path: String);
