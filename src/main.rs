@@ -16,20 +16,18 @@
 */
 
 pub mod detecting;
-pub mod hashing;
 pub mod offloading;
 
 use std::fs::{self, File};
 use std::io::Read;
 use std::time::Duration;
 
+use fuzzyhash::FuzzyHash;
+use whichlicense_detection::detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection;
 use whichlicense_detection::{
-    create_license_db, hash_license, process_all_licenses,
-    strip_license, strip_spdx_heading, ComputedLicense, ComputedLicenseList,
+    strip_license, strip_spdx_heading, ComputedLicense, LicenseListActions, LicenseMatch,
 };
-use whichlicense_detection::{
-    detect_hashed_license, load_license_db, offloading::threaded_detection::detect_license_threaded,
-};
+
 
 use gaoya::minhash::{MinHashIndex, MinHasher, MinHasher32};
 use gaoya::text::shingle_text;
@@ -124,47 +122,33 @@ fn fuzzy_hash_benchmark(
     accuracy_check_license:  &str,
 ) {
     println!("\n\n -- Running FuzzyHash benchmarks --");
-    let known_licenses = load_license_db("./licenses/licenses.json");
+
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+    };
+
+    fuzzy.load_from_file(String::from("./licenses/licenses.json"));
+    let results = fuzzy.match_by_plain_text(String::from(test_license));
+
     let single_threaded_license_detection = benchmark("detect_license", &|| {
-        detect_hashed_license(
-            &hash_license(test_license),
-            &known_licenses.clone(),
-            50,
-            false,
-        );
+        fuzzy.match_by_plain_text(String::from(test_license));
     });
 
-    let multi_8_threaded_license_detection =
-        benchmark("threaded detect_license with 8 threads", &|| {
-            detect_license_threaded(
-                8,
-                hash_license(test_license),
-                known_licenses.clone(),
-                50,
-                false,
-            );
-        });
 
-    let detection_results = detect_hashed_license(
-        &hash_license(test_license),
-        &known_licenses.clone(),
-        50,
-        false,
-    );
+    
+    let detection_results = fuzzy.match_by_plain_text(String::from(test_license));
 
-    let accuracy_check_license_signature = hash_license(accuracy_check_license);
-    let accuracy_check_results = detect_hashed_license(
-        &accuracy_check_license_signature,
-        &known_licenses.clone(),
-        50,
-        false,
-    );
+    let accuracy_check_results = fuzzy.match_by_plain_text(String::from(accuracy_check_license));
 
+    let test_license_size = test_license.bytes().len();
+    let test_license_hash_size = fuzzy.licenses.iter().find(|license| license.name == name_of_license).unwrap().hash.bytes().len();
     println!(
         "size of algorithm hash ({} bytes) is less than 50% of the size of the license text({} bytes): {}",
-        hash_license(test_license).bytes().len(),
-        test_license.bytes().len(),
-        hash_license(test_license).bytes().len() < (test_license.bytes().len()/2)
+        test_license_hash_size,
+        test_license_size,
+        test_license_hash_size < (test_license_size/2)
     );
     println!(
         "Detection results (must contain {} at 100% confidence): {:?}",
@@ -174,10 +158,6 @@ fn fuzzy_hash_benchmark(
     println!(
         "1000 licenses would take an average of {:.2?} seconds to detect with a single thread",
         single_threaded_license_detection.as_secs_f32() * 1000.0
-    );
-    println!(
-        "1000 licenses would take an average of {:.2?} seconds to detect with 8 threads",
-        multi_8_threaded_license_detection.as_secs_f32() * 1000.0
     );
 
     println!(
@@ -194,7 +174,6 @@ fn main() {
     test_license_file
         .read_to_string(&mut test_license_contents)
         .unwrap();
-    let test_license = strip_license(&strip_spdx_heading(&test_license_contents)).to_lowercase();
 
     let apache_modified_license = strip_license("Apache License
     Version 2.0, January 2004
@@ -393,36 +372,19 @@ fn main() {
     limitations under the License.");
 
 
-    gaoya_benchmark(
-        license_name,
-        &test_license.clone(),
-        &apache_modified_license.clone(),
-        42,
-        3,
-        50
-    );
-
-    // for num_bands in 1..=10 {
-    //     for band_width in 1..=10 {
-    //         gaoya_benchmark(
-    //             license_name,
-    //             &test_license.clone(),
-    //             (
-    //                 original_accuracy_check_license.clone(),
-    //                 modified_accuracy_check_license.clone(),
-    //             ),
-    //             num_bands * 10, band_width * 10
-    //         );
-    //     }
-    // }
+    // gaoya_benchmark(
+    //     license_name,
+    //     &test_license.clone(),
+    //     &apache_modified_license.clone(),
+    //     42,
+    //     3,
+    //     50
+    // );
 
     fuzzy_hash_benchmark(
         license_name,
-        &test_license.clone(),
+        &test_license_contents.clone(),
         &apache_modified_license.clone(),
     );
-
-
-
     
 }
