@@ -24,8 +24,9 @@ use std::time::Duration;
 
 use fuzzyhash::FuzzyHash;
 use whichlicense_detection::detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection;
+use whichlicense_detection::detecting::gaoya_implementation::gaoya_implementation::GaoyaDetection;
 use whichlicense_detection::{
-    strip_license, strip_spdx_heading, ComputedLicense, LicenseListActions, LicenseMatch,
+    strip_license, strip_spdx_heading, ComputedLicense, LicenseListActions, LicenseMatch, load_licenses_from_folder,
 };
 
 
@@ -60,36 +61,23 @@ fn gaoya_benchmark(
         "\n\n -- Running Gaoya benchmarks with num_bands:{}, and band_width:{} --",
         num_bands, band_width
     );
-    let minhasher = MinHasher32::new(num_bands * band_width);
-    let mut index = MinHashIndex::new(num_bands, band_width, 0.5);
 
-    let paths = fs::read_dir("./licenses/RAW").unwrap();
+    let mut gaoya = GaoyaDetection {
+        index: MinHashIndex::new(num_bands, band_width, 0.5),
+        min_hasher: MinHasher32::new(num_bands * band_width),
+        shingle_text_size,
+    };
 
-    // add all the licenses to the index.
-    for path in paths {
-        let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).unwrap();
-
-        let stripped = strip_license(&strip_spdx_heading(&contents));
-
-        index.insert(
-            path.unwrap().file_name().to_str().unwrap().to_string(),
-            minhasher.create_signature(shingle_text(&stripped, shingle_text_size)),
-        );
+    for l in load_licenses_from_folder("./licenses/RAW"){
+        gaoya.add_plain(l.name, l.text);
     }
 
     let bench_1_duration = benchmark("gaoya_benchmark", &|| {
         // explicitly create a signature for the incoming license to make benchmarks fair.
-        let signature = minhasher.create_signature(shingle_text(&test_license, shingle_text_size));
-        index.query(&signature);
+        gaoya.match_by_plain_text(test_license.to_string());
     });
     // used for prints below.
-    let signature_incoming = minhasher.create_signature(shingle_text(&test_license, shingle_text_size));
-
-    // calculate the accuracy of the license detection.
-    let accuracy_check_license_signature =
-        minhasher.create_signature(shingle_text(accuracy_check_license, shingle_text_size));
+    let signature_incoming = gaoya.min_hasher.create_signature(shingle_text(&test_license, shingle_text_size));
 
     // incoming license is converted into bytes (8 bits per entry) and the signature is 4 bytes per entry (32 bits per entry).
     println!(
@@ -102,7 +90,7 @@ fn gaoya_benchmark(
     println!(
         "Detection results (must contain {} at 100% confidence): {:?}",
         name_of_license,
-        index.query_owned_return_similarity(&signature_incoming)
+        gaoya.match_by_plain_text(test_license.to_string())
     );
 
     println!(
@@ -112,7 +100,7 @@ fn gaoya_benchmark(
 
     println!(
         "accuracy check of Apache 2.0 modified license: {:?}",
-        index.query_owned_return_similarity(&accuracy_check_license_signature)
+        gaoya.match_by_plain_text(accuracy_check_license.to_string())
     )
 }
 
@@ -372,19 +360,23 @@ fn main() {
     limitations under the License.");
 
 
-    // gaoya_benchmark(
-    //     license_name,
-    //     &test_license.clone(),
-    //     &apache_modified_license.clone(),
-    //     42,
-    //     3,
-    //     50
-    // );
+    // TODO: now that we have a common interface, we can loop over all the implementations and benchmark
+    // them all at once. This will make it easier to compare them. and will make everything fair!
 
-    fuzzy_hash_benchmark(
+
+    gaoya_benchmark(
         license_name,
         &test_license_contents.clone(),
         &apache_modified_license.clone(),
+        42,
+        3,
+        50
     );
+
+    // fuzzy_hash_benchmark(
+    //     license_name,
+    //     &test_license_contents.clone(),
+    //     &apache_modified_license.clone(),
+    // );
     
 }
