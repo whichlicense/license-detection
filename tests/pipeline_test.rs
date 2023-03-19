@@ -15,7 +15,7 @@
  *   limitations under the License.
  */
 
- use whichlicense_detection::pipeline::{PipelineTriggerInstruction, PipeLineAction, PipelineTriggerCondition, PipelineActionType, ConditionalPipeline, RunnablePipeLineAction};
+use whichlicense_detection::{PipelineTriggerInstruction, PipelineTriggerCondition, ConditionalPipeline, PipeLineAction, PipelineActionType, RunnablePipeLineAction};
 
 #[test]
 fn pipeline_trigger_action_adheres_to_its_condition(){
