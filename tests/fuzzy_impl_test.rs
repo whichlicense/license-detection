@@ -20,17 +20,6 @@ use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implement
 
 #[test]
 fn it_finds_exact_match() {
-    // let known_licenses = load_license_db("./licenses/licenses.json");
-    // assert_eq!(
-    //     known_licenses.licenses[0].name,
-    //     detect_hashed_license(
-    //         &known_licenses.licenses[0].hash,
-    //         &known_licenses,
-    //         100,
-    //         false
-    //     )[0]
-    //     .name
-    // );
     let mut fuzzy = FuzzyDetection {
         licenses: vec![],
         min_confidence: 50,
@@ -239,14 +228,6 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
     See the License for the specific language governing permissions and
     limitations under the License.";
 
-    // let known_licenses = load_license_db("./licenses/licenses.json");
-
-    // let matches = detect_hashed_license(
-    //     &hash_license(&strip_license(apache_test_license)),
-    //     &known_licenses,
-    //     50,
-    //     false,
-    // );
     let mut fuzzy = FuzzyDetection {
         licenses: vec![],
         min_confidence: 50,
