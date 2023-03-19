@@ -16,12 +16,15 @@
 */
 
 pub mod detecting;
-pub mod hashing;
-pub mod offloading;
+pub mod license_tools;
+// pub mod offloading;
+pub mod pipeline_tools;
+
 
 pub use crate::detecting::detecting::*;
-pub use crate::hashing::license_tools::*;
-pub use crate::offloading::threaded_detection::*;
+pub use crate::license_tools::license_tools::*;
+pub use crate::pipeline_tools::pipeline::*;
+// pub use crate::offloading::threaded_detection::*;
 
 
 // // C mappings
