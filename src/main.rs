@@ -18,11 +18,10 @@
 pub mod detecting;
 pub mod offloading;
 
-use std::fs::{self, File};
+use std::fs::{File};
 use std::io::Read;
 use std::time::Duration;
 
-use fuzzyhash::FuzzyHash;
 use whichlicense_detection::detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection;
 use whichlicense_detection::detecting::gaoya_implementation::gaoya_implementation::GaoyaDetection;
 use whichlicense_detection::{
@@ -117,8 +116,10 @@ fn fuzzy_hash_benchmark(
         exit_on_exact_match: false,
     };
 
-    fuzzy.load_from_file(String::from("./licenses/licenses.json"));
-    let results = fuzzy.match_by_plain_text(String::from(test_license));
+    for l in load_licenses_from_folder("./licenses/RAW"){
+        fuzzy.add_plain(l.name, l.text);
+    }
+
 
     let single_threaded_license_detection = benchmark("detect_license", &|| {
         fuzzy.match_by_plain_text(String::from(test_license));
@@ -360,10 +361,6 @@ fn main() {
     limitations under the License.");
 
 
-    // TODO: now that we have a common interface, we can loop over all the implementations and benchmark
-    // them all at once. This will make it easier to compare them. and will make everything fair!
-
-
     gaoya_benchmark(
         license_name,
         &test_license_contents.clone(),
@@ -378,5 +375,4 @@ fn main() {
         &test_license_contents.clone(),
         &apache_modified_license.clone(),
     );
-    
 }
