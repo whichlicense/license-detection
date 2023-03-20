@@ -14,7 +14,7 @@
 *   See the License for the specific language governing permissions and
 *   limitations under the License.
 */
-// TODO: Gaoya has a simhash implementation.
+// TODO: implement Gaoya simhash variant.
 pub mod gaoya_implementation {
     use std::{
         fs::File,
@@ -36,7 +36,7 @@ pub mod gaoya_implementation {
     /// How the contents of the JSON db looks like, used for parsing purposes.
     struct _GaoyaComputedLicense {
         name: String,
-        hash: Vec<u32>, // TODO: fact check this
+        hash: Vec<u32>,
     }
 
     #[derive(Serialize, Deserialize, Debug, Clone)]

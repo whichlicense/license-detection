@@ -373,10 +373,10 @@ fn main() {
         50
     );
 
-    // fuzzy_hash_benchmark(
-    //     license_name,
-    //     &test_license_contents.clone(),
-    //     &apache_modified_license.clone(),
-    // );
+    fuzzy_hash_benchmark(
+        license_name,
+        &test_license_contents.clone(),
+        &apache_modified_license.clone(),
+    );
     
 }
