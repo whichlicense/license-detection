@@ -32,11 +32,6 @@ pub mod detecting {
         pub name: String,
         pub hash: String,
     }
-
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    pub struct ComputedLicenseList {
-        pub licenses: Vec<ComputedLicense>,
-    }
     pub trait LicenseListActions<T> {
         /// Converts the plain text into a representation that can be used to find a license
         /// then runs the match_by_hash function on that representation.
