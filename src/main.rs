@@ -16,8 +16,6 @@
 */
 
 pub mod detecting;
-pub mod offloading;
-
 use std::fs::{File};
 use std::io::Read;
 use std::time::Duration;
