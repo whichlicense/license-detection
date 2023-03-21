@@ -22,17 +22,10 @@ pub mod fuzzy_implementation {
     };
 
     use fuzzyhash::FuzzyHash;
-    use serde::{Serialize, Deserialize};
 
     use crate::{
         strip_license, strip_spdx_heading, ComputedLicense, LicenseListActions, LicenseMatch,
     };
-
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    /// How the contents of the JSON db looks like, used for parsing purposes.
-    struct _Raw {
-        pub licenses: Vec<ComputedLicense>,
-    }
 
     pub struct FuzzyDetection {
         pub licenses: Vec<ComputedLicense>,
@@ -80,10 +73,10 @@ pub mod fuzzy_implementation {
             file.read_to_string(&mut contents).unwrap();
 
             let loaded =
-                serde_json::from_str::<_Raw>(&contents)
-                    .unwrap_or(_Raw { licenses: Vec::new() });
+                serde_json::from_str::<Vec<ComputedLicense>>(&contents)
+                    .unwrap_or(Vec::new());
             self.licenses.clear();
-            self.licenses.extend(loaded.licenses);
+            self.licenses.extend(loaded);
         }
 
         fn add_plain(&mut self, license_name: String, license_text: String) {
