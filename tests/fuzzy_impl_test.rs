@@ -15,7 +15,7 @@
 *   limitations under the License.
 */
 
-use std::{fs::File, io::{Read, BufReader}};
+use std::{fs::File, io::{Read, BufReader}, path::Path};
 use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection};
 
 #[test]
@@ -26,7 +26,9 @@ fn it_finds_exact_match() {
         exit_on_exact_match: false,
     };
 
-    fuzzy.load_from_file(String::from("./licenses/licenses.json"));
+    for l in load_licenses_from_folder("./licenses/RAW"){
+        fuzzy.add_plain(l.name, l.text);
+    }
     assert_eq!(fuzzy.licenses[0].name, fuzzy.match_by_hash(fuzzy.licenses[0].hash.clone())[0].name);
 }
 
@@ -234,7 +236,10 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
         exit_on_exact_match: false,
     };
 
-    fuzzy.load_from_file(String::from("./licenses/licenses.json"));
+    for l in load_licenses_from_folder("./licenses/RAW"){
+        fuzzy.add_plain(l.name, l.text);
+    }
+
     let matches = fuzzy.match_by_plain_text(String::from(apache_test_license));
 
     assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
@@ -251,7 +256,10 @@ fn it_fails_on_unknown(){
         exit_on_exact_match: false,
     };
 
-    fuzzy.load_from_file(String::from("./licenses/licenses.json"));
+    for l in load_licenses_from_folder("./licenses/RAW"){
+        fuzzy.add_plain(l.name, l.text);
+    }
+
     let matches = fuzzy.match_by_plain_text(String::from(unknown_license));
     assert!(matches.len() == 0, "Found a match for an unknown license!");
 }
@@ -264,7 +272,9 @@ fn it_filters_on_min_confidence(){
         exit_on_exact_match: false,
     };
 
-    fuzzy.load_from_file(String::from("./licenses/licenses.json"));
+    for l in load_licenses_from_folder("./licenses/RAW"){
+        fuzzy.add_plain(l.name, l.text);
+    }
     
     // gets this project's current license
     let file = File::open("./LICENSE").unwrap();
@@ -282,4 +292,60 @@ fn it_filters_on_min_confidence(){
     for m in matches.iter(){
         assert!(m.confidence >= 50.0, "Confidence was lower than the supplied minimum confidence!");
     }
+}
+
+#[test]
+fn add_plain_works(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+    };
+    fuzzy.add_plain(String::from("test_license"), String::from("This is a test license"));
+
+    assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
+    assert!(fuzzy.licenses[0].hash.len() > 0);
+
+}
+
+#[test]
+fn it_saves_to_file(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+    };
+    fuzzy.add_plain(String::from("test_license"), String::from("This is a test license"));
+
+    fuzzy.save_to_file(String::from("./test_db.json"));
+
+    // assert that file exists
+    assert!(Path::new("./test_db.json").try_exists().is_ok());
+}
+
+#[test]
+fn it_loads_from_saved_file(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+    };
+    fuzzy.load_from_file(String::from("./test_db.json"));
+
+    assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
+    assert!(fuzzy.licenses[0].hash.len() > 0);
+}
+
+#[test]
+fn remove_works(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+    };
+    fuzzy.add_plain(String::from("test_license"), String::from("This is a test license"));
+
+    fuzzy.remove(String::from("test_license"));
+
+    assert!(fuzzy.licenses.len() == 0);
 }
