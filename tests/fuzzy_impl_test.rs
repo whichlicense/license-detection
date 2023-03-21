@@ -330,6 +330,8 @@ fn it_loads_from_saved_file(){
         min_confidence: 50,
         exit_on_exact_match: false,
     };
+    fuzzy.add_plain(String::from("test_license"), String::from("This is a test license"));
+    fuzzy.save_to_file(String::from("./test_db.json"));
     fuzzy.load_from_file(String::from("./test_db.json"));
 
     assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
