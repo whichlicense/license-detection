@@ -16,5 +16,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Pull in license data
+      run: git clone https://github.com/nexB/scancode-toolkit.git
+    - name: test dir entries
+      run: ls
+    - name: Move license data to correct location
+      run: mv -v scancode-toolkit/src/licensedcode/data/licenses/* ./licenses/RAW/
     - name: Run tests
       run: cargo test --verbose
