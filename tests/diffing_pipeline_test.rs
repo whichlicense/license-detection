@@ -15,7 +15,7 @@
  *   limitations under the License.
  */
 
-use whichlicense_detection::{diffing_pipeline::DiffingPipeLine, PipelineTriggerInstruction, PipelineTriggerCondition, PipeLineAction, PipelineActionType, RunnablePipeLine};
+use whichlicense_detection::{PipelineTriggerInstruction, PipelineTriggerCondition, PipeLineAction, PipelineActionType, RunnablePipeLine, pipeline_tools::diffing_pipeline::diffing_pipeline::DiffingPipeLine};
 
  #[test]
 fn diffing_pipeline_executes_on_truthy_regex_condition(){

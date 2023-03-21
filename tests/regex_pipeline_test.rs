@@ -15,7 +15,7 @@
  *   limitations under the License.
  */
 
-use whichlicense_detection::{regex_pipeline::RegexPipeLine, PipelineTriggerInstruction, PipelineTriggerCondition, PipeLineAction, PipelineActionType, RunnablePipeLine};
+use whichlicense_detection::{ PipelineTriggerInstruction, PipelineTriggerCondition, PipeLineAction, PipelineActionType, RunnablePipeLine, pipeline_tools::regex_pipeline::regex_pipeline::RegexPipeLine};
 
 #[test]
 fn regex_pipeline_executes(){
