@@ -39,7 +39,8 @@ The pipeline system was developed to automatically improve the results of licens
 
 #### Diffing pipeline
 The diffing pipeline works by only taking the modified license parts and putting them in a new string. This string is then passed to the regex provided to check if the changes matches the regex.
-TODO... image....
+![diffing_pipeline_expl_1](https://user-images.githubusercontent.com/30909481/227518673-361c79e8-752e-443b-a76b-58b8f40e2fb3.jpg)
+
 ```rust
 let regex_pipeline = DiffingPipeLine {
     regex: String::from(r"\d{4}-\d{2}-\d{2}"), // date finding regex
