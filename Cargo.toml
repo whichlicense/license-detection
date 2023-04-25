@@ -8,6 +8,9 @@ version = "1.0.0"
 edition = "2021"
 authors = ["Duart Snel <duartsnel@icloud.com>"]
 license = "Apache-2.0"
+exclude = [
+    "old_impl/*",
+]
 
 [profile.release]
 lto = true
