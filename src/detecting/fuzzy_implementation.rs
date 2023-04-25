@@ -81,6 +81,14 @@ pub mod fuzzy_implementation {
             self.licenses.extend(loaded);
         }
 
+        fn load_from_inline_string(&mut self, json: String) {
+            let loaded =
+                serde_json::from_str::<Vec<ComputedLicense>>(&json)
+                    .unwrap_or(Vec::new());
+            self.licenses.clear();
+            self.licenses.extend(loaded);
+        }
+
         fn add_plain(&mut self, license_name: String, license_text: String) {
             let stripped = strip_license(&strip_spdx_heading(&license_text));
             let fuzzy = FuzzyHash::new(stripped);

@@ -109,6 +109,15 @@ pub mod gaoya_implementation {
             }
         }
 
+        fn load_from_inline_string(&mut self, json: String) {
+            let loaded = serde_json::from_str::<_Raw>(&json).unwrap_or(_Raw {
+                licenses: Vec::new(),
+            });
+            for license in loaded.licenses {
+                self.index.insert(license.name, license.hash);
+            }
+        }
+
         fn add_plain(&mut self, license_name: String, license_text: String) {
             let signature = self.min_hasher.create_signature(shingle_text(
                 &strip_license(&strip_spdx_heading(&license_text)),
