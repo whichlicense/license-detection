@@ -16,6 +16,7 @@
 */
 
 use std::{fs::File, io::{Read, BufReader}, path::Path};
+use serde_json::json;
 use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection};
 
 #[test]
@@ -337,6 +338,26 @@ fn it_loads_from_saved_file(){
     assert!(fuzzy.licenses.len() == 1);
     assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
     assert!(fuzzy.licenses[0].hash.len() > 0);
+}
+
+#[test]
+fn it_loads_from_inline_string(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+    };
+
+    fuzzy.load_from_inline_string(json!([
+            {
+                "name": "test_license",
+                "hash": "This is a test license"
+            }
+        ]
+    ).to_string());
+
+    assert!(fuzzy.licenses.len() == 1);
+    assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
 }
 
 #[test]
