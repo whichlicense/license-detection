@@ -42,6 +42,7 @@ pub mod gaoya_implementation {
     #[derive(Serialize, Deserialize, Debug, Clone)]
     /// How the contents of the JSON db looks like, used for parsing purposes.
     struct _Raw {
+        //TODO: make this universal so that we can use it for all implementations.
         pub licenses: Vec<_GaoyaComputedLicense>,
     }
 

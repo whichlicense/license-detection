@@ -62,12 +62,14 @@ pub mod fuzzy_implementation {
         }
 
         fn save_to_file(&self, file_path: String) {
+            // TODO: this is different from gaoya implementation, make it the same by extracting the _Raw struct.
             let serialized = serde_json::to_string(&self.licenses).unwrap();
             let mut file = File::create(file_path).unwrap();
             file.write_all(serialized.as_bytes()).unwrap();
         }
 
         fn load_from_file(&mut self, file_path: String) {
+            // TODO: incorrect.. extract _Raw struct to have common interface.
             let mut file = File::open(file_path).unwrap();
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
