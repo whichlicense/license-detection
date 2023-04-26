@@ -46,13 +46,15 @@ pub mod detecting {
         /// Loads a computed license list from a file and stores it in the hosting struct.
         fn load_from_file(&mut self, file_path: String);
 
-        // TODO: load_from_inline_string that takes json as a string
         fn load_from_inline_string(&mut self, json: String);
 
         /// Adds a license that has yet to be computed to the list.
         /// 
         /// This license must be in plain text format.
         fn add_plain(&mut self, license_name: String, license_text: String);
+
+        /// Computes the hash of the given license_text string and returns it.
+        fn hash_from_inline_string(&self, license_text: String) -> T;
 
         /// Removes a license from the list.
         fn remove(&mut self, license_name: String);

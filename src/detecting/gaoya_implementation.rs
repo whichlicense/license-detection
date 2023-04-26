@@ -126,6 +126,13 @@ pub mod gaoya_implementation {
             self.index.insert(license_name, signature);
         }
 
+        fn hash_from_inline_string(&self, license_text: String) -> Vec<u32> {
+            self.min_hasher.create_signature(shingle_text(
+                &strip_license(&strip_spdx_heading(&license_text)),
+                self.shingle_text_size,
+            ))
+        }
+
         fn remove(&mut self, license_name: String) {
             self.index.remove(&license_name);
         }

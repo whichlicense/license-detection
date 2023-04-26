@@ -98,6 +98,10 @@ pub mod fuzzy_implementation {
             });
         }
 
+        fn hash_from_inline_string(&self, license_text: String) -> String {
+            FuzzyHash::new(strip_license(&strip_spdx_heading(&license_text))).to_string()
+        }
+
         fn remove(&mut self, license_name: String) {
             self.licenses.retain(|l| l.name != license_name);
         }
