@@ -373,3 +373,23 @@ fn remove_works(){
 
     assert!(fuzzy.licenses.len() == 0);
 }
+
+#[test]
+fn it_hashes_from_inline_string(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+    };
+    let res = fuzzy.hash_from_inline_string(String::from("This is a test license"));
+    fuzzy.licenses.push(ComputedLicense {
+        name: String::from("test_license"),
+        hash: res.clone(),
+    });
+
+    
+    assert!(res.len() > 0);
+    assert!(
+        fuzzy.match_by_plain_text(String::from("This is a test license")).iter().any(|x| x.name == "test_license"),
+    )
+}
