@@ -23,7 +23,7 @@ use std::time::Duration;
 use whichlicense_detection::detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection;
 use whichlicense_detection::detecting::gaoya_implementation::gaoya_implementation::GaoyaDetection;
 use whichlicense_detection::{
-    strip_license, strip_spdx_heading, ComputedLicense, LicenseListActions, LicenseMatch, load_licenses_from_folder,
+    strip_license, strip_spdx_heading, LicenseListActions, LicenseMatch, load_licenses_from_folder,
 };
 
 

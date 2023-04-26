@@ -17,7 +17,7 @@
 
 use std::{fs::File, io::{Read, BufReader}, path::Path};
 use serde_json::json;
-use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection};
+use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implementation::{FuzzyDetection, ComputedLicense}};
 
 #[test]
 fn it_finds_exact_match() {
@@ -348,12 +348,15 @@ fn it_loads_from_inline_string(){
         exit_on_exact_match: false,
     };
 
-    fuzzy.load_from_inline_string(json!([
-            {
-                "name": "test_license",
-                "hash": "This is a test license"
-            }
-        ]
+    fuzzy.load_from_inline_string(json!(
+        {
+            "licenses": [
+                {
+                    "name": "test_license",
+                    "hash": "This is a test license"
+                }
+            ]
+        }
     ).to_string());
 
     assert!(fuzzy.licenses.len() == 1);

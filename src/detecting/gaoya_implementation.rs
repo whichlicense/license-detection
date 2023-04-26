@@ -27,9 +27,9 @@ pub mod gaoya_implementation {
         text::shingle_text,
     };
     use serde::{Deserialize, Serialize};
-
+    
     use crate::{
-        strip_license, strip_spdx_heading, LicenseListActions, LicenseMatch,
+        strip_license, strip_spdx_heading, LicenseListActions, LicenseMatch, detecting::detecting::DiskData,
     };
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -39,12 +39,6 @@ pub mod gaoya_implementation {
         hash: Vec<u32>,
     }
 
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    /// How the contents of the JSON db looks like, used for parsing purposes.
-    struct _Raw {
-        //TODO: make this universal so that we can use it for all implementations.
-        pub licenses: Vec<_GaoyaComputedLicense>,
-    }
 
     pub struct GaoyaDetection {
         pub index: MinHashIndex<u32, String>,
@@ -91,7 +85,7 @@ pub mod gaoya_implementation {
                     hash: hash.clone(),
                 });
             }
-            let raw = _Raw { licenses };
+            let raw = DiskData { licenses };
             let json = serde_json::to_string(&raw).unwrap();
             file.write_all(json.as_bytes()).unwrap();
         }
@@ -101,7 +95,8 @@ pub mod gaoya_implementation {
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
 
-            let loaded = serde_json::from_str::<_Raw>(&contents).unwrap_or(_Raw {
+            let loaded = serde_json::from_str::<DiskData<_GaoyaComputedLicense>>(&contents)
+            .unwrap_or(DiskData {
                 licenses: Vec::new(),
             });
             for license in loaded.licenses {
@@ -110,7 +105,7 @@ pub mod gaoya_implementation {
         }
 
         fn load_from_inline_string(&mut self, json: String) {
-            let loaded = serde_json::from_str::<_Raw>(&json).unwrap_or(_Raw {
+            let loaded = serde_json::from_str::<DiskData<_GaoyaComputedLicense>>(&json).unwrap_or(DiskData {
                 licenses: Vec::new(),
             });
             for license in loaded.licenses {

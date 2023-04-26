@@ -23,9 +23,17 @@ pub mod fuzzy_implementation {
 
     use fuzzyhash::FuzzyHash;
 
+    use serde::{Serialize, Deserialize};
+
     use crate::{
-        strip_license, strip_spdx_heading, ComputedLicense, LicenseListActions, LicenseMatch,
+        strip_license, strip_spdx_heading, LicenseListActions, LicenseMatch, detecting::detecting::DiskData,
     };
+
+    #[derive(Serialize, Deserialize, Debug, Clone)]
+    pub struct ComputedLicense {
+        pub name: String,
+        pub hash: String,
+    }
 
     pub struct FuzzyDetection {
         pub licenses: Vec<ComputedLicense>,
@@ -63,7 +71,9 @@ pub mod fuzzy_implementation {
 
         fn save_to_file(&self, file_path: String) {
             // TODO: this is different from gaoya implementation, make it the same by extracting the _Raw struct.
-            let serialized = serde_json::to_string(&self.licenses).unwrap();
+            let serialized = serde_json::to_string::<DiskData<ComputedLicense>>(&DiskData {
+                licenses: self.licenses.clone(),
+            }).unwrap();
             let mut file = File::create(file_path).unwrap();
             file.write_all(serialized.as_bytes()).unwrap();
         }
@@ -74,19 +84,17 @@ pub mod fuzzy_implementation {
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
 
-            let loaded =
-                serde_json::from_str::<Vec<ComputedLicense>>(&contents)
-                    .unwrap_or(Vec::new());
-            self.licenses.clear();
-            self.licenses.extend(loaded);
+            self.load_from_inline_string(contents);
         }
 
         fn load_from_inline_string(&mut self, json: String) {
             let loaded =
-                serde_json::from_str::<Vec<ComputedLicense>>(&json)
-                    .unwrap_or(Vec::new());
+                serde_json::from_str::<DiskData<ComputedLicense>>(&json)
+                    .unwrap_or(DiskData {
+                        licenses: Vec::new(),
+                    });
             self.licenses.clear();
-            self.licenses.extend(loaded);
+            self.licenses.extend(loaded.licenses);
         }
 
         fn add_plain(&mut self, license_name: String, license_text: String) {
