@@ -15,8 +15,9 @@
 *   limitations under the License.
 */
 
-use std::{fs::File, io::{Read, BufReader}, path::Path};
-use gaoya::minhash::{MinHashIndex, MinHasher32};
+use std::{fs::File, io::{Read, BufReader}, path::Path, vec};
+use gaoya::{minhash::{MinHashIndex, MinHasher32, MinHasher}, text::shingle_text};
+use serde_json::json;
 use whichlicense_detection::{*, detecting::gaoya_implementation::gaoya_implementation::GaoyaDetection};
 
 #[test]
@@ -338,6 +339,51 @@ fn it_loads_from_saved_file(){
     gaoya.add_plain(String::from("test_license"), String::from("This is a test license"));
     gaoya.save_to_file(String::from("./test_db.json"));
     gaoya.load_from_file(String::from("./test_db.json"));
+
+    assert!(gaoya.index.get_id_signature_map().contains_key("test_license"));
+    assert!(gaoya.index.get_id_signature_map().get("test_license").unwrap().len() > 0);
+    assert!(gaoya.index.get_id_signature_map().len() > 0);
+}
+
+#[test]
+fn it_hashes_from_inline_string(){
+    let mut gaoya = GaoyaDetection {
+        index: MinHashIndex::new(42, 3, 0.5),
+        min_hasher: MinHasher32::new(42 * 3),
+        shingle_text_size: 50,
+    };
+    let res = gaoya.hash_from_inline_string(String::from("This is a test license"));
+    gaoya.index.insert(String::from("test_license"), res.clone());
+
+    
+    assert!(res.len() > 0);
+    assert!(
+        gaoya.match_by_plain_text(String::from("This is a test license")).iter().any(|x| x.name == "test_license"),
+    )
+}
+
+#[test]
+fn it_loads_from_inline_string(){
+    let mut gaoya = GaoyaDetection {
+        index: MinHashIndex::new(42, 3, 0.5),
+        min_hasher: MinHasher32::new(42 * 3),
+        shingle_text_size: 50,
+    };
+
+    let signature = gaoya.min_hasher.create_signature(shingle_text(
+        &strip_license(&strip_spdx_heading(&"This is a test license")),
+        gaoya.shingle_text_size,
+    ));
+    gaoya.load_from_inline_string(json!(
+        {
+            "licenses": [
+                {
+                    "name": "test_license",
+                    "hash": signature
+                }
+            ]
+        }
+    ).to_string());
 
     assert!(gaoya.index.get_id_signature_map().contains_key("test_license"));
     assert!(gaoya.index.get_id_signature_map().get("test_license").unwrap().len() > 0);
