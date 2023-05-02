@@ -373,4 +373,32 @@ fn main() {
         &test_license_contents.clone(),
         &apache_modified_license.clone(),
     );
+
+
+
+    // let mut fuzzy = FuzzyDetection {
+    //     licenses: vec![],
+    //     min_confidence: 50,
+    //     exit_on_exact_match: false,
+    // };
+
+    // for l in load_licenses_from_folder("./licenses/RAW"){
+    //     fuzzy.add_plain(l.name, l.text);
+    // }
+
+    // fuzzy.save_to_file(String::from("./licenses/fuzzy_db.json"));
+
+
+    // let mut gaoya = GaoyaDetection {
+    //     index: MinHashIndex::new(42, 3, 0.5),
+    //     min_hasher: MinHasher32::new(42 * 3),
+    //     shingle_text_size: 50,
+    // };
+
+    // for l in load_licenses_from_folder("./licenses/RAW"){
+    //     gaoya.add_plain(l.name, l.text);
+    // }
+
+    // gaoya.save_to_file(String::from("./licenses/gaoya_db.json"));
+
 }
