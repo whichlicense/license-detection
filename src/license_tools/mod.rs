@@ -47,7 +47,11 @@ pub mod license_tools {
         for path in paths {
             let mut file = File::open(path.as_ref().unwrap().path()).unwrap();
             let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
+
+            if file.read_to_string(&mut contents).is_err() {
+                println!("Error reading license file: {}", path.unwrap().path().display());
+                continue;
+            }
 
             licenses.push(RawLicense {
                 name: path.unwrap().file_name().to_str().unwrap().to_string(),
