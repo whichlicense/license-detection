@@ -383,9 +383,8 @@ fn main() {
     // };
 
     // for l in load_licenses_from_folder("./licenses/RAW"){
-    //     fuzzy.add_plain(l.name, l.text);
+    //     fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
     // }
-
     // fuzzy.save_to_file(String::from("./licenses/fuzzy_db.json"));
 
 
@@ -396,9 +395,8 @@ fn main() {
     // };
 
     // for l in load_licenses_from_folder("./licenses/RAW"){
-    //     gaoya.add_plain(l.name, l.text);
+    //     gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
     // }
-
     // gaoya.save_to_file(String::from("./licenses/gaoya_db.json"));
 
 }
