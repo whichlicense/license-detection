@@ -29,7 +29,7 @@ fn it_finds_exact_match() {
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, l.text);
+        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
     }
 
     let res = gaoya.match_by_hash(gaoya.index.get_signature(&String::from("apache-2.0.LICENSE")).unwrap().to_vec());
@@ -243,7 +243,7 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, l.text);
+        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
     }
 
     let matches = gaoya.match_by_plain_text(String::from(apache_test_license));
@@ -263,7 +263,7 @@ fn it_fails_on_unknown(){
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, l.text);
+        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
     }
 
     let matches = gaoya.match_by_plain_text(String::from(unknown_license));
@@ -279,7 +279,7 @@ fn it_filters_on_min_confidence(){
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, l.text);
+        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
     }
     
     // gets this project's current license

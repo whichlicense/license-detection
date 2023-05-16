@@ -26,7 +26,7 @@ pub mod fuzzy_implementation {
     use serde::{Serialize, Deserialize};
 
     use crate::{
-        strip_license, strip_spdx_heading, LicenseListActions, LicenseMatch, detecting::detecting::DiskData,
+        strip_license, LicenseListActions, LicenseMatch, detecting::detecting::DiskData,
     };
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -43,7 +43,7 @@ pub mod fuzzy_implementation {
     impl LicenseListActions<String> for FuzzyDetection {
         fn match_by_plain_text(&self, plain_text: String) -> Vec<LicenseMatch> {
             self.match_by_hash(
-                FuzzyHash::new(strip_license(&strip_spdx_heading(&plain_text))).to_string(),
+                FuzzyHash::new(strip_license(&plain_text)).to_string(),
             )
         }
 
@@ -96,7 +96,7 @@ pub mod fuzzy_implementation {
         }
 
         fn add_plain(&mut self, license_name: String, license_text: String) {
-            let stripped = strip_license(&strip_spdx_heading(&license_text));
+            let stripped = strip_license(&license_text);
             let fuzzy = FuzzyHash::new(stripped);
             self.licenses.push(ComputedLicense {
                 name: license_name,
@@ -105,7 +105,7 @@ pub mod fuzzy_implementation {
         }
 
         fn hash_from_inline_string(&self, license_text: String) -> String {
-            FuzzyHash::new(strip_license(&strip_spdx_heading(&license_text))).to_string()
+            FuzzyHash::new(strip_license(&license_text)).to_string()
         }
 
         fn remove(&mut self, license_name: String) {

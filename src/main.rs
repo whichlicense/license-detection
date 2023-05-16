@@ -66,7 +66,7 @@ fn gaoya_benchmark(
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, l.text);
+        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
     }
 
     let bench_1_duration = benchmark("gaoya_benchmark", &|| {
@@ -115,7 +115,7 @@ fn fuzzy_hash_benchmark(
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, l.text);
+        fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
     }
 
 

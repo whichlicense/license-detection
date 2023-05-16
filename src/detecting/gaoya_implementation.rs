@@ -29,7 +29,7 @@ pub mod gaoya_implementation {
     use serde::{Deserialize, Serialize};
     
     use crate::{
-        strip_license, strip_spdx_heading, LicenseListActions, LicenseMatch, detecting::detecting::DiskData,
+        strip_license, LicenseListActions, LicenseMatch, detecting::detecting::DiskData,
     };
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -48,7 +48,7 @@ pub mod gaoya_implementation {
     impl LicenseListActions<Vec<u32>> for GaoyaDetection {
         fn match_by_plain_text(&self, plain_text: String) -> Vec<LicenseMatch> {
             let signature = self.min_hasher.create_signature(shingle_text(
-                &strip_license(&strip_spdx_heading(&plain_text)),
+                &strip_license(&plain_text),
                 self.shingle_text_size,
             ));
             let res = self.index.query_owned_return_similarity(&signature);
@@ -115,7 +115,7 @@ pub mod gaoya_implementation {
 
         fn add_plain(&mut self, license_name: String, license_text: String) {
             let signature = self.min_hasher.create_signature(shingle_text(
-                &strip_license(&strip_spdx_heading(&license_text)),
+                &strip_license(&license_text),
                 self.shingle_text_size,
             ));
             self.index.insert(license_name, signature);
@@ -123,7 +123,7 @@ pub mod gaoya_implementation {
 
         fn hash_from_inline_string(&self, license_text: String) -> Vec<u32> {
             self.min_hasher.create_signature(shingle_text(
-                &strip_license(&strip_spdx_heading(&license_text)),
+                &strip_license(&license_text),
                 self.shingle_text_size,
             ))
         }

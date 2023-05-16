@@ -238,7 +238,7 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, l.text);
+        fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
     }
 
     let matches = fuzzy.match_by_plain_text(String::from(apache_test_license));
@@ -258,7 +258,7 @@ fn it_fails_on_unknown(){
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, l.text);
+        fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
     }
 
     let matches = fuzzy.match_by_plain_text(String::from(unknown_license));
@@ -274,7 +274,7 @@ fn it_filters_on_min_confidence(){
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, l.text);
+        fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
     }
     
     // gets this project's current license
