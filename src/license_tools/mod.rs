@@ -32,7 +32,7 @@ pub mod license_tools {
 
     pub fn strip_license(l: &str) -> String {
         l.chars()
-            .filter(|c| !matches!(c, ' ' | '\t' | '\n' | '\r'))
+            .filter(|c| matches!(c, 'A'..='Z' | 'a'..='z' | '0'..='9'))
             .collect()
     }
 
