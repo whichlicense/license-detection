@@ -16,8 +16,11 @@
 */
 
 pub mod license_tools {
-    use std::{fs::{self, File}, io::Read};
     use regex::Regex;
+    use std::{
+        fs::{self, File},
+        io::Read,
+    };
 
     pub fn strip_spdx_heading(l: &str) -> String {
         // TODO: return a vector with the groups in one slot and the replaced string in the other
@@ -28,10 +31,9 @@ pub mod license_tools {
     }
 
     pub fn strip_license(l: &str) -> String {
-        Regex::new(r"( |\t|\n|\r|\n\r|\r\n)")
-            .unwrap()
-            .replace_all(l, "")
-            .to_string()
+        l.chars()
+            .filter(|c| !matches!(c, ' ' | '\t' | '\n' | '\r'))
+            .collect()
     }
 
     pub struct RawLicense {
@@ -49,7 +51,10 @@ pub mod license_tools {
             let mut contents = String::new();
 
             if file.read_to_string(&mut contents).is_err() {
-                println!("Error reading license file: {}", path.unwrap().path().display());
+                println!(
+                    "Error reading license file: {}",
+                    path.unwrap().path().display()
+                );
                 continue;
             }
 
