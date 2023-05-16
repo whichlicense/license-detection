@@ -31,9 +31,7 @@ pub mod license_tools {
     }
 
     pub fn strip_license(l: &str) -> String {
-        l.chars()
-            .filter(|c| matches!(c, 'A'..='Z' | 'a'..='z' | '0'..='9'))
-            .collect()
+        l.chars().filter(|c| c.is_ascii_alphanumeric()).collect()
     }
 
     pub struct RawLicense {
