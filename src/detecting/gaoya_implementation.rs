@@ -27,10 +27,8 @@ pub mod gaoya_implementation {
         text::shingle_text,
     };
     use serde::{Deserialize, Serialize};
-    
-    use crate::{
-        strip_license, LicenseListActions, LicenseMatch, detecting::detecting::DiskData,
-    };
+
+    use crate::{detecting::detecting::DiskData, strip_license, LicenseListActions, LicenseMatch};
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
     /// How the contents of the JSON db looks like, used for parsing purposes.
@@ -39,16 +37,15 @@ pub mod gaoya_implementation {
         hash: Vec<u32>,
     }
 
-
     pub struct GaoyaDetection {
         pub index: MinHashIndex<u32, String>,
         pub min_hasher: MinHasher32<BuildHasherDefault<fnv::FnvHasher>>,
         pub shingle_text_size: usize,
     }
     impl LicenseListActions<Vec<u32>> for GaoyaDetection {
-        fn match_by_plain_text(&self, plain_text: String) -> Vec<LicenseMatch> {
+        fn match_by_plain_text(&self, plain_text: &str) -> Vec<LicenseMatch> {
             let signature = self.min_hasher.create_signature(shingle_text(
-                &strip_license(&plain_text),
+                &strip_license(plain_text),
                 self.shingle_text_size,
             ));
             let res = self.index.query_owned_return_similarity(&signature);
@@ -76,7 +73,7 @@ pub mod gaoya_implementation {
             matches
         }
 
-        fn save_to_file(&self, file_path: String) {
+        fn save_to_file(&self, file_path: &str) {
             let mut file = File::create(file_path).unwrap();
             let mut licenses: Vec<_GaoyaComputedLicense> = Vec::new();
             for (name, hash) in self.index.get_id_signature_map().iter() {
@@ -90,12 +87,24 @@ pub mod gaoya_implementation {
             file.write_all(json.as_bytes()).unwrap();
         }
 
-        fn load_from_file(&mut self, file_path: String) {
+        fn load_from_file(&mut self, file_path: &str) {
             let mut file = File::open(file_path).unwrap();
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
 
             let loaded = serde_json::from_str::<DiskData<_GaoyaComputedLicense>>(&contents)
+                .unwrap_or(DiskData {
+                    licenses: Vec::new(),
+                });
+            for license in loaded.licenses {
+                self.index.insert(license.name, license.hash);
+            }
+        }
+
+        fn load_from_inline_string(&mut self, json: &str) {
+            let loaded: DiskData<_GaoyaComputedLicense> = serde_json::from_str::<
+                DiskData<_GaoyaComputedLicense>,
+            >(&json)
             .unwrap_or(DiskData {
                 licenses: Vec::new(),
             });
@@ -104,32 +113,23 @@ pub mod gaoya_implementation {
             }
         }
 
-        fn load_from_inline_string(&mut self, json: String) {
-            let loaded = serde_json::from_str::<DiskData<_GaoyaComputedLicense>>(&json).unwrap_or(DiskData {
-                licenses: Vec::new(),
-            });
-            for license in loaded.licenses {
-                self.index.insert(license.name, license.hash);
-            }
-        }
-
-        fn add_plain(&mut self, license_name: String, license_text: String) {
+        fn add_plain(&mut self, license_name: &str, license_text: &str) {
             let signature = self.min_hasher.create_signature(shingle_text(
-                &strip_license(&license_text),
+                &strip_license(license_text),
                 self.shingle_text_size,
             ));
-            self.index.insert(license_name, signature);
+            self.index.insert(license_name.to_string(), signature);
         }
 
-        fn hash_from_inline_string(&self, license_text: String) -> Vec<u32> {
+        fn hash_from_inline_string(&self, license_text: &str) -> Vec<u32> {
             self.min_hasher.create_signature(shingle_text(
-                &strip_license(&license_text),
+                &strip_license(license_text),
                 self.shingle_text_size,
             ))
         }
 
-        fn remove(&mut self, license_name: String) {
-            self.index.remove(&license_name);
+        fn remove(&mut self, license_name: &str) {
+            self.index.remove(&license_name.to_string());
         }
     }
 }

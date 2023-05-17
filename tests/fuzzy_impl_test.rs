@@ -28,7 +28,7 @@ fn it_finds_exact_match() {
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, l.text);
+        fuzzy.add_plain(&l.name, &l.text);
     }
     assert_eq!(fuzzy.licenses[0].name, fuzzy.match_by_hash(fuzzy.licenses[0].hash.clone())[0].name);
 }
@@ -238,10 +238,10 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
+        fuzzy.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
 
-    let matches = fuzzy.match_by_plain_text(String::from(apache_test_license));
+    let matches = fuzzy.match_by_plain_text(apache_test_license);
 
     assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
     assert_eq!(matches[0].name, "apache-2.0.LICENSE");
@@ -258,10 +258,10 @@ fn it_fails_on_unknown(){
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
+        fuzzy.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
 
-    let matches = fuzzy.match_by_plain_text(String::from(unknown_license));
+    let matches = fuzzy.match_by_plain_text(unknown_license);
     assert!(matches.len() == 0, "Found a match for an unknown license!");
 }
 
@@ -274,7 +274,7 @@ fn it_filters_on_min_confidence(){
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
+        fuzzy.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
     
     // gets this project's current license
@@ -284,7 +284,7 @@ fn it_filters_on_min_confidence(){
     reader.read_to_string(&mut license).unwrap();
 
 
-    let matches = fuzzy.match_by_plain_text(license);
+    let matches = fuzzy.match_by_plain_text(&license);
     assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
 
     assert!(matches[0].confidence == 100.0);
@@ -302,7 +302,7 @@ fn add_plain_works(){
         min_confidence: 50,
         exit_on_exact_match: false,
     };
-    fuzzy.add_plain(String::from("test_license"), String::from("This is a test license"));
+    fuzzy.add_plain("test_license", "This is a test license");
 
     assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
     assert!(fuzzy.licenses[0].hash.len() > 0);
@@ -316,9 +316,9 @@ fn it_saves_to_file(){
         min_confidence: 50,
         exit_on_exact_match: false,
     };
-    fuzzy.add_plain(String::from("test_license"), String::from("This is a test license"));
+    fuzzy.add_plain("test_license", "This is a test license");
 
-    fuzzy.save_to_file(String::from("./test_db.json"));
+    fuzzy.save_to_file("./test_db.json");
 
     // assert that file exists
     assert!(Path::new("./test_db.json").try_exists().is_ok());
@@ -331,9 +331,9 @@ fn it_loads_from_saved_file(){
         min_confidence: 50,
         exit_on_exact_match: false,
     };
-    fuzzy.add_plain(String::from("test_license"), String::from("This is a test license"));
-    fuzzy.save_to_file(String::from("./test_db.json"));
-    fuzzy.load_from_file(String::from("./test_db.json"));
+    fuzzy.add_plain("test_license", "This is a test license");
+    fuzzy.save_to_file("./test_db.json");
+    fuzzy.load_from_file("./test_db.json");
 
     assert!(fuzzy.licenses.len() == 1);
     assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
@@ -348,7 +348,7 @@ fn it_loads_from_inline_string(){
         exit_on_exact_match: false,
     };
 
-    fuzzy.load_from_inline_string(json!(
+    fuzzy.load_from_inline_string(&json!(
         {
             "licenses": [
                 {
@@ -370,9 +370,9 @@ fn remove_works(){
         min_confidence: 50,
         exit_on_exact_match: false,
     };
-    fuzzy.add_plain(String::from("test_license"), String::from("This is a test license"));
+    fuzzy.add_plain("test_license", "This is a test license");
 
-    fuzzy.remove(String::from("test_license"));
+    fuzzy.remove("test_license");
 
     assert!(fuzzy.licenses.len() == 0);
 }
@@ -384,7 +384,7 @@ fn it_hashes_from_inline_string(){
         min_confidence: 50,
         exit_on_exact_match: false,
     };
-    let res = fuzzy.hash_from_inline_string(String::from("This is a test license"));
+    let res = fuzzy.hash_from_inline_string("This is a test license");
     fuzzy.licenses.push(ComputedLicense {
         name: String::from("test_license"),
         hash: res.clone(),
@@ -393,6 +393,6 @@ fn it_hashes_from_inline_string(){
     
     assert!(res.len() > 0);
     assert!(
-        fuzzy.match_by_plain_text(String::from("This is a test license")).iter().any(|x| x.name == "test_license"),
+        fuzzy.match_by_plain_text("This is a test license").iter().any(|x| x.name == "test_license"),
     )
 }

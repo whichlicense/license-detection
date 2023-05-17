@@ -29,7 +29,7 @@ fn it_finds_exact_match() {
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
+        gaoya.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
 
     let res = gaoya.match_by_hash(gaoya.index.get_signature(&String::from("apache-2.0.LICENSE")).unwrap().to_vec());
@@ -243,10 +243,10 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
+        gaoya.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
 
-    let matches = gaoya.match_by_plain_text(String::from(apache_test_license));
+    let matches = gaoya.match_by_plain_text(apache_test_license);
 
     assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
     assert_eq!(matches[0].name, "apache-2.0.LICENSE");
@@ -263,10 +263,10 @@ fn it_fails_on_unknown(){
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
+        gaoya.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
 
-    let matches = gaoya.match_by_plain_text(String::from(unknown_license));
+    let matches = gaoya.match_by_plain_text(unknown_license);
     assert!(matches.len() == 0, "Found a match for an unknown license!");
 }
 
@@ -279,7 +279,7 @@ fn it_filters_on_min_confidence(){
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
+        gaoya.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
     
     // gets this project's current license
@@ -289,7 +289,7 @@ fn it_filters_on_min_confidence(){
     reader.read_to_string(&mut license).unwrap();
 
 
-    let matches = gaoya.match_by_plain_text(license);
+    let matches = gaoya.match_by_plain_text(&license);
     assert!(matches.len() > 0, "No matches found!! Is the database populated? is apache's license in the database?");
 
     assert!(matches[0].confidence == 100.0);
@@ -307,7 +307,7 @@ fn add_plain_works(){
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
     };
-    gaoya.add_plain(String::from("test_license"), String::from("This is a test license"));
+    gaoya.add_plain("test_license", "This is a test license");
 
     assert!(gaoya.index.get_id_signature_map().contains_key("test_license"));
     assert!(gaoya.index.get_id_signature_map().get("test_license").unwrap().len() > 0);
@@ -321,9 +321,9 @@ fn it_saves_to_file(){
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
     };
-    gaoya.add_plain(String::from("test_license"), String::from("This is a test license"));
+    gaoya.add_plain("test_license", "This is a test license");
 
-    gaoya.save_to_file(String::from("./test_db.json"));
+    gaoya.save_to_file("./test_db.json");
 
     // assert that file exists
     assert!(Path::new("./test_db.json").try_exists().is_ok());
@@ -336,9 +336,9 @@ fn it_loads_from_saved_file(){
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
     };
-    gaoya.add_plain(String::from("test_license"), String::from("This is a test license"));
-    gaoya.save_to_file(String::from("./test_db.json"));
-    gaoya.load_from_file(String::from("./test_db.json"));
+    gaoya.add_plain("test_license", "This is a test license");
+    gaoya.save_to_file("./test_db.json");
+    gaoya.load_from_file("./test_db.json");
 
     assert!(gaoya.index.get_id_signature_map().contains_key("test_license"));
     assert!(gaoya.index.get_id_signature_map().get("test_license").unwrap().len() > 0);
@@ -352,13 +352,13 @@ fn it_hashes_from_inline_string(){
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
     };
-    let res = gaoya.hash_from_inline_string(String::from("This is a test license"));
+    let res = gaoya.hash_from_inline_string("This is a test license");
     gaoya.index.insert(String::from("test_license"), res.clone());
 
     
     assert!(res.len() > 0);
     assert!(
-        gaoya.match_by_plain_text(String::from("This is a test license")).iter().any(|x| x.name == "test_license"),
+        gaoya.match_by_plain_text("This is a test license").iter().any(|x| x.name == "test_license"),
     )
 }
 
@@ -374,7 +374,7 @@ fn it_loads_from_inline_string(){
         &strip_license(&strip_spdx_heading(&"This is a test license")),
         gaoya.shingle_text_size,
     ));
-    gaoya.load_from_inline_string(json!(
+    gaoya.load_from_inline_string(&json!(
         {
             "licenses": [
                 {
@@ -397,9 +397,9 @@ fn remove_works(){
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
     };
-    gaoya.add_plain(String::from("test_license"), String::from("This is a test license"));
+    gaoya.add_plain("test_license", "This is a test license");
 
-    gaoya.remove(String::from("test_license"));
+    gaoya.remove("test_license");
 
     assert!(gaoya.index.size()  == 0);
 }

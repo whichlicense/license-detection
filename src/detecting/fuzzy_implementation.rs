@@ -41,9 +41,9 @@ pub mod fuzzy_implementation {
         pub exit_on_exact_match: bool,
     }
     impl LicenseListActions<String> for FuzzyDetection {
-        fn match_by_plain_text(&self, plain_text: String) -> Vec<LicenseMatch> {
+        fn match_by_plain_text(&self, plain_text: &str) -> Vec<LicenseMatch> {
             self.match_by_hash(
-                FuzzyHash::new(strip_license(&plain_text)).to_string(),
+                FuzzyHash::new(strip_license(plain_text)).to_string(),
             )
         }
 
@@ -69,7 +69,7 @@ pub mod fuzzy_implementation {
             matches
         }
 
-        fn save_to_file(&self, file_path: String) {
+        fn save_to_file(&self, file_path: &str) {
             let serialized = serde_json::to_string::<DiskData<ComputedLicense>>(&DiskData {
                 licenses: self.licenses.clone(),
             }).unwrap();
@@ -77,17 +77,17 @@ pub mod fuzzy_implementation {
             file.write_all(serialized.as_bytes()).unwrap();
         }
 
-        fn load_from_file(&mut self, file_path: String) {
+        fn load_from_file(&mut self, file_path: &str) {
             let mut file = File::open(file_path).unwrap();
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
 
-            self.load_from_inline_string(contents);
+            self.load_from_inline_string(&contents);
         }
 
-        fn load_from_inline_string(&mut self, json: String) {
+        fn load_from_inline_string(&mut self, json: &str) {
             let loaded =
-                serde_json::from_str::<DiskData<ComputedLicense>>(&json)
+                serde_json::from_str::<DiskData<ComputedLicense>>(json)
                     .unwrap_or(DiskData {
                         licenses: Vec::new(),
                     });
@@ -95,21 +95,21 @@ pub mod fuzzy_implementation {
             self.licenses.extend(loaded.licenses);
         }
 
-        fn add_plain(&mut self, license_name: String, license_text: String) {
-            let stripped = strip_license(&license_text);
+        fn add_plain(&mut self, license_name: &str, license_text: &str) {
+            let stripped = strip_license(license_text);
             let fuzzy = FuzzyHash::new(stripped);
             self.licenses.push(ComputedLicense {
-                name: license_name,
+                name: license_name.to_string(),
                 hash: fuzzy.to_string(),
             });
         }
 
-        fn hash_from_inline_string(&self, license_text: String) -> String {
-            FuzzyHash::new(strip_license(&license_text)).to_string()
+        fn hash_from_inline_string(&self, license_text: &str) -> String {
+            FuzzyHash::new(strip_license(license_text)).to_string()
         }
 
-        fn remove(&mut self, license_name: String) {
-            self.licenses.retain(|l| l.name != license_name);
+        fn remove(&mut self, license_name: &str) {
+            self.licenses.retain(|l| l.name != license_name.to_string());
         }
     }
 }

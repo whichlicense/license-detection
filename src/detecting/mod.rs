@@ -35,28 +35,28 @@ pub mod detecting {
     pub trait LicenseListActions<T> {
         /// Converts the plain text into a representation that can be used to find a license
         /// then runs the match_by_hash function on that representation.
-        fn match_by_plain_text(&self, plain_text: String) -> Vec<LicenseMatch>;
+        fn match_by_plain_text(&self, plain_text: &str) -> Vec<LicenseMatch>;
 
         /// Attempts to find one or more matching licenses by hash.
         fn match_by_hash(&self, hash: T) -> Vec<LicenseMatch>;
 
         /// Saves the computed license list to a file.
-        fn save_to_file(&self, file_path: String);
+        fn save_to_file(&self, file_path: &str);
 
         /// Loads a computed license list from a file and stores it in the hosting struct.
-        fn load_from_file(&mut self, file_path: String);
+        fn load_from_file(&mut self, file_path: &str);
 
-        fn load_from_inline_string(&mut self, json: String);
+        fn load_from_inline_string(&mut self, json: &str);
 
         /// Adds a license that has yet to be computed to the list.
         /// 
         /// This license must be in plain text format.
-        fn add_plain(&mut self, license_name: String, license_text: String);
+        fn add_plain(&mut self, license_name: &str, license_text: &str);
 
         /// Computes the hash of the given license_text string and returns it.
-        fn hash_from_inline_string(&self, license_text: String) -> T;
+        fn hash_from_inline_string(&self, license_text: &str) -> T;
 
         /// Removes a license from the list.
-        fn remove(&mut self, license_name: String);
+        fn remove(&mut self, license_name: &str);
     }
 }

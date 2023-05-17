@@ -66,12 +66,12 @@ fn gaoya_benchmark(
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        gaoya.add_plain(l.name, strip_spdx_heading(&l.text));
+        gaoya.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
 
     let bench_1_duration = benchmark("gaoya_benchmark", &|| {
         // explicitly create a signature for the incoming license to make benchmarks fair.
-        gaoya.match_by_plain_text(test_license.to_string());
+        gaoya.match_by_plain_text(test_license);
     });
     // used for prints below.
     let signature_incoming = gaoya.min_hasher.create_signature(shingle_text(&test_license, shingle_text_size));
@@ -87,7 +87,7 @@ fn gaoya_benchmark(
     println!(
         "Detection results (must contain {} at 100% confidence): {:?}",
         name_of_license,
-        gaoya.match_by_plain_text(test_license.to_string())
+        gaoya.match_by_plain_text(test_license)
     );
 
     println!(
@@ -97,7 +97,7 @@ fn gaoya_benchmark(
 
     println!(
         "accuracy check of Apache 2.0 modified license: {:?}",
-        gaoya.match_by_plain_text(accuracy_check_license.to_string())
+        gaoya.match_by_plain_text(accuracy_check_license)
     )
 }
 
@@ -115,19 +115,19 @@ fn fuzzy_hash_benchmark(
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
-        fuzzy.add_plain(l.name, strip_spdx_heading(&l.text));
+        fuzzy.add_plain(&l.name, &strip_spdx_heading(&l.text));
     }
 
 
     let single_threaded_license_detection = benchmark("detect_license", &|| {
-        fuzzy.match_by_plain_text(String::from(test_license));
+        fuzzy.match_by_plain_text(test_license);
     });
 
 
     
-    let detection_results = fuzzy.match_by_plain_text(String::from(test_license));
+    let detection_results = fuzzy.match_by_plain_text(test_license);
 
-    let accuracy_check_results = fuzzy.match_by_plain_text(String::from(accuracy_check_license));
+    let accuracy_check_results = fuzzy.match_by_plain_text(accuracy_check_license);
 
     let test_license_size = test_license.bytes().len();
     let test_license_hash_size = fuzzy.licenses.iter().find(|license| license.name == name_of_license).unwrap().hash.bytes().len();
