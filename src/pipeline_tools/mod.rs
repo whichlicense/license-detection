@@ -60,7 +60,27 @@ pub mod pipeline {
     pub struct Pipeline {
         pub segments: Vec<Segment>,
     }
+
     impl Pipeline {
+
+        /// Creates a new pipeline with the given segments.
+        /// 
+        /// A pipeline works by executing each segment on the running license whilst also checking against the algorithm every time a segment is executed.
+        /// The pipeline will stop running if the confidence of the top (highest confidence) license is above the desired confidence.
+        /// 
+        /// The steps are as follows:
+        /// 1. The pipeline is created with the given segments.
+        /// 2. An initial sample is fetched from the algorithm directly without executing any pipeline segment.
+        /// 3. The system checks if the confidence of the top (highest confidence) license is above the desired confidence.
+        ///     * If it is, the pipeline stops running and returns the results.
+        ///     * If it is not, the pipeline continues to step 4.
+        /// 4. The next segment is executed on the running license (starts at the first segment).
+        /// 5. The system checks if the confidence of the top (highest confidence) license is above the desired confidence.
+        ///    * If it is, the pipeline stops running and returns the results.
+        ///    * If it is not, the pipeline moves back to step 4 and runs the next segment.
+        /// 
+        /// ---
+        /// For more information on how the pipeline works, see the [pipeline module's run function](crate::pipeline_tools::pipeline::Pipeline::run).
         pub fn new(segments: Vec<Segment>) -> Self {
             Self {
                 segments,
