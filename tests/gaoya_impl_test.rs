@@ -413,3 +413,25 @@ fn remove_works(){
 
     assert!(gaoya.index.size()  == 0);
 }
+
+#[test]
+fn it_changes_normalization_fn(){
+    // gaoya is less sensitive to casing and thus the tests need to be more drastic than say, fuzzy matching.
+    let mut gaoya = GaoyaDetection {
+        index: MinHashIndex::new(42, 3, 0.5),
+        min_hasher: MinHasher32::new(42 * 3),
+        shingle_text_size: 50,
+        normalization_fn: |x| x.to_string(),
+    };
+    gaoya.add_plain("test_license", "this is a test license");
+    assert!(
+        // should fail to match, normalization fn leaves text as is (with 'X').
+        gaoya.match_by_plain_text("XXXXXXXXXXXXXXXXXXXXXXXTHIS IS A TEST LICENSEXXXXXXXXXXXXXXXXXXXXXXX").len() == 0
+    );
+
+    gaoya.set_normalization_fn(|x| x.replace("X", ""));
+    assert!(
+        // should pass matching, normalization fn removes all "X" characters.
+        gaoya.match_by_plain_text("XXXXXXXXXXXXXXXXXXXXXXXTHIS IS A TEST LICENSEXXXXXXXXXXXXXXXXXXXXXXX").iter().any(|x| x.name == "test_license"),
+    );    
+}

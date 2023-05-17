@@ -407,3 +407,25 @@ fn it_hashes_from_inline_string(){
         fuzzy.match_by_plain_text("This is a test license").iter().any(|x| x.name == "test_license"),
     )
 }
+
+#[test]
+fn it_changes_normalization_fn(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+        normalization_fn: |x| x.to_string(),
+    };
+
+    fuzzy.add_plain("test_license", "this is a test license");
+    assert!(
+        // should fail, normalization fn leaves text as is.
+        fuzzy.match_by_plain_text("THIS IS A TEST LICENSE").len() == 0
+    );
+
+    fuzzy.set_normalization_fn(|x| x.to_lowercase());
+    assert!(
+        // should pass, normalization fn lowercases text to match stored license.
+        fuzzy.match_by_plain_text("THIS IS A TEST LICENSE").iter().any(|x| x.name == "test_license"),
+    );
+}
