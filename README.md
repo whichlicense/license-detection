@@ -9,14 +9,15 @@ This is a library to facilitate the detection of licenses in source code.
 #### Gaoya detection
 ```rust
 let mut gaoya = GaoyaDetection {
-    index: MinHashIndex::new(42, 3, 0.5),
-    min_hasher: MinHasher32::new(42 * 3),
-    shingle_text_size: 50,
+    index: MinHashIndex::new(num_bands, band_width, 0.5),
+    min_hasher: MinHasher32::new(num_bands * band_width),
+    shingle_text_size,
+    normalization_fn: DEFAULT_NORMALIZATION_FN,
 };
 gaoya.load_from_file("licenses.json");
 // OR: 
 // for l in load_licenses_from_folder("./licenses/RAW"){
-//      gaoya.add_plain(l.name, l.text);
+//     gaoya.add_plain(&l.name, &strip_spdx_heading(&l.text));
 // }
 ```
 
@@ -26,62 +27,51 @@ let mut fuzzy = FuzzyDetection {
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
 };
 fuzzy.load_from_file("licenses.json");
 // OR: 
 // for l in load_licenses_from_folder("./licenses/RAW"){
-//      fuzzy.add_plain(l.name, l.text);
+//     fuzzy.add_plain(&l.name, &strip_spdx_heading(&l.text));
 // }
 ```
 
+### Normalization function
+The normalization function is used to normalize the license text before it is processed by the algorithm. This is used so that the algorithm can focus on the license text itself and not the formatting of the license text, which ultimately improves the accuracy of the algorithm (higher confidence).
+
 ### Pipeline System
 The pipeline system was developed to automatically improve the results of license detection outputs by allowing further processing when a confidence is, for example, too low.
+A pipeline works by executing each segment on the running license whilst also checking against the algorithm every time a segment is executed.
+The pipeline will stop running if the confidence of the top (highest confidence) license is above the desired confidence.
 
-#### Diffing pipeline
-The diffing pipeline works by only taking the modified license parts and putting them in a new string. This string is then passed to the regex provided to check if the changes matches the regex.
-![diffing_pipeline_expl_1](https://user-images.githubusercontent.com/30909481/227518673-361c79e8-752e-443b-a76b-58b8f40e2fb3.jpg)
+The steps are as follows:
+1. The pipeline is created with the given segments.
+2. An initial sample is fetched from the algorithm directly without executing any pipeline segment.
+3. The system checks if the confidence of the top (highest confidence) license is above the desired confidence.
+    * If it is, the pipeline stops running and returns the results.
+    * If it is not, the pipeline continues to step 4.
+4. The next segment is executed on the running license (starts at the first segment).
+5. The system checks if the confidence of the top (highest confidence) license is above the desired confidence.
+    * If it is, the pipeline stops running and returns the results.
+    * If it is not, the pipeline moves back to step 4 and runs the next segment.
 
+> Batched segments allow you to run multiple segments one after the other without checking against (i.e., testing) the algorithm after each segment. The algorithm will be tested after all batched segments have executed.
+
+#### Example
 ```rust
-let regex_pipeline = DiffingPipeLine {
-    regex: String::from(r"\d{4}-\d{2}-\d{2}"), // date finding regex
-    original_license: String::from("this is a sample license created on [enter_license_creation_date_here] copyright Some Company"),
-    modified_license: String::from("this is a sample license created on 2014-01-01 copyright Some Company. and stuff"),
-    run_condition: PipelineTriggerInstruction {
-        // adjust this to the trigger condition you want
-        condition: PipelineTriggerCondition::Always,
-        // does not matter on always
-        value: 10,
-    },
-    action: PipeLineAction {
-        // what is the action you want to take when the regex matches?
-        action: PipelineActionType::Add,
-        value: 5,
-    },
-};
- 
-let result = regex_pipeline.run(10);
-assert_eq!(result, 15)
+let pipeline = Pipeline::new(vec![
+    Segment::Remove(Using::Regex(Regex::new(r"...").unwrap())),
+    Segment::Remove(Using::Text("...".to_string())),
+    Segment::Replace(Using::Text("...".to_string()), "***".to_string()),
+    Segment::Batch(vec![
+        Segment::Remove(Using::Regex(Regex::new(r"...").unwrap())),
+        Segment::Remove(Using::Regex(Regex::new(r"...").unwrap())),
+    ]),
+]);
+
+let results = pipeline.run(&algorithm, "<your_incoming_license>", 100.0);
 ```
 
-#### Regex pipeline
-The regex pipeline works by taking the entire (incoming) license text and checking if it matches the regex provided.
-```rust
-let regex_pipeline = RegexPipeLine {
-        regex: String::from("some text"),
-        license_text: String::from("this is a sample license with some text"),
-        run_condition: PipelineTriggerInstruction {
-            condition: PipelineTriggerCondition::GreaterThan,
-            value: 50,
-        },
-        action: PipeLineAction {
-            action: PipelineActionType::Add,
-            value: 5,
-        },
-    };
-
-let result = regex_pipeline.run(95);
-assert_eq!(result, 100)
-```
 
 # Attributions
 
