@@ -23,11 +23,9 @@ pub mod fuzzy_implementation {
 
     use fuzzyhash::FuzzyHash;
 
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
 
-    use crate::{
-        strip_license, LicenseListActions, LicenseMatch, detecting::detecting::DiskData,
-    };
+    use crate::{detecting::detecting::DiskData, strip_license, LicenseListActions, LicenseMatch};
 
     #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct ComputedLicense {
@@ -39,12 +37,12 @@ pub mod fuzzy_implementation {
         pub licenses: Vec<ComputedLicense>,
         pub min_confidence: u8,
         pub exit_on_exact_match: bool,
+
+        pub normalization_fn: fn(&str) -> String,
     }
     impl LicenseListActions<String> for FuzzyDetection {
         fn match_by_plain_text(&self, plain_text: &str) -> Vec<LicenseMatch> {
-            self.match_by_hash(
-                FuzzyHash::new(strip_license(plain_text)).to_string(),
-            )
+            self.match_by_hash(FuzzyHash::new(strip_license(plain_text)).to_string())
         }
 
         fn match_by_hash(&self, hash: String) -> Vec<LicenseMatch> {
@@ -72,7 +70,8 @@ pub mod fuzzy_implementation {
         fn save_to_file(&self, file_path: &str) {
             let serialized = serde_json::to_string::<DiskData<ComputedLicense>>(&DiskData {
                 licenses: self.licenses.clone(),
-            }).unwrap();
+            })
+            .unwrap();
             let mut file = File::create(file_path).unwrap();
             file.write_all(serialized.as_bytes()).unwrap();
         }
@@ -87,10 +86,9 @@ pub mod fuzzy_implementation {
 
         fn load_from_inline_string(&mut self, json: &str) {
             let loaded =
-                serde_json::from_str::<DiskData<ComputedLicense>>(json)
-                    .unwrap_or(DiskData {
-                        licenses: Vec::new(),
-                    });
+                serde_json::from_str::<DiskData<ComputedLicense>>(json).unwrap_or(DiskData {
+                    licenses: Vec::new(),
+                });
             self.licenses.clear();
             self.licenses.extend(loaded.licenses);
         }
@@ -110,6 +108,10 @@ pub mod fuzzy_implementation {
 
         fn remove(&mut self, license_name: &str) {
             self.licenses.retain(|l| l.name != license_name.to_string());
+        }
+
+        fn set_normalization_fn(&mut self, func: fn(&str) -> String) {
+            self.normalization_fn = func;
         }
     }
 }

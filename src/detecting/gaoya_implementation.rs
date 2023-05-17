@@ -14,7 +14,7 @@
 *   See the License for the specific language governing permissions and
 *   limitations under the License.
 */
-// TODO: implement Gaoya simhash variant.
+
 pub mod gaoya_implementation {
     use std::{
         fs::File,
@@ -41,6 +41,8 @@ pub mod gaoya_implementation {
         pub index: MinHashIndex<u32, String>,
         pub min_hasher: MinHasher32<BuildHasherDefault<fnv::FnvHasher>>,
         pub shingle_text_size: usize,
+
+        pub normalization_fn: fn(&str) -> String,
     }
     impl LicenseListActions<Vec<u32>> for GaoyaDetection {
         fn match_by_plain_text(&self, plain_text: &str) -> Vec<LicenseMatch> {
@@ -130,6 +132,10 @@ pub mod gaoya_implementation {
 
         fn remove(&mut self, license_name: &str) {
             self.index.remove(&license_name.to_string());
+        }
+
+        fn set_normalization_fn(&mut self, func: fn(&str) -> String) {
+            self.normalization_fn = func;
         }
     }
 }

@@ -30,6 +30,8 @@ use whichlicense_detection::{
 use gaoya::minhash::{MinHashIndex, MinHasher, MinHasher32};
 use gaoya::text::shingle_text;
 
+use crate::detecting::detecting::DEFAULT_NORMALIZATION_FN;
+
 /// Benchmarks a given function.
 /// Runs the function 10 times and returns the average time it took to execute.
 fn benchmark(name: &str, it: &dyn Fn() -> ()) -> Duration {
@@ -63,6 +65,7 @@ fn gaoya_benchmark(
         index: MinHashIndex::new(num_bands, band_width, 0.5),
         min_hasher: MinHasher32::new(num_bands * band_width),
         shingle_text_size,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -112,6 +115,7 @@ fn fuzzy_hash_benchmark(
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){

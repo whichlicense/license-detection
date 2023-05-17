@@ -26,6 +26,7 @@ fn it_finds_exact_match() {
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -240,6 +241,7 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -260,6 +262,7 @@ fn it_fails_on_unknown(){
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -276,6 +279,7 @@ fn it_filters_on_min_confidence(){
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -306,6 +310,7 @@ fn add_plain_works(){
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     gaoya.add_plain("test_license", "This is a test license");
 
@@ -320,6 +325,7 @@ fn it_saves_to_file(){
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     gaoya.add_plain("test_license", "This is a test license");
 
@@ -335,6 +341,7 @@ fn it_loads_from_saved_file(){
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     gaoya.add_plain("test_license", "This is a test license");
     gaoya.save_to_file("./test_db.json");
@@ -351,6 +358,7 @@ fn it_hashes_from_inline_string(){
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     let res = gaoya.hash_from_inline_string("This is a test license");
     gaoya.index.insert(String::from("test_license"), res.clone());
@@ -368,6 +376,7 @@ fn it_loads_from_inline_string(){
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     let signature = gaoya.min_hasher.create_signature(shingle_text(
@@ -396,6 +405,7 @@ fn remove_works(){
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     gaoya.add_plain("test_license", "This is a test license");
 

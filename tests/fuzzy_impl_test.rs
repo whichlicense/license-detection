@@ -25,6 +25,8 @@ fn it_finds_exact_match() {
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -235,6 +237,7 @@ fn it_detects_with_over_90_confidence_with_similar_license() {
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -255,6 +258,7 @@ fn it_fails_on_unknown(){
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -271,6 +275,7 @@ fn it_filters_on_min_confidence(){
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     for l in load_licenses_from_folder("./licenses/RAW"){
@@ -301,6 +306,7 @@ fn add_plain_works(){
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     fuzzy.add_plain("test_license", "This is a test license");
 
@@ -315,6 +321,7 @@ fn it_saves_to_file(){
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     fuzzy.add_plain("test_license", "This is a test license");
 
@@ -330,6 +337,7 @@ fn it_loads_from_saved_file(){
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     fuzzy.add_plain("test_license", "This is a test license");
     fuzzy.save_to_file("./test_db.json");
@@ -346,6 +354,7 @@ fn it_loads_from_inline_string(){
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
     fuzzy.load_from_inline_string(&json!(
@@ -369,6 +378,7 @@ fn remove_works(){
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     fuzzy.add_plain("test_license", "This is a test license");
 
@@ -383,6 +393,7 @@ fn it_hashes_from_inline_string(){
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     let res = fuzzy.hash_from_inline_string("This is a test license");
     fuzzy.licenses.push(ComputedLicense {

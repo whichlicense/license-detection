@@ -20,6 +20,7 @@ pub mod gaoya_implementation;
 
 pub mod detecting {
     use serde::{Serialize, Deserialize};
+    use crate::strip_license;
 
     #[derive(Debug)]
     pub struct LicenseMatch {
@@ -32,6 +33,7 @@ pub mod detecting {
         pub licenses: Vec<K>,
     }
 
+    pub static DEFAULT_NORMALIZATION_FN: fn(&str) -> String = strip_license;
     pub trait LicenseListActions<T> {
         /// Converts the plain text into a representation that can be used to find a license
         /// then runs the match_by_hash function on that representation.
@@ -58,5 +60,12 @@ pub mod detecting {
 
         /// Removes a license from the list.
         fn remove(&mut self, license_name: &str);
+
+        /// Changes the normalization function.
+        /// 
+        /// The normalization function is used to convert the license text into a representation
+        /// that can be used to compute the hash, so that the confidence is not affected by text changes that do not matter,
+        /// for example stylistic formatting changes.
+        fn set_normalization_fn(&mut self, func: fn(&str) -> String);
     }
 }
