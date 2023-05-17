@@ -93,7 +93,7 @@ pub mod pipeline {
         /// (i.e., directly contacting the algorithm to determine the initial confidence).
         /// 
         /// The vector of vectors is structured as follows:
-        /// ```
+        /// ```json
         /// [
         ///    [ // First run directly against algorithm (no segments involved)
         ///       LicenseMatch { confidence: 50.0, license: "MIT" }
