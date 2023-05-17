@@ -64,8 +64,6 @@ pub mod pipeline {
         pub fn new(segments: Vec<Segment>) -> Self {
             Self {
                 segments,
-                // incoming_license: String::new(),
-                // current_confidence: 0.0,
             }
         }
 
@@ -110,9 +108,4 @@ pub mod pipeline {
             return alg_match_results;
         }
     }
-
-
-    // impl RunnablePipelineAction for PipelineAction {
-
-    // }
 }
