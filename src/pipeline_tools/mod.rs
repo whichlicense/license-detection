@@ -69,6 +69,25 @@ pub mod pipeline {
 
         /// Run the pipeline on the incoming license.
         /// 
+        /// Returns a vector of each pipeline segment execution with the first (0th) element of that vector being the first run without any segments
+        /// (i.e., directly contacting the algorithm to determine the initial confidence).
+        /// 
+        /// The vector of vectors is structured as follows:
+        /// ```
+        /// [
+        ///    [ // First run directly against algorithm (no segments involved)
+        ///       LicenseMatch { confidence: 50.0, license: "MIT" }
+        ///    ],
+        ///    [ // Second run (first segment)
+        ///       LicenseMatch { confidence: 98.5, license: "MIT" }
+        ///    ]
+        /// ```
+        /// 
+        /// The pipeline will stop running if the confidence of the top (highest confidence) license is above the desired confidence.
+        /// 
+        /// > NOTE: the outer vector can be used to determine how many segments were executed before the pipeline stopped running (i.e., short-circuit).
+        /// 
+        /// 
         /// # Arguments
         /// * `alg` - The algorithm to use for matching.
         /// * `incoming_license` - The license to run the pipeline on.
@@ -77,7 +96,7 @@ pub mod pipeline {
         /// 
         /// > The confidence is a value between 0 and 100 (inclusive). 
         /// Any values outside of this range will be clamped to the nearest acceptable value.
-        pub fn run<T>(&self, alg: &dyn LicenseListActions<T>, incoming_license: &str, desired_confidence: f32) -> Vec<LicenseMatch> {
+        pub fn run<T>(&self, alg: &dyn LicenseListActions<T>, incoming_license: &str, desired_confidence: f32) -> Vec<Vec<LicenseMatch>> {
             let desired_confidence = desired_confidence.clamp(0.0, 100.0);
 
             let mut piped_string = incoming_license.to_string();
@@ -85,10 +104,13 @@ pub mod pipeline {
             let mut top_match_confidence: f32 = match alg_match_results.get(0) {
                 Some(top_match) => top_match.confidence,
                 None => 0.0,
-            }; 
+            };
+
+            let mut pipeline_results = Vec::with_capacity(self.segments.len());
+            pipeline_results.push(alg_match_results);
 
             if top_match_confidence >= desired_confidence {
-                return alg_match_results;
+                return pipeline_results;
             }
 
             for segment in self.segments.iter() {
@@ -100,12 +122,14 @@ pub mod pipeline {
                     None => 0.0,
                 };
 
+                pipeline_results.push(alg_match_results);
+
                 if top_match_confidence >= desired_confidence {
                     break;
                 }
             }
 
-            return alg_match_results;
+            return pipeline_results;
         }
     }
 }

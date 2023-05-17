@@ -51,8 +51,10 @@ fn it_clamps_run_confidence(){
     // the pipeline should stop after the first segment, and thus the confidence should be 100.
     let results = pipeline.run(&alg, "-----Hello, world!-----", 696.9);
 
-    assert!(results.get(0).unwrap().confidence == 100.0);
-    assert!(results.get(0).unwrap().name == "test_license_5");
+    assert!(results.len() == 2);
+
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
 }
 
 #[test]
@@ -66,8 +68,8 @@ fn it_runs_multiple(){
 
     let results = pipeline.run(&alg, "-X-X-X-X-Hello, world!-X-X-X-X-", 100.0);
 
-    assert!(results.get(0).unwrap().confidence == 100.0);
-    assert!(results.get(0).unwrap().name == "test_license_5");
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
 }
 
 #[test]
@@ -81,8 +83,8 @@ fn it_runs_remove_using_regex(){
 
     let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
 
-    assert!(results.get(0).unwrap().confidence == 100.0);
-    assert!(results.get(0).unwrap().name == "test_license_5");
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
 }
 
 #[test]
@@ -96,8 +98,8 @@ fn it_runs_remove_using_text(){
 
     let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
 
-    assert!(results.get(0).unwrap().confidence == 100.0);
-    assert!(results.get(0).unwrap().name == "test_license_5");
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
 }
 
 #[test]
@@ -110,8 +112,8 @@ fn it_executes_custom(){
 
     let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
 
-    assert!(results.get(0).unwrap().confidence == 100.0);
-    assert!(results.get(0).unwrap().name == "test_license_5");
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
 }
 
 #[test]
@@ -124,8 +126,8 @@ fn it_executes_replace_using_regex(){
 
     let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
 
-    assert!(results.get(0).unwrap().confidence == 100.0);
-    assert!(results.get(0).unwrap().name == "test_license_5");
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
 }
 
 #[test]
@@ -138,8 +140,8 @@ fn it_executes_replace_using_text(){
 
     let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
 
-    assert!(results.get(0).unwrap().confidence == 100.0);
-    assert!(results.get(0).unwrap().name == "test_license_5");
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
 }
 
 #[test]
@@ -155,6 +157,6 @@ fn it_executes_batch(){
 
     let results = pipeline.run(&alg, "-X-X-X-X-Hello, world!-X-X-X-X-", 100.0);
 
-    assert!(results.get(0).unwrap().confidence == 100.0);
-    assert!(results.get(0).unwrap().name == "test_license_5");
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
 }
