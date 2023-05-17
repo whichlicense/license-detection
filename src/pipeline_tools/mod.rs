@@ -15,97 +15,104 @@
 *   limitations under the License.
 */
 
-pub mod diffing_pipeline;
-pub mod regex_pipeline;
-
 pub mod pipeline {
-    pub enum PipelineTriggerCondition {
-        GreaterThan,
-        LessThan,
-        GreaterThanOrEqual,
-        LessThanOrEqual,
-        Equal,
-        NotEqual,
-        /// Always runs the pipe regardless of the confidence
-        Always,
-    }
-    pub trait ConditionalPipeline {
-        /// Returns true if the given pipe should be run
-        ///
-        /// The confidence parameter is the confidence of the previous pipe or, if this is the initial pipe,
-        /// the confidence of the license detection results.
-        fn should_run(&self, confidence: u8) -> bool;
-    }
+    use crate::{LicenseListActions, LicenseMatch};
 
-    /// The trigger indicates based on its properties if the given pipe should be run or not.
-    ///
-    /// The formula is: ```should_run``` = ```C``` ```condition``` ```V```
-    ///
-    /// where condition is one of: >, <, >=, <=, =, !=
-    ///
-    /// - ```C``` represents the confidence
-    /// - ```V``` represents the value
-    /// - ```should_run``` is a boolean which determines if the given pipe should be run or not
-    pub struct PipelineTriggerInstruction {
-        pub condition: PipelineTriggerCondition,
-        pub value: u8,
+    pub enum Using {
+        Regex(regex::Regex),
+        Text(String),
     }
+    pub enum Segment {
+        /// Executes a remove instruction which removes a piece of text from the running license.
+        /// 
+        /// The running license is the license that is being processed by the pipeline.
+        /// > The running license always starts off as the incoming license.
+        Remove(Using),
+        Replace(Using, String),
+        Custom(fn (&str) -> String),
 
-    pub enum PipelineActionType {
-        Add,
-        Subtract,
-        Set,
+        /// Executes multiple segment actions before testing on the algorithm.
+        Batch(Vec<Segment>),
     }
-    pub struct PipeLineAction {
-        pub action: PipelineActionType,
-        pub value: u8,
-    }
-    pub trait RunnablePipeLineAction {
-        fn run(&self, confidence: u8) -> u8;
-    }
-    impl RunnablePipeLineAction for PipeLineAction {
-        /// Runs the given action on the given confidence
-        /// and returns the new confidence.
-        fn run(&self, confidence: u8) -> u8 {
-            match self.action {
-                PipelineActionType::Add => {
-                    // clamp the confidence to 0-100
-                    let res = confidence.saturating_add(self.value);
-                    match res {
-                        0..=100 => res,
-                        101..=u8::MAX => 100,
-                    }
-                }
-                PipelineActionType::Subtract => {
-                    let res = confidence.saturating_sub(self.value);
-                    match res {
-                        0..=100 => res,
-                        101..=u8::MAX => 100,
-                    }
-                }
-                PipelineActionType::Set => match self.value {
-                    0..=100 => self.value,
-                    101..=u8::MAX => 100,
+    impl Segment {
+        fn execute(&self, string: &str) -> String {
+            match self {
+                Self::Remove(using) => match using {
+                    Using::Regex(re) => re.replace_all(string, "").to_string(),
+                    Using::Text(text) => string.replace(text, ""),
                 },
+                Self::Batch(actions) => {
+                    let mut license = string.to_string();
+                    for action in actions.iter() {
+                        license = action.execute(&license);
+                    }
+                    license
+                }
+                Self::Replace(using, replacement) => match using {
+                    Using::Regex(re) => re.replace_all(string, replacement).to_string(),
+                    Using::Text(text) => string.replace(text, replacement),
+                },
+                Self::Custom(func) => func(string),
             }
         }
     }
 
-    impl ConditionalPipeline for PipelineTriggerInstruction {
-        fn should_run(&self, confidence: u8) -> bool {
-            match self.condition {
-                PipelineTriggerCondition::GreaterThan => confidence > self.value,
-                PipelineTriggerCondition::LessThan => confidence < self.value,
-                PipelineTriggerCondition::GreaterThanOrEqual => confidence >= self.value,
-                PipelineTriggerCondition::LessThanOrEqual => confidence <= self.value,
-                PipelineTriggerCondition::Equal => confidence == self.value,
-                PipelineTriggerCondition::NotEqual => confidence != self.value,
-                PipelineTriggerCondition::Always => true,
+    pub struct Pipeline {
+        pub segments: Vec<Segment>,
+    }
+    impl Pipeline {
+        pub fn new(segments: Vec<Segment>) -> Self {
+            Self {
+                segments,
+                // incoming_license: String::new(),
+                // current_confidence: 0.0,
             }
+        }
+
+        /// Run the pipeline on the incoming license.
+        /// 
+        /// # Arguments
+        /// * `alg` - The algorithm to use for matching.
+        /// * `incoming_license` - The license to run the pipeline on.
+        /// * `desired_confidence` - The threshold at which the pipeline will stop running. 
+        /// > I.e., if the confidence of ***the top (highest confidence) license*** is above this threshold, the pipeline will stop running.
+        /// 
+        /// > The confidence is a value between 0 and 100 (inclusive). 
+        /// Any values outside of this range will be clamped to the nearest acceptable value.
+        pub fn run<T>(&self, alg: &dyn LicenseListActions<T>, incoming_license: &str, desired_confidence: f32) -> Vec<LicenseMatch> {
+            let desired_confidence = desired_confidence.clamp(0.0, 100.0);
+
+            let mut piped_string = incoming_license.to_string();
+            let mut alg_match_results = alg.match_by_plain_text(&piped_string);
+            let mut top_match_confidence: f32 = match alg_match_results.get(0) {
+                Some(top_match) => top_match.confidence,
+                None => 0.0,
+            }; 
+
+            if top_match_confidence >= desired_confidence {
+                return alg_match_results;
+            }
+
+            for segment in self.segments.iter() {
+                piped_string = segment.execute(&piped_string);
+                alg_match_results = alg.match_by_plain_text(&piped_string);
+
+                top_match_confidence = match alg_match_results.get(0) {
+                    Some(top_match) => top_match.confidence,
+                    None => 0.0,
+                };
+
+                if top_match_confidence >= desired_confidence {
+                    break;
+                }
+            }
+
+            return alg_match_results;
         }
     }
 
-    pub trait RunnablePipeLine {
-        fn run(&self, confidence: u8) -> u8;
-    }
+
+    // impl RunnablePipelineAction for PipelineAction {
+
+    // }
 }

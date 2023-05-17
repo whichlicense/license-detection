@@ -15,129 +15,146 @@
  *   limitations under the License.
  */
 
-use whichlicense_detection::{PipelineTriggerInstruction, PipelineTriggerCondition, ConditionalPipeline, PipeLineAction, PipelineActionType, RunnablePipeLineAction};
+use regex::Regex;
+use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implementation::FuzzyDetection};
+
+fn create_testing_algorithm()-> FuzzyDetection {
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+        normalization_fn: |x| x.to_string(),
+    };
+
+    fuzzy.add_plain("test_license_1", "this is a test license");
+    fuzzy.add_plain("test_license_2", "this is a different test license");
+    fuzzy.add_plain("test_license_3", "aaaaaaaaaaaaaaaaa");
+    fuzzy.add_plain("test_license_4", "bbbbbbbbbbbbbbbbb");
+    fuzzy.add_plain("test_license_5", "Hello, world!");
+
+    fuzzy
+}
+
+
 
 #[test]
-fn pipeline_trigger_action_adheres_to_its_condition(){
-    let trigger_instruction_gt = PipelineTriggerInstruction {
-        condition: PipelineTriggerCondition::GreaterThan,
-        value: 50,
-    };
-    assert_eq!(trigger_instruction_gt.should_run(51), true);
-    assert_eq!(trigger_instruction_gt.should_run(52), true);
-    assert_eq!(trigger_instruction_gt.should_run(49), false);
-    assert_eq!(trigger_instruction_gt.should_run(0), false);
-
-    let trigger_instruction_lt = PipelineTriggerInstruction {
-        condition: PipelineTriggerCondition::LessThan,
-        value: 50,
-    };
-    assert_eq!(trigger_instruction_lt.should_run(49), true);
-    assert_eq!(trigger_instruction_lt.should_run(10), true);
-    assert_eq!(trigger_instruction_lt.should_run(0), true);
-    assert_eq!(trigger_instruction_lt.should_run(50), false);
-    assert_eq!(trigger_instruction_lt.should_run(51), false);
-    assert_eq!(trigger_instruction_lt.should_run(100), false);
-
-    let trigger_instruction_gte = PipelineTriggerInstruction {
-        condition: PipelineTriggerCondition::GreaterThanOrEqual,
-        value: 50,
-    };
-    assert_eq!(trigger_instruction_gte.should_run(50), true);
-    assert_eq!(trigger_instruction_gte.should_run(51), true);
-    assert_eq!(trigger_instruction_gte.should_run(100), true);
-    assert_eq!(trigger_instruction_gte.should_run(49), false);
-    assert_eq!(trigger_instruction_gte.should_run(0), false);
-
-
-    let trigger_instruction_lte = PipelineTriggerInstruction {
-        condition: PipelineTriggerCondition::LessThanOrEqual,
-        value: 50,
-    };
-    assert_eq!(trigger_instruction_lte.should_run(50), true);
-    assert_eq!(trigger_instruction_lte.should_run(49), true);
-    assert_eq!(trigger_instruction_lte.should_run(0), true);
-    assert_eq!(trigger_instruction_lte.should_run(51), false);
-    assert_eq!(trigger_instruction_lte.should_run(100), false);
-
-    let trigger_instruction_eq = PipelineTriggerInstruction {
-        condition: PipelineTriggerCondition::Equal,
-        value: 50,
-    };
-    assert_eq!(trigger_instruction_eq.should_run(50), true);
-    assert_eq!(trigger_instruction_eq.should_run(51), false);
-    assert_eq!(trigger_instruction_eq.should_run(49), false);
-    assert_eq!(trigger_instruction_eq.should_run(0), false);
-    assert_eq!(trigger_instruction_eq.should_run(100), false);
+fn it_clamps_run_confidence(){
+    let alg = create_testing_algorithm();
     
+    let pipeline = Pipeline::new(vec![
+        Segment::Remove(Using::Regex(Regex::new(r"-").unwrap())),
+        // first segment should remove all dashes and thus give the next run a confidence of 100
+        Segment::Remove(Using::Regex(Regex::new(r"Hello, world!").unwrap())), // i.e., don't run this one!
+    ]);
 
-    let trigger_instruction_neq = PipelineTriggerInstruction {
-        condition: PipelineTriggerCondition::NotEqual,
-        value: 50,
-    };
-    assert_eq!(trigger_instruction_neq.should_run(49), true);
-    assert_eq!(trigger_instruction_neq.should_run(51), true);
-    assert_eq!(trigger_instruction_neq.should_run(0), true);
-    assert_eq!(trigger_instruction_neq.should_run(100), true);
-    assert_eq!(trigger_instruction_neq.should_run(50), false);
+    // high confidence indicates that this pipeline should continue running; however, due to clamping it should not.
+    // the pipeline should stop after the first segment, and thus the confidence should be 100.
+    let results = pipeline.run(&alg, "-----Hello, world!-----", 696.9);
 
-    let trigger_instruction_always = PipelineTriggerInstruction {
-        condition: PipelineTriggerCondition::Always,
-        value: 50,
-    };
-    assert_eq!(trigger_instruction_always.should_run(1), true);
-    assert_eq!(trigger_instruction_always.should_run(49), true);
-    assert_eq!(trigger_instruction_always.should_run(50), true);
-    assert_eq!(trigger_instruction_always.should_run(100), true);
-    assert_eq!(trigger_instruction_always.should_run(99), true);
-
-
+    assert!(results.get(0).unwrap().confidence == 100.0);
+    assert!(results.get(0).unwrap().name == "test_license_5");
 }
 
 #[test]
-fn pipeline_action_modifies_correctly(){
-    let action_add = PipeLineAction {
-        action: PipelineActionType::Add,
-        value: 5,
-    };
-    assert_eq!(action_add.run(10), 15);
-    assert_eq!(action_add.run(0), 5);
-    assert_eq!(action_add.run(100), 100);
-    assert_eq!(action_add.run(255), 100);
-    assert_eq!(action_add.run(200), 100);
-    assert_eq!(action_add.run(95), 100);
+fn it_runs_multiple(){
+    let alg = create_testing_algorithm();
+    
+    let pipeline = Pipeline::new(vec![
+        Segment::Remove(Using::Regex(Regex::new(r"-").unwrap())),
+        Segment::Remove(Using::Regex(Regex::new(r"X").unwrap())),
+    ]);
 
-    let action_subtract = PipeLineAction {
-        action: PipelineActionType::Subtract,
-        value: 5,
-    };
-    assert_eq!(action_subtract.run(10), 5);
-    assert_eq!(action_subtract.run(5), 0);
-    assert_eq!(action_subtract.run(3), 0);
-    assert_eq!(action_subtract.run(1), 0);
-    assert_eq!(action_subtract.run(0), 0);
-    assert_eq!(action_subtract.run(255), 100);
-    assert_eq!(action_subtract.run(200), 100);
-    assert_eq!(action_subtract.run(105), 100);
-    assert_eq!(action_subtract.run(106), 100);
+    let results = pipeline.run(&alg, "-X-X-X-X-Hello, world!-X-X-X-X-", 100.0);
 
+    assert!(results.get(0).unwrap().confidence == 100.0);
+    assert!(results.get(0).unwrap().name == "test_license_5");
+}
 
+#[test]
+fn it_runs_remove_using_regex(){
+    let alg = create_testing_algorithm();
 
-    let action_set = PipeLineAction {
-        action: PipelineActionType::Set,
-        value: 5,
-    };
-    assert_eq!(action_set.run(10), 5);
-    assert_eq!(action_set.run(0), 5);
-    assert_eq!(action_set.run(100), 5);
-    assert_eq!(action_set.run(255), 5);
+    
+    let pipeline = Pipeline::new(vec![
+        Segment::Remove(Using::Regex(Regex::new(r"-").unwrap())),
+    ]);
 
-    let action_set = PipeLineAction {
-        action: PipelineActionType::Set,
-        value: 255,
-    };
-    assert_eq!(action_set.run(10), 100);
-    assert_eq!(action_set.run(0), 100);
-    assert_eq!(action_set.run(100), 100);
-    assert_eq!(action_set.run(255), 100);
+    let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
+
+    assert!(results.get(0).unwrap().confidence == 100.0);
+    assert!(results.get(0).unwrap().name == "test_license_5");
+}
+
+#[test]
+fn it_runs_remove_using_text(){
+    let alg = create_testing_algorithm();
+
+    
+    let pipeline = Pipeline::new(vec![
+        Segment::Remove(Using::Text("-".to_string())),
+    ]);
+
+    let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
+
+    assert!(results.get(0).unwrap().confidence == 100.0);
+    assert!(results.get(0).unwrap().name == "test_license_5");
+}
+
+#[test]
+fn it_executes_custom(){
+    let alg = create_testing_algorithm();
+
+    let pipeline = Pipeline::new(vec![
+        Segment::Custom(|x| x.replace("-", "")),
+    ]);
+
+    let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
+
+    assert!(results.get(0).unwrap().confidence == 100.0);
+    assert!(results.get(0).unwrap().name == "test_license_5");
+}
+
+#[test]
+fn it_executes_replace_using_regex(){
+    let alg = create_testing_algorithm();
+
+    let pipeline = Pipeline::new(vec![
+        Segment::Replace(Using::Regex(Regex::new(r"-").unwrap()), "".to_string()),
+    ]);
+
+    let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
+
+    assert!(results.get(0).unwrap().confidence == 100.0);
+    assert!(results.get(0).unwrap().name == "test_license_5");
+}
+
+#[test]
+fn it_executes_replace_using_text(){
+    let alg = create_testing_algorithm();
+
+    let pipeline = Pipeline::new(vec![
+        Segment::Replace(Using::Text("-".to_string()), "".to_string()),
+    ]);
+
+    let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
+
+    assert!(results.get(0).unwrap().confidence == 100.0);
+    assert!(results.get(0).unwrap().name == "test_license_5");
+}
+
+#[test]
+fn it_executes_batch(){
+    let alg = create_testing_algorithm();
+
+    let pipeline = Pipeline::new(vec![
+        Segment::Batch(vec![
+            Segment::Remove(Using::Regex(Regex::new(r"-").unwrap())),
+            Segment::Remove(Using::Regex(Regex::new(r"X").unwrap())),
+        ]),
+    ]);
+
+    let results = pipeline.run(&alg, "-X-X-X-X-Hello, world!-X-X-X-X-", 100.0);
+
+    assert!(results.get(0).unwrap().confidence == 100.0);
+    assert!(results.get(0).unwrap().name == "test_license_5");
 }
