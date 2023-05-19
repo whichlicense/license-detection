@@ -14,7 +14,7 @@ let mut gaoya = GaoyaDetection {
     shingle_text_size,
     normalization_fn: DEFAULT_NORMALIZATION_FN,
 };
-gaoya.load_from_file("licenses.json");
+gaoya.load_from_file("licenses");
 // OR: 
 // for l in load_licenses_from_folder("./licenses/RAW"){
 //     gaoya.add_plain(&l.name, &strip_spdx_heading(&l.text));
@@ -29,7 +29,7 @@ let mut fuzzy = FuzzyDetection {
         exit_on_exact_match: false,
         normalization_fn: DEFAULT_NORMALIZATION_FN,
 };
-fuzzy.load_from_file("licenses.json");
+fuzzy.load_from_file("licenses");
 // OR: 
 // for l in load_licenses_from_folder("./licenses/RAW"){
 //     fuzzy.add_plain(&l.name, &strip_spdx_heading(&l.text));

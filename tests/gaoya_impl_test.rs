@@ -17,7 +17,6 @@
 
 use std::{fs::File, io::{Read, BufReader}, path::Path, vec};
 use gaoya::{minhash::{MinHashIndex, MinHasher32, MinHasher}, text::shingle_text};
-use serde_json::json;
 use whichlicense_detection::{*, detecting::gaoya_implementation::gaoya_implementation::GaoyaDetection};
 
 #[test]
@@ -329,23 +328,31 @@ fn it_saves_to_file(){
     };
     gaoya.add_plain("test_license", "This is a test license");
 
-    gaoya.save_to_file("./test_db.json");
+    gaoya.save_to_file("./test_db");
 
     // assert that file exists
-    assert!(Path::new("./test_db.json").try_exists().is_ok());
+    assert!(Path::new("./test_db").try_exists().is_ok());
 }
 
 #[test]
 fn it_loads_from_saved_file(){
+    let mut old = GaoyaDetection {
+        index: MinHashIndex::new(42, 3, 0.5),
+        min_hasher: MinHasher32::new(42 * 3),
+        shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
+    };
+    old.add_plain("test_license", "This is a test license");
+    old.save_to_file("./test_db");
+
+
     let mut gaoya = GaoyaDetection {
         index: MinHashIndex::new(42, 3, 0.5),
         min_hasher: MinHasher32::new(42 * 3),
         shingle_text_size: 50,
         normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
-    gaoya.add_plain("test_license", "This is a test license");
-    gaoya.save_to_file("./test_db.json");
-    gaoya.load_from_file("./test_db.json");
+    gaoya.load_from_file("./test_db");
 
     assert!(gaoya.index.get_id_signature_map().contains_key("test_license"));
     assert!(gaoya.index.get_id_signature_map().get("test_license").unwrap().len() > 0);
@@ -383,16 +390,19 @@ fn it_loads_from_inline_string(){
         &strip_license(&strip_spdx_heading(&"This is a test license")),
         gaoya.shingle_text_size,
     ));
-    gaoya.load_from_inline_string(&json!(
-        {
-            "licenses": [
-                {
-                    "name": "test_license",
-                    "hash": signature
+
+    let raw = bincode::serialize(
+        &DiskData {
+            licenses: vec![
+                LicenseEntry {
+                    name: String::from("test_license"),
+                    hash: signature
                 }
             ]
         }
-    ).to_string());
+    ).unwrap();
+
+    gaoya.load_from_memory(raw);
 
     assert!(gaoya.index.get_id_signature_map().contains_key("test_license"));
     assert!(gaoya.index.get_id_signature_map().get("test_license").unwrap().len() > 0);
@@ -434,4 +444,23 @@ fn it_changes_normalization_fn(){
         // should pass matching, normalization fn removes all "X" characters.
         gaoya.match_by_plain_text("XXXXXXXXXXXXXXXXXXXXXXXTHIS IS A TEST LICENSEXXXXXXXXXXXXXXXXXXXXXXX").iter().any(|x| x.name == "test_license"),
     );    
+}
+
+#[test]
+fn it_gets_license_list(){
+    let mut gaoya = GaoyaDetection {
+        index: MinHashIndex::new(42, 3, 0.5),
+        min_hasher: MinHasher32::new(42 * 3),
+        shingle_text_size: 50,
+        normalization_fn: |x| x.to_string(),
+    };
+
+    gaoya.add_plain("test_license", "This is a test license");
+    gaoya.add_plain("test_license_2", "This is a test license 2");
+
+    let list = gaoya.get_license_list();
+
+    assert!(list.len() == 2);
+    assert!(list.iter().any(|x| x.0 == "test_license" && !x.1.is_empty()));
+    assert!(list.iter().any(|x| x.0 == "test_license_2" && !x.1.is_empty()));
 }

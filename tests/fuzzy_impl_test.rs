@@ -16,8 +16,7 @@
 */
 
 use std::{fs::File, io::{Read, BufReader}, path::Path};
-use serde_json::json;
-use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implementation::{FuzzyDetection, ComputedLicense}};
+use whichlicense_detection::{*, detecting::fuzzy_implementation::fuzzy_implementation::{FuzzyDetection}};
 
 #[test]
 fn it_finds_exact_match() {
@@ -325,23 +324,32 @@ fn it_saves_to_file(){
     };
     fuzzy.add_plain("test_license", "This is a test license");
 
-    fuzzy.save_to_file("./test_db.json");
+    fuzzy.save_to_file("./test_db");
 
     // assert that file exists
-    assert!(Path::new("./test_db.json").try_exists().is_ok());
+    assert!(Path::new("./test_db").try_exists().is_ok());
 }
 
 #[test]
 fn it_loads_from_saved_file(){
-    let mut fuzzy = FuzzyDetection {
+    let mut old = FuzzyDetection {
         licenses: vec![],
         min_confidence: 50,
         exit_on_exact_match: false,
         normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
-    fuzzy.add_plain("test_license", "This is a test license");
-    fuzzy.save_to_file("./test_db.json");
-    fuzzy.load_from_file("./test_db.json");
+    old.add_plain("test_license", "This is a test license");
+    old.save_to_file("./test_db_2");
+
+
+
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
+    };    
+    fuzzy.load_from_file("./test_db_2");
 
     assert!(fuzzy.licenses.len() == 1);
     assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
@@ -349,7 +357,7 @@ fn it_loads_from_saved_file(){
 }
 
 #[test]
-fn it_loads_from_inline_string(){
+fn it_loads_from_memory(){
     let mut fuzzy = FuzzyDetection {
         licenses: vec![],
         min_confidence: 50,
@@ -357,16 +365,18 @@ fn it_loads_from_inline_string(){
         normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
-    fuzzy.load_from_inline_string(&json!(
-        {
-            "licenses": [
-                {
-                    "name": "test_license",
-                    "hash": "This is a test license"
+    let raw = bincode::serialize(
+        &DiskData {
+            licenses: vec![
+                LicenseEntry {
+                    name: String::from("test_license"),
+                    hash: String::from("This is a test license")
                 }
             ]
         }
-    ).to_string());
+    ).unwrap();
+
+    fuzzy.load_from_memory(raw);
 
     assert!(fuzzy.licenses.len() == 1);
     assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));
@@ -396,7 +406,7 @@ fn it_hashes_from_inline_string(){
         normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
     let res = fuzzy.hash_from_inline_string("This is a test license");
-    fuzzy.licenses.push(ComputedLicense {
+    fuzzy.licenses.push(LicenseEntry {
         name: String::from("test_license"),
         hash: res.clone(),
     });
@@ -428,4 +438,23 @@ fn it_changes_normalization_fn(){
         // should pass, normalization fn lowercases text to match stored license.
         fuzzy.match_by_plain_text("THIS IS A TEST LICENSE").iter().any(|x| x.name == "test_license"),
     );
+}
+
+#[test]
+fn it_gets_license_list(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+        normalization_fn: |x| x.to_string(),
+    };
+
+    fuzzy.add_plain("test_license", "this is a test license");
+    fuzzy.add_plain("test_license_2", "this is a test license 2");
+
+    let list = fuzzy.get_license_list();
+
+    assert!(list.len() == 2);
+    assert!(list.iter().any(|x| x.0 == "test_license" && !x.1.is_empty()));
+    assert!(list.iter().any(|x| x.0 == "test_license_2" && !x.1.is_empty()));
 }

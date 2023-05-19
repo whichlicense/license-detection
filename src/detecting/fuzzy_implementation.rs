@@ -16,25 +16,17 @@
 */
 
 pub mod fuzzy_implementation {
-    use std::{
-        fs::File,
-        io::{Read, Write},
-    };
+    use std::{fs::File, io::Read};
 
     use fuzzyhash::FuzzyHash;
 
-    use serde::{Deserialize, Serialize};
-
-    use crate::{detecting::detecting::DiskData, LicenseListActions, LicenseMatch};
-
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    pub struct ComputedLicense {
-        pub name: String,
-        pub hash: String,
-    }
+    use crate::{
+        detecting::detecting::{DiskData, LicenseEntry},
+        LicenseListActions, LicenseMatch,
+    };
 
     pub struct FuzzyDetection {
-        pub licenses: Vec<ComputedLicense>,
+        pub licenses: Vec<LicenseEntry<String>>,
         pub min_confidence: u8,
         pub exit_on_exact_match: bool,
 
@@ -67,36 +59,32 @@ pub mod fuzzy_implementation {
             matches
         }
 
-        fn save_to_file(&self, file_path: &str) {
-            let serialized = serde_json::to_string::<DiskData<ComputedLicense>>(&DiskData {
-                licenses: self.licenses.clone(),
-            })
-            .unwrap();
-            let mut file = File::create(file_path).unwrap();
-            file.write_all(serialized.as_bytes()).unwrap();
+        fn get_license_list(&self) -> Vec<(String, String)> {
+            self.licenses
+                .iter()
+                .map(|l| (l.name.to_string(), l.hash.to_string()))
+                .collect()
+        }
+
+        fn load_from_memory(&mut self, raw: Vec<u8>) {
+            let loaded: DiskData<String> = bincode::deserialize(&raw).unwrap_or(DiskData {
+                licenses: Vec::new(),
+            });
+            self.licenses.extend(loaded.licenses);
         }
 
         fn load_from_file(&mut self, file_path: &str) {
             let mut file = File::open(file_path).unwrap();
-            let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
+            let mut contents = Vec::new();
+            file.read_to_end(&mut contents).unwrap();
 
-            self.load_from_inline_string(&contents);
-        }
-
-        fn load_from_inline_string(&mut self, json: &str) {
-            let loaded =
-                serde_json::from_str::<DiskData<ComputedLicense>>(json).unwrap_or(DiskData {
-                    licenses: Vec::new(),
-                });
-            self.licenses.clear();
-            self.licenses.extend(loaded.licenses);
+            self.load_from_memory(contents);
         }
 
         fn add_plain(&mut self, license_name: &str, license_text: &str) {
             let stripped = (self.normalization_fn)(license_text);
             let fuzzy = FuzzyHash::new(stripped);
-            self.licenses.push(ComputedLicense {
+            self.licenses.push(LicenseEntry {
                 name: license_name.to_string(),
                 hash: fuzzy.to_string(),
             });

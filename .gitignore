@@ -6,3 +6,5 @@ licenses/RAW/**
 src/test1.txt
 src/test2.txt
 test_db.json
+test_db
+test_db_2

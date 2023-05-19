@@ -16,26 +16,21 @@
 */
 
 pub mod gaoya_implementation {
-    use std::{
-        fs::File,
-        hash::BuildHasherDefault,
-        io::{Read, Write},
-    };
+    use std::{fs::File, hash::BuildHasherDefault, io::Read};
 
     use gaoya::{
         minhash::{MinHashIndex, MinHasher, MinHasher32},
         text::shingle_text,
     };
-    use serde::{Deserialize, Serialize};
 
     use crate::{detecting::detecting::DiskData, LicenseListActions, LicenseMatch};
 
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    /// How the contents of the JSON db looks like, used for parsing purposes.
-    struct _GaoyaComputedLicense {
-        name: String,
-        hash: Vec<u32>,
-    }
+    // #[derive(Serialize, Deserialize, Debug, Clone)]
+    // /// How the contents of the JSON db looks like, used for parsing purposes.
+    // struct _GaoyaComputedLicense {
+    //     name: String,
+    //     hash: Vec<u32>,
+    // }
 
     pub struct GaoyaDetection {
         pub index: MinHashIndex<u32, String>,
@@ -75,43 +70,28 @@ pub mod gaoya_implementation {
             matches
         }
 
-        fn save_to_file(&self, file_path: &str) {
-            let mut file = File::create(file_path).unwrap();
-            let mut licenses: Vec<_GaoyaComputedLicense> = Vec::new();
-            for (name, hash) in self.index.get_id_signature_map().iter() {
-                licenses.push(_GaoyaComputedLicense {
-                    name: name.clone(),
-                    hash: hash.clone(),
-                });
-            }
-            let raw = DiskData { licenses };
-            let json = serde_json::to_string(&raw).unwrap();
-            file.write_all(json.as_bytes()).unwrap();
+        fn get_license_list(&self) -> Vec<(String, Vec<u32>)> {
+            self.index
+                .get_id_signature_map()
+                .iter()
+                .map(|(name, hash)| (name.clone(), hash.clone()))
+                .collect()
         }
 
         fn load_from_file(&mut self, file_path: &str) {
             let mut file = File::open(file_path).unwrap();
-            let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
+            let mut contents = Vec::new();
+            file.read_to_end(&mut contents).unwrap();
 
-            let loaded = serde_json::from_str::<DiskData<_GaoyaComputedLicense>>(&contents)
-                .unwrap_or(DiskData {
-                    licenses: Vec::new(),
-                });
-            for license in loaded.licenses {
-                self.index.insert(license.name, license.hash);
-            }
+            self.load_from_memory(contents);
         }
 
-        fn load_from_inline_string(&mut self, json: &str) {
-            let loaded: DiskData<_GaoyaComputedLicense> = serde_json::from_str::<
-                DiskData<_GaoyaComputedLicense>,
-            >(&json)
-            .unwrap_or(DiskData {
+        fn load_from_memory(&mut self, raw: Vec<u8>) {
+            let decoded: DiskData<Vec<u32>> = bincode::deserialize(&raw[..]).unwrap_or(DiskData {
                 licenses: Vec::new(),
             });
-            for license in loaded.licenses {
-                self.index.insert(license.name, license.hash);
+            for l in decoded.licenses {
+                self.index.insert(l.name, l.hash);
             }
         }
 

@@ -1,8 +1,0 @@
-licenses/RAW/**
-.DS_Store
-TEST_LICENSE_1
-TEST_LICENSE_2
-x.ts
-PERSONAL_TODO.md
-coverage/**
-speed_v_accuracy.csv

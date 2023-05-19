@@ -16,6 +16,8 @@
 */
 
 pub mod pipeline {
+    use serde::Serialize;
+
     use crate::{LicenseListActions, LicenseMatch};
 
     pub enum Using {
@@ -116,7 +118,7 @@ pub mod pipeline {
         /// 
         /// > The confidence is a value between 0 and 100 (inclusive). 
         /// Any values outside of this range will be clamped to the nearest acceptable value.
-        pub fn run<T>(&self, alg: &dyn LicenseListActions<T>, incoming_license: &str, desired_confidence: f32) -> Vec<Vec<LicenseMatch>> {
+        pub fn run<T: Serialize>(&self, alg: &dyn LicenseListActions<T>, incoming_license: &str, desired_confidence: f32) -> Vec<Vec<LicenseMatch>> {
             let desired_confidence = desired_confidence.clamp(0.0, 100.0);
 
             let mut piped_string = incoming_license.to_string();
