@@ -24,7 +24,7 @@ pub mod detecting {
     use serde::{Serialize, Deserialize};
     use crate::strip_license;
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct LicenseMatch {
         pub name: String,
         pub confidence: f32,
