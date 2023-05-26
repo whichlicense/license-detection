@@ -31,7 +31,7 @@ pub mod pipeline {
         /// > The running license always starts off as the incoming license.
         Remove(Using),
         Replace(Using, String),
-        Custom(fn (&str) -> String),
+        Custom(Box<dyn Fn(&str) -> String>),
 
         /// Executes multiple segment actions before testing on the algorithm.
         Batch(Vec<Segment>),

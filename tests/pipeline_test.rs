@@ -107,7 +107,23 @@ fn it_executes_custom(){
     let alg = create_testing_algorithm();
 
     let pipeline = Pipeline::new(vec![
-        Segment::Custom(|x| x.replace("-", "")),
+        Segment::Custom(Box::new(|x| x.replace("-", ""))),
+    ]);
+
+    let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
+
+    assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
+    assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
+}
+
+#[test]
+fn it_executed_custom_with_external_data(){
+    let alg = create_testing_algorithm();
+
+    let replacer = "-";
+
+    let pipeline = Pipeline::new(vec![
+        Segment::Custom(Box::new(move |x| x.replace(replacer, ""))),
     ]);
 
     let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
