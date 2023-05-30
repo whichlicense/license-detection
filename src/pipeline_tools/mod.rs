@@ -37,24 +37,24 @@ pub mod pipeline {
         Batch(Vec<Segment>),
     }
     impl Segment {
-        fn execute(&self, string: &str) -> String {
+        fn execute(&self, incoming_string: &str) -> String {
             match self {
                 Self::Remove(using) => match using {
-                    Using::Regex(re) => re.replace_all(string, "").to_string(),
-                    Using::Text(text) => string.replace(text, ""),
+                    Using::Regex(re) => re.replace_all(incoming_string, "").to_string(),
+                    Using::Text(text) => incoming_string.replace(text, ""),
                 },
                 Self::Batch(actions) => {
-                    let mut license = string.to_string();
+                    let mut license = incoming_string.to_string();
                     for action in actions.iter() {
                         license = action.execute(&license);
                     }
                     license
                 }
                 Self::Replace(using, replacement) => match using {
-                    Using::Regex(re) => re.replace_all(string, replacement).to_string(),
-                    Using::Text(text) => string.replace(text, replacement),
+                    Using::Regex(re) => re.replace_all(incoming_string, replacement).to_string(),
+                    Using::Text(text) => incoming_string.replace(text, replacement),
                 },
-                Self::Custom(func) => func(string),
+                Self::Custom(func) => func(incoming_string),
             }
         }
     }
