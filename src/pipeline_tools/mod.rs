@@ -31,13 +31,14 @@ pub mod pipeline {
         /// > The running license always starts off as the incoming license.
         Remove(Using),
         Replace(Using, String),
-        Custom(Box<dyn Fn(&str) -> String>),
+
+        Custom(Box<dyn Fn(&str, &Vec<Vec<LicenseMatch>>) -> String>),
 
         /// Executes multiple segment actions before testing on the algorithm.
         Batch(Vec<Segment>),
     }
     impl Segment {
-        fn execute(&self, incoming_string: &str) -> String {
+        fn execute(&self, incoming_string: &str, previous_matches: &Vec<Vec<LicenseMatch>>) -> String {
             match self {
                 Self::Remove(using) => match using {
                     Using::Regex(re) => re.replace_all(incoming_string, "").to_string(),
@@ -46,7 +47,7 @@ pub mod pipeline {
                 Self::Batch(actions) => {
                     let mut license = incoming_string.to_string();
                     for action in actions.iter() {
-                        license = action.execute(&license);
+                        license = action.execute(&license, previous_matches);
                     }
                     license
                 }
@@ -54,7 +55,7 @@ pub mod pipeline {
                     Using::Regex(re) => re.replace_all(incoming_string, replacement).to_string(),
                     Using::Text(text) => incoming_string.replace(text, replacement),
                 },
-                Self::Custom(func) => func(incoming_string),
+                Self::Custom(func) => func(incoming_string, previous_matches),
             }
         }
     }
@@ -113,13 +114,14 @@ pub mod pipeline {
         /// # Arguments
         /// * `alg` - The algorithm to use for matching.
         /// * `incoming_license` - The license to run the pipeline on.
-        /// * `desired_confidence` - The threshold at which the pipeline will stop running. 
+        /// * `desired_confidence` - The threshold at which the pipeline will stop running. Values above 100 will ensure the pipeline runs to completion. 
         /// > I.e., if the confidence of ***the top (highest confidence) license*** is above this threshold, the pipeline will stop running.
         /// 
         /// > The confidence is a value between 0 and 100 (inclusive). 
-        /// Any values outside of this range will be clamped to the nearest acceptable value.
+        /// Any value below 0 will be treated as 0 and any value above 100 will be clamped to 101, indicating that this pipeline will run to completion with no
+        /// short circuits.
         pub fn run<T: Serialize>(&self, alg: &dyn LicenseListActions<T>, incoming_license: &str, desired_confidence: f32) -> Vec<Vec<LicenseMatch>> {
-            let desired_confidence = desired_confidence.clamp(0.0, 100.0);
+            let desired_confidence = desired_confidence.clamp(0.0, 101.0);
 
             let mut piped_string = incoming_license.to_string();
             let mut alg_match_results = alg.match_by_plain_text(&piped_string);
@@ -128,7 +130,7 @@ pub mod pipeline {
                 None => 0.0,
             };
 
-            let mut pipeline_results = Vec::with_capacity(self.segments.len());
+            let mut pipeline_results: Vec<Vec<LicenseMatch>> = Vec::with_capacity(self.segments.len());
             pipeline_results.push(alg_match_results);
 
             if top_match_confidence >= desired_confidence {
@@ -136,7 +138,7 @@ pub mod pipeline {
             }
 
             for segment in self.segments.iter() {
-                piped_string = segment.execute(&piped_string);
+                piped_string = segment.execute(&piped_string, &pipeline_results);
                 alg_match_results = alg.match_by_plain_text(&piped_string);
 
                 top_match_confidence = match alg_match_results.get(0) {

@@ -38,20 +38,18 @@ fn create_testing_algorithm()-> FuzzyDetection {
 
 
 #[test]
-fn it_clamps_run_confidence(){
+fn it_runs_to_completion_on_confidence_above_100(){
     let alg = create_testing_algorithm();
     
     let pipeline = Pipeline::new(vec![
-        Segment::Remove(Using::Regex(Regex::new(r"-").unwrap())),
-        // first segment should remove all dashes and thus give the next run a confidence of 100
-        Segment::Remove(Using::Regex(Regex::new(r"Hello, world!").unwrap())), // i.e., don't run this one!
+        Segment::Remove(Using::Regex(Regex::new(r"-").unwrap())), // 100% due to removal of all "-""
+        Segment::Remove(Using::Regex(Regex::new(r"Hello, world!").unwrap())), // makes text empty, 0%
+        Segment::Custom(Box::new(|_, _| "Hello, world!".to_string())) // makes text Hello, world!, 100% confidence again.
     ]);
 
-    // high confidence indicates that this pipeline should continue running; however, due to clamping it should not.
-    // the pipeline should stop after the first segment, and thus the confidence should be 100.
     let results = pipeline.run(&alg, "-----Hello, world!-----", 696.9);
 
-    assert!(results.len() == 2);
+    assert!(results.len() == 4);
 
     assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
     assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
@@ -107,7 +105,7 @@ fn it_executes_custom(){
     let alg = create_testing_algorithm();
 
     let pipeline = Pipeline::new(vec![
-        Segment::Custom(Box::new(|x| x.replace("-", ""))),
+        Segment::Custom(Box::new(|x, _pm| x.replace("-", ""))),
     ]);
 
     let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
@@ -123,13 +121,40 @@ fn it_executed_custom_with_external_data(){
     let replacer = "-";
 
     let pipeline = Pipeline::new(vec![
-        Segment::Custom(Box::new(move |x| x.replace(replacer, ""))),
+        Segment::Custom(Box::new(move |x, _pm| x.replace(replacer, ""))),
     ]);
 
     let results = pipeline.run(&alg, "-----Hello, world!-----", 100.0);
 
     assert!(results.last().unwrap().get(0).unwrap().confidence == 100.0);
     assert!(results.last().unwrap().get(0).unwrap().name == "test_license_5");
+}
+
+#[test]
+fn it_passes_previous_matches_in_custom(){
+    let alg = create_testing_algorithm();
+
+    let pipeline = Pipeline::new(vec![
+        Segment::Remove(Using::Regex(Regex::new(r"-").unwrap())), // 100% due to removal of all "-""
+        Segment::Remove(Using::Regex(Regex::new(r"Hello, world!").unwrap())), // makes text empty, 0%
+        Segment::Custom(Box::new(|_, pm| {
+            // first segment is at index 1 since the first element in the vector is the initial test against the algorithm (i.e., before any segment is executed).
+            let first_segment_result = pm.get(1).unwrap().first().unwrap();
+            assert!(first_segment_result.confidence == 100.0);
+            assert!(first_segment_result.name == "test_license_5");
+
+            // assert that the second segment is empty. (no matches)
+            // since the last entry always points to the previous segment, we call last() to get the final element.
+            assert!(pm.last().unwrap().is_empty());
+            
+            "Hello, world!".to_string()
+        }))
+    ]);
+
+    let results = pipeline.run(&alg, "-----Hello, world!-----", 696.9);
+
+    // ensure that all pipelines ran.
+    assert!(results.len() == 4);
 }
 
 #[test]
