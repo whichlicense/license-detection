@@ -335,6 +335,35 @@ fn it_saves_to_file(){
 }
 
 #[test]
+fn it_saves_to_memory(){
+    let mut gaoya = GaoyaDetection {
+        index: MinHashIndex::new(42, 3, 0.5),
+        min_hasher: MinHasher32::new(42 * 3),
+        shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
+    };
+    gaoya.add_plain("test_license", "This is a test license");
+
+    let buffer = gaoya.save_to_memory();
+
+    assert!(buffer.len() > 0);
+
+    // it loads back?
+    let mut g2 = GaoyaDetection {
+        index: MinHashIndex::new(42, 3, 0.5),
+        min_hasher: MinHasher32::new(42 * 3),
+        shingle_text_size: 50,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
+    };
+
+    g2.load_from_memory(buffer);
+
+    let x = g2.match_by_plain_text("This is a test license");
+    assert!(x.len() > 0);
+    assert!(x[0].confidence == 100.0);
+}
+
+#[test]
 fn it_loads_from_saved_file(){
     let mut old = GaoyaDetection {
         index: MinHashIndex::new(42, 3, 0.5),

@@ -331,6 +331,34 @@ fn it_saves_to_file(){
 }
 
 #[test]
+fn it_saves_to_memory(){
+    let mut fuzzy = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
+    };
+    fuzzy.add_plain("test_license", "This is a test license");
+
+    let buffer = fuzzy.save_to_memory();
+
+    assert!(buffer.len() > 0);
+
+    let mut f2 = FuzzyDetection {
+        licenses: vec![],
+        min_confidence: 50,
+        exit_on_exact_match: false,
+        normalization_fn: DEFAULT_NORMALIZATION_FN,
+    };
+    f2.load_from_memory(buffer);
+
+    assert!(f2.licenses.len() == 1);
+    let x = f2.match_by_plain_text("This is a test license");
+    assert!(x.len() > 0);
+    assert!(x[0].confidence == 100.0);
+}
+
+#[test]
 fn it_loads_from_saved_file(){
     let mut old = FuzzyDetection {
         licenses: vec![],

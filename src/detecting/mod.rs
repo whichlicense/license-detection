@@ -66,6 +66,17 @@ pub mod detecting {
             file.write_all(&raw).unwrap();
         }
 
+        fn save_to_memory(&self) -> Vec<u8> {
+            let binding = self.get_license_list();
+            let data = DiskData {
+                licenses: binding.iter().map(|(name, hash)| LicenseEntry {
+                    name: name.clone(),
+                    hash: hash.clone(),
+                }).collect(),
+            };
+            bincode::serialize(&data).unwrap()
+        }
+
         /// Loads a computed license list from a file and stores it in the hosting struct.
         fn load_from_file(&mut self, file_path: &str);
 
