@@ -83,10 +83,10 @@ pub mod gaoya_implementation {
             let mut contents = Vec::new();
             file.read_to_end(&mut contents).unwrap();
 
-            self.load_from_memory(contents);
+            self.load_from_memory(&contents);
         }
 
-        fn load_from_memory(&mut self, raw: Vec<u8>) {
+        fn load_from_memory(&mut self, raw: &Vec<u8>) {
             let decoded: DiskData<Vec<u32>> = bincode::deserialize(&raw[..]).unwrap_or(DiskData {
                 licenses: Vec::new(),
             });

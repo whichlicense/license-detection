@@ -356,7 +356,7 @@ fn it_saves_to_memory(){
         normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
 
-    g2.load_from_memory(buffer);
+    g2.load_from_memory(&buffer);
 
     let x = g2.match_by_plain_text("This is a test license");
     assert!(x.len() > 0);
@@ -431,7 +431,7 @@ fn it_loads_from_inline_string(){
         }
     ).unwrap();
 
-    gaoya.load_from_memory(raw);
+    gaoya.load_from_memory(&raw);
 
     assert!(gaoya.index.get_id_signature_map().contains_key("test_license"));
     assert!(gaoya.index.get_id_signature_map().get("test_license").unwrap().len() > 0);

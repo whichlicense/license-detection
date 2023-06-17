@@ -350,7 +350,7 @@ fn it_saves_to_memory(){
         exit_on_exact_match: false,
         normalization_fn: DEFAULT_NORMALIZATION_FN,
     };
-    f2.load_from_memory(buffer);
+    f2.load_from_memory(&buffer);
 
     assert!(f2.licenses.len() == 1);
     let x = f2.match_by_plain_text("This is a test license");
@@ -404,7 +404,7 @@ fn it_loads_from_memory(){
         }
     ).unwrap();
 
-    fuzzy.load_from_memory(raw);
+    fuzzy.load_from_memory(&raw);
 
     assert!(fuzzy.licenses.len() == 1);
     assert_eq!(fuzzy.licenses[0].name, String::from("test_license"));

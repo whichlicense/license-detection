@@ -66,7 +66,7 @@ pub mod fuzzy_implementation {
                 .collect()
         }
 
-        fn load_from_memory(&mut self, raw: Vec<u8>) {
+        fn load_from_memory(&mut self, raw: &Vec<u8>) {
             let loaded: DiskData<String> = bincode::deserialize(&raw).unwrap_or(DiskData {
                 licenses: Vec::new(),
             });
@@ -78,7 +78,7 @@ pub mod fuzzy_implementation {
             let mut contents = Vec::new();
             file.read_to_end(&mut contents).unwrap();
 
-            self.load_from_memory(contents);
+            self.load_from_memory(&contents);
         }
 
         fn add_plain(&mut self, license_name: &str, license_text: &str) {

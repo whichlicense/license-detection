@@ -81,7 +81,7 @@ pub mod detecting {
         fn load_from_file(&mut self, file_path: &str);
 
         /// Loads a computed license list from a stored byte vector and stores it in the hosting struct.
-        fn load_from_memory(&mut self, raw: Vec<u8>);
+        fn load_from_memory(&mut self, raw: &Vec<u8>);
 
         /// Adds a license that has yet to be computed to the list.
         /// 
